@@ -1,0 +1,154 @@
+version: '3.8'
+
+
+services:
+  # ======================================================================
+  # 1. SERVIÇO DE APLICAÇÃO (WALLET-SERVICE)
+  # ======================================================================
+  wallet-service-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wallet_service:latest
+    container_name: cont-wallet-service-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080" # Porta da aplicação
+      - "5005:5005" # Porta do debug
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'        # Limite de 1 CPU
+          memory: 640M       # Limite de 512 MB de memória
+        reservations:
+          cpus: '0.25'       # Reserva de 0.25 CPU
+          memory: 400M       # Reserva de 128 MB de memória
+    volumes:
+      - wallet_service_data:/var/lib/wallet_service/data
+    # Variáveis de ambiente
+    environment:
+      SPRING_PROFILES_ACTIVE: dev  #values{ dev, hml, prd }
+      SERVICE_NAME: wallet-service-api
+#      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/wallet_db
+      SPRING_DATASOURCE_USERNAME: wallet_user
+      SPRING_DATASOURCE_PASSWORD: wallet_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    #      # Conexão com RabbitMQ
+#      SPRING_RABBITMQ_HOST: rabbitmq
+#      SPRING_RABBITMQ_PORT: 5672
+#      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"
+#      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
+    networks:
+      - wallet_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+#      rabbitmq:
+#        condition: service_started
+
+  # ======================================================================
+  # 2. BANCO DE DADOS (POSTGRESQL)
+  # ======================================================================
+  postgres:
+    image: postgres:15.3-alpine
+    container_name: cont-wallet-postgres
+    restart: unless-stopped
+    environment:
+      - TX=America/Sao_Paulo
+      - POSTGRES_DB= wallet_db
+      - POSTGRES_USER= wallet_user
+      - POSTGRES_PASSWORD= wallet_pass
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          memory: 640M         # Limite de 1 GB para o banco de dados
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wallet_user -d wallet_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wallet_network
+
+
+#  # ======================================================================
+#  # 3. IDE - POSTGRES ADMIN (PGADMIN4)
+#  # ======================================================================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: cont-wallet-pgadmin4
+    restart: unless-stopped
+    ports:
+      - "5050:80" # Porta para acessar o pgAdmin
+    deploy:
+      resources:
+        limits:
+          memory: 640M
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'mail@wallet.com'
+      PGADMIN_DEFAULT_PASSWORD: wallet_pass
+    depends_on:
+      - postgres
+
+
+#  # ======================================================================
+#  # 3. MESSAGE BROKER (RABBITMQ)
+#  # ======================================================================
+#  rabbitmq:
+#    image: rabbitmq:3-management-alpine
+#    container_name: cont-wallet-rabbitmq
+#    restart: unless-stopped
+#    ports:
+#      - "5672:5672" # Porta de comunicação AMQP
+#      - "15672:15672" # Porta da interface de gerenciamento (Web UI)
+#    networks:
+#      - wallet_network
+#    volumes:
+#      - rabbitmq_data:/var/lib/rabbitmq
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: cont-wallet-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - wallet_network
+
+
+  # ======================================================================
+  #    GRAFANA
+  # ======================================================================
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: cont-wallet-grafana
+    restart: unless-stopped
+    user: "472"
+    ports:
+      - "3000:3000"
+    #depends_on:
+    #  - prometheus
+    networks:
+      - wallet_network
+
+
+# ======================================================================
+# VOLUMES E REDES
+# ======================================================================
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  wallet_service_data:
+
+networks:
+  wallet_network:
+    driver: bridge
