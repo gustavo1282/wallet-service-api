@@ -1,3 +1,5 @@
+server:
+  port: '8080'
 controller:
   path:
     base: "/wallet-services-api/api"
@@ -26,12 +28,8 @@ spring:
         page-parameter: page
         size-parameter: size
 
-
-
 logging:
   level:
     org:
       springframework: DEBUG
     root: INFO
-server:
-  port: '8080'
