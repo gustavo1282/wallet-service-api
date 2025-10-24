@@ -3,7 +3,6 @@ com\guga\walletserviceapi\config\ResourceBadRequestException.class
 com\guga\walletserviceapi\controller\WalletOperatorController.class
 com\guga\walletserviceapi\repository\CustomerRepository.class
 com\guga\walletserviceapi\model\Wallet.class
-com\guga\walletserviceapi\controller\OpenApiConfig.class
 com\guga\walletserviceapi\config\SpringSecurityConfig.class
 com\guga\walletserviceapi\service\TransactionService$1.class
 com\guga\walletserviceapi\model\enums\TransactionType.class

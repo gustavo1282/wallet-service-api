@@ -25,6 +25,6 @@ jobs:
 
       # 3. Compila, testa e envia a análise para o SonarQube
       - name: Build e Análise com SonarQube
-        run: ./mvnw clean verify sonar:sonar \
-          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: mvn clean verify sonar:sonar \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
