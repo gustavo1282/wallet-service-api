@@ -6,25 +6,32 @@ on:
     branches: [ develop, main, feature/*, fix/* ]
   pull_request:
     branches: [ develop, main ]
+    types: [opened, synchronize, reopened]
 
 jobs:
-  sonar:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Baixa o código do repositório
-      - name: Checkout do código
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # ESSENCIAL: Permite que o Sonar analise o histórico completo
 
-      # 2. Instala o Java 17
-      - name: Configurar JDK 17
+      - name: Set up JDK 17 # Ajuste para a versão do seu Java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
 
-      # 3. Compila, testa e envia a análise para o SonarQube
-      - name: Build e Análise com SonarQube
-        run: mvn clean verify sonar:sonar \
-            -Dsonar.host.url=SONAR_HOST_URL \
-            -Dsonar.token=SONAR_TOKEN
+      - name: Build and Scan with Sonar
+        env:
+          # A URL do SonarCloud é padrão, mas você pode passar a sua aqui
+          # Caso esteja usando uma instância self-hosted
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+        run: |
+          # O comando limpa, executa os testes (jacoco gera o arquivo .exec) e depois o SonarScanner
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=gustavo1282_wallet-service-api \
+            -Dsonar.organization=gustavo1282 \
+            -Dsonar.host.url=https://sonarcloud.io
