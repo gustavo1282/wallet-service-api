@@ -32,6 +32,6 @@ jobs:
         run: |
           # O comando limpa, executa os testes (jacoco gera o arquivo .exec) e depois o SonarScanner
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=gustavo1282_wallet-service-api \
+            -Dsonar.projectKey=gustavo1282 \
             -Dsonar.organization=gustavo1282 \
             -Dsonar.host.url=https://sonarcloud.io
