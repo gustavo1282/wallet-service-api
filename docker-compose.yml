@@ -27,7 +27,7 @@ services:
       - wallet_service_data:/var/lib/wallet_service/data
     # Variáveis de ambiente
     environment:
-      SPRING_PROFILES_ACTIVE: dev  #values{ dev, hml, prd }
+      SPRING_PROFILES_ACTIVE: desenv  #values{ desenv, hml, prd }
       SERVICE_NAME: wallet-service-api
 #      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/wallet_db
