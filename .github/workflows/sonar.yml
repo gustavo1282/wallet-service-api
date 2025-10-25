@@ -39,7 +39,7 @@ jobs:
               -Dsonar.host.url=http://localhost:9000 \
               -P desenv
           else
-            ./mvnw clean verify sonar:sonar -DskipTests \
+            ./mvnw clean verify sonar:sonar -DskipTests -X \
               -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
               -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
               -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
