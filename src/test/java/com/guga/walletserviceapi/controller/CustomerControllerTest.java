@@ -1,18 +1,19 @@
 package com.guga.walletserviceapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guga.walletserviceapi.config.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.RandomGenerator;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.service.CustomerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,20 +21,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-// Levanta apenas a camada Web (Controller) para o teste
 @WebMvcTest(CustomerController.class)
 @ActiveProfiles("test")
-//@TestPropertySource(properties = {
-//        "controller.path.base=/api/v1/customers"
-//})
+@AutoConfigureMockMvc(addFilters = false)
+@WithMockUser(username = "user", roles = {"USER"})
 class CustomerControllerTest {
 
     // Objeto usado para simular chamadas HTTP
@@ -48,12 +46,10 @@ class CustomerControllerTest {
     @MockitoBean
     private CustomerService customerService;
 
-    // O path base é definido no application.properties, mas o @WebMvcTest
-    // geralmente assume o path raiz, ou você pode configurá-lo.
     @Value("${controller.path.base}")
-    private final String BASE_PATH = "/customers";
+    private String BASE_PATH;
 
-    // --- 1. Testes para POST /customer ---
+    private String API_NAME = "customers";
 
     @Test
     @DisplayName("Deve retornar 201 Created ao criar um Customer com sucesso")
@@ -66,7 +62,7 @@ class CustomerControllerTest {
         when(customerService.saveCustomer(any(Customer.class))).thenReturn(customerCreated);
 
         // Act & Assert
-        mockMvc.perform(post(BASE_PATH + "/customer")
+        mockMvc.perform(post(BASE_PATH.concat("/customers/customer"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerInput)))
                 .andExpect(status().isCreated()) // Verifica o status HTTP 201
@@ -132,14 +128,14 @@ class CustomerControllerTest {
         Long customerId = 99L;
 
         // Simula uma exceção (como NotFoundException) que o Service levantaria
-        when(customerService.getCustomerById(customerId)).thenThrow(new RuntimeException("Customer not found"));
+        when(customerService.getCustomerById(customerId)).thenThrow(new ResourceNotFoundException("Customer not found"));
         // Nota: O tratamento de exceção no Controller precisaria ser mais robusto
         // para mapear a exceção do Service para 404, mas assumimos aqui o retorno padrão de erro.
 
         // Act & Assert
-        mockMvc.perform(get(BASE_PATH + "/{id}", customerId))
+        mockMvc.perform(get(BASE_PATH.concat("/customers") + "/{id}", customerId))
                 // Idealmente seria .andExpect(status().isNotFound()), dependendo do Exception Handler
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     // --- 3. Testes para PUT /{id} ---
