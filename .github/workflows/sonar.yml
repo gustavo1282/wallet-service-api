@@ -1,37 +1,45 @@
-name: SonarQube Analysis
+name: 🧠 SonarQube Analysis
 
 on:
-  workflow_dispatch:  # permite executar manualmente pelo botão "Run workflow"
   push:
-    branches: [ develop, main, feature/*, fix/* ]
+    branches: [ main, develop, feature/* ]
   pull_request:
-    branches: [ develop, main ]
-    types: [opened, synchronize, reopened]
+    branches: [ main, develop, feature/* ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  sonar:
+    name: 🔍 SonarQube Quality Scan
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # ESSENCIAL: Permite que o Sonar analise o histórico completo
 
-      - name: Set up JDK 17 # Ajuste para a versão do seu Java
+    strategy:
+      matrix:
+        profile: [ desenv, cloud ]
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: 17
           cache: 'maven'
 
-      - name: Build and Scan with Sonar
-        env:
-          # A URL do SonarCloud é padrão, mas você pode passar a sua aqui
-          # Caso esteja usando uma instância self-hosted
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+      - name: 🔨 Build and analyze
         run: |
-          # O comando limpa, executa os testes (jacoco gera o arquivo .exec) e depois o SonarScanner
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=wallet-service-api \
-            -Dsonar.organization=gustavo1282 \
-            -Dsonar.host.url=https://sonarcloud.io
+          if [ "${{ matrix.profile }}" == "desenv" ]; then
+            ./mvnw clean verify sonar:sonar -DskipTests \
+              -Dsonar.login=admin \
+              -Dsonar.password=admin123 \
+              -Dsonar.host.url=http://localhost:9000 \
+              -P desenv
+          else
+            ./mvnw clean verify sonar:sonar -DskipTests \
+              -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+              -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+              -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+              -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+              -P cloud
+          fi

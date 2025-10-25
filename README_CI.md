@@ -1,7 +1,7 @@
 # 🚀 Integração Contínua — Análise SonarQube
 
-Este pacote adiciona ao projeto **Wallet Service API** o workflow do **GitHub Actions**
-para realizar automaticamente a análise de qualidade de código via **SonarQube**.
+Este pacote adiciona ao projeto **Wallet Service API** o workflow do **GitHub Actions**  
+para realizar automaticamente a análise de qualidade de código via **SonarQube**, tanto em ambiente **local (Docker)** quanto na **nuvem (SonarCloud)**.
 
 ---
 
@@ -11,90 +11,153 @@ para realizar automaticamente a análise de qualidade de código via **SonarQube
 .github/
 └── workflows/
     └── sonar.yml
-README_CI.md
+ci.md
 ```
 
 ---
 
-## ⚙️ Passos para Configuração
+## ⚙️ Configuração dos Ambientes
 
-### 1️⃣ Criar os Secrets no GitHub
+### 🔹 1. Ambiente Local (SonarQube em Docker)
 
-1. Acesse o repositório no GitHub:  
-   👉 https://github.com/gustavo1282/wallet-service-api
+Use esta configuração quando quiser rodar o SonarQube localmente em sua máquina.
 
-2. Vá em **Settings → Secrets and variables → Actions**  
-   (ou **Settings → Actions → Secrets and variables** em versões mais novas).
+#### 🧩 Pré-requisitos
 
-3. Clique em **New repository secret** e adicione:
+- Docker instalado
+- Maven configurado (ou wrapper `./mvnw`)
+- SonarQube rodando localmente
+
+#### ▶️ Subindo o SonarQube Local
+
+```bash
+docker run -d --name sonarqube -p 9000:9000 sonarqube:lts
+```
+
+Verifique se está rodando:
+```bash
+docker ps | grep sonarqube
+```
+
+Acesse em: [http://localhost:9000](http://localhost:9000)  
+Login padrão: `admin` / `admin`
+
+#### ▶️ Executando a análise localmente
+
+```bash
+mvn clean verify sonar:sonar -DskipTests \
+  -Dsonar.login=admin \
+  -Dsonar.password=admin123 \
+  -Dsonar.host.url=http://localhost:9000 \
+  -P desenv
+```
+
+Isso executará a análise com o perfil `desenv` e enviará os resultados para seu Sonar local.
+
+---
+
+### 🔹 2. Ambiente Cloud (GitHub Actions + SonarCloud)
+
+Use este modo para que o **GitHub Actions** execute a análise e envie os resultados para o **SonarCloud** automaticamente.
+
+#### 🧩 Configuração dos Secrets
+
+No repositório do GitHub:
+
+1. Vá em **Settings → Secrets and variables → Actions**
+2. Clique em **New repository secret**
+3. Adicione os seguintes valores:
 
 | Nome | Valor | Descrição |
 |------|--------|------------|
-| `SONAR_HOST_URL` | `http://localhost:9000` | Endereço do seu servidor SonarQube |
-| `SONAR_TOKEN` | `SEU_TOKEN_GERADO_NO_SONAR` | Token pessoal gerado no painel do SonarQube |
+| `SONAR_HOST_URL` | `https://sonarcloud.io` | URL da instância do Sonar na nuvem |
+| `SONAR_TOKEN` | `seu_token_sonarcloud` | Token gerado no painel do SonarCloud |
+| `SONAR_ORGANIZATION` | `sua_organizacao` | (opcional) Nome da organização no SonarCloud |
+| `SONAR_PROJECT_KEY` | `wallet-service-api` | Chave do projeto cadastrada no SonarCloud |
 
 ---
 
-### 2️⃣ Criar o Workflow localmente
+## 🧩 Arquivo `.github/workflows/sonar.yml`
 
-Se a pasta `.github/workflows` ainda não existir, crie-a na raiz do projeto:
+```yaml
+name: 🧠 SonarQube Analysis
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  sonar:
+    name: 🔍 SonarQube Quality Scan
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        profile: [ desenv, cloud ]
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'maven'
+
+      - name: 🔨 Build and analyze
+        run: |
+          if [ "${{ matrix.profile }}" == "desenv" ]; then
+            ./mvnw clean verify sonar:sonar -DskipTests \
+              -Dsonar.login=admin \
+              -Dsonar.password=admin123 \
+              -Dsonar.host.url=http://localhost:9000 \
+              -P desenv
+          else
+            ./mvnw clean verify sonar:sonar -DskipTests \
+              -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+              -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+              -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+              -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+              -P cloud
+          fi
 ```
-mkdir -p .github/workflows
-```
-
-Coloque o arquivo `sonar.yml` dentro dela.
 
 ---
 
-### 3️⃣ Commitar e enviar ao repositório
+## 🧪 Execução Manual
 
-```bash
-git add .github/workflows/sonar.yml
-git commit -m "ci(sonar): adiciona workflow de análise SonarQube"
-git push origin feature/unit-tests-sonar
-```
-
----
-
-### 4️⃣ Executar o Workflow
-
-Após o push:
-1. Acesse a aba **Actions** do repositório no GitHub.  
-2. Clique em **SonarQube Analysis**.  
-3. Clique em **Run workflow** (graças ao `workflow_dispatch`).  
-4. Acompanhe os logs da execução.
+1. Vá até a aba **Actions** do repositório no GitHub
+2. Selecione o workflow **SonarQube Analysis**
+3. Clique em **Run workflow**
+4. Escolha o **profile** desejado (local ou cloud, conforme configurado)
+5. Acompanhe os logs da execução
 
 ---
 
-## 🧠 Detalhes Técnicos
+## ✅ Checklist de Verificação
 
-- **Pipeline base:** Ubuntu runner (Linux)
-- **Java:** versão 17 (Temurin)
-- **Trigger:** Push, Pull Request e manual (`workflow_dispatch`)
-- **Ferramentas:** Maven Wrapper (`./mvnw`) + Sonar Scanner Plugin
-- **Autenticação:** via Secrets (`SONAR_HOST_URL` e `SONAR_TOKEN`)
-
----
-
-## 🧩 Resultados da Análise
-
-Ao final da execução:
-- O GitHub Actions enviará o relatório ao servidor SonarQube.
-- Você poderá visualizar em:  
-  👉 `http://localhost:9000/projects`
+| Item | Verifique se... | Status |
+|------|------------------|--------|
+| Pasta `.github/workflows` existe | ✅ | |
+| Secrets foram criados no GitHub | ✅ | |
+| SonarQube local está rodando (porta 9000) | ✅ | |
+| SonarCloud possui o projeto configurado | ✅ | |
+| Token está válido e com permissões corretas | ✅ | |
 
 ---
 
-## ✅ Verificação
+## 🎯 Resumo
 
-| Item | Verifique se... |
-|------|------------------|
-| Pasta `.github/workflows` existe | ✅ |
-| Secrets foram criados no GitHub | ✅ |
-| SonarQube está rodando (porta 9000) | ✅ |
-| Token foi gerado e válido | ✅ |
+| Modo | Execução | Destino | Autenticação |
+|------|-----------|----------|---------------|
+| **Local (Docker)** | `mvn sonar:sonar -P desenv` | `http://localhost:9000` | admin / admin123 |
+| **Cloud (GitHub)** | GitHub Actions (CI) | `https://sonarcloud.io` | Token via Secrets |
 
 ---
 
-Pronto 🎯  
-Com isso, seu projeto **Wallet Service API** está integrado ao **SonarQube** via **GitHub Actions** com execução automática e manual.
+Com este setup, seu projeto **Wallet Service API** está preparado para análise de código tanto **localmente** quanto **em integração contínua via GitHub Actions**, com total flexibilidade para alternar entre perfis de execução. 🚀
