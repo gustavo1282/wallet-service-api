@@ -59,6 +59,6 @@ jobs:
               -Dsonar.projectKey=cloud-wallet-service-api \
               -Dsonar.organization=gustavo1282 \
               -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.login=081f360937c4128676addce4f5074cc5f554f9af \
+              -Dsonar.login=214710f028711557d94f54aab1be14a66a108294 \
               -P cloud
           fi
