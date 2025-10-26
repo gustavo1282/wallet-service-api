@@ -163,7 +163,7 @@ O projeto utiliza perfis Spring Boot para gerenciar ambientes:
 
 #### Via terminal
 ```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=desenv
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
 
 Rodar apenas o serviço localmente:
@@ -183,7 +183,7 @@ export SPRING_PROFILES_ACTIVE=prod
 ```
 
 ### Cada profile possui um arquivo de configuração específico:
-- application-desenv.yml
+- application-dev.yml
 - application-homolog.yml
 - application-prod.yml
 

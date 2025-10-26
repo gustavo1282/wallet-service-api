@@ -16,12 +16,9 @@ jobs:
       matrix:
         profile: [ desenv, cloud ]
 
-
     steps:
       - name: 🛒 Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # O Sonar exige histórico completo (full git history)
 
       - name: ☕ Set up JDK 17
         uses: actions/setup-java@v4
@@ -30,20 +27,7 @@ jobs:
           java-version: 17
           cache: 'maven'
 
-      # NOVO PASSO DE DEBUG
-      - name: Debug #: Imprimir Valores de Configuração
-        run: |
-          echo "Verificando as chaves de configuração (Valores sensíveis são mascarados):"
-          echo "PROJECT KEY: ${{ secrets.SONAR_PROJECT_KEY }}"
-          echo "ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}"
-          echo "HOST URL: ${{ secrets.SONAR_HOST_URL }}"
-          echo "SONAR TOKEN: ${{ secrets.SONAR_TOKEN }}" # Será mascarado
-        shell: bash
-
-
       - name: 🔨 Build and analyze
-        #env:
-        #  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           if [ "${{ matrix.profile }}" == "desenv" ]; then
             ./mvnw clean verify sonar:sonar -DskipTests \
@@ -52,7 +36,7 @@ jobs:
               -Dsonar.host.url=http://localhost:9000 \
               -P desenv
           else
-            ./mvnw clean verify sonar:sonar -DskipTests -X \
+            ./mvnw clean verify sonar:sonar -DskipTests \
               -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
               -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
               -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
