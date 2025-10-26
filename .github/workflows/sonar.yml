@@ -1,4 +1,4 @@
-name: 🧠 SonarQube Analysis
+name: 🧠 (Sonar) cloud-wallet-service-api
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
 
       - name: 🔨 Build and analyze
         #env:
-        #  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  ignorado
         run: |
           if [ "${{ matrix.profile }}" == "desenv" ]; then
             ./mvnw clean verify sonar:sonar -DskipTests \
