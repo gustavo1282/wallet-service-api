@@ -31,6 +31,17 @@ jobs:
           java-version: 17
           cache: 'maven'
 
+      # NOVO PASSO DE DEBUG
+      - name: Debug #: Imprimir Valores de Configuração
+        run: |
+          echo "Verificando as chaves de configuração (Valores sensíveis são mascarados):"
+          echo "PROJECT KEY: ${{ secrets.SONAR_PROJECT_KEY }}"
+          echo "ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}"
+          echo "HOST URL: ${{ secrets.SONAR_HOST_URL }}"
+          echo "SONAR TOKEN: ${{ secrets.SONAR_TOKEN }}" # Será mascarado
+        shell: bash
+
+
       - name: 🔨 Build and analyze
         #env:
         #  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
