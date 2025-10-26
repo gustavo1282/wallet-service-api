@@ -29,6 +29,19 @@
 
     <profiles>
         <profile>
+            <id>cloud</id>
+			<activation>
+              <activeByDefault>false</activeByDefault> 
+			</activation>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <log.level>INFO</log.level>
+            </properties>
+            <dependencies>
+            </dependencies>
+        </profile>
+		
+        <profile>
             <id>desenv</id>
             <properties>
                 <spring.profiles.active>desenv</spring.profiles.active>
@@ -39,17 +52,6 @@
             </dependencies>
             <build>
             </build>
-        </profile>
-
-        <profile>
-            <id>prod</id>
-            <properties>
-                <spring.profiles.active>prod</spring.profiles.active>
-                <sonar.token>wallet-service-api-sonar-token</sonar.token>
-                <log.level>INFO</log.level>
-            </properties>
-            <dependencies>
-            </dependencies>
         </profile>
     </profiles>
 
