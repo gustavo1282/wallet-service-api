@@ -9,7 +9,7 @@ on:
 
 jobs:
   sonar:
-    name: 🔍 SonarQube Quality Scan
+    name: 🔍 (Sonar) cloud-wallet-service-api
     runs-on: ubuntu-latest
 
     strategy:
