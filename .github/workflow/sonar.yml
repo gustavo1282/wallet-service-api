@@ -3,8 +3,6 @@ name: 🧠 SonarQube Analysis
 on:
   push:
     branches: [ main, develop, feature/* ]
-  pull_request:
-    branches: [ main, develop, feature/* ]
    # types: [ opened, synchronize, reopened ]
   workflow_dispatch:
 
