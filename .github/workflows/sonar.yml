@@ -56,7 +56,7 @@ jobs:
               -P desenv
           else
             ./mvnw clean verify sonar:sonar -DskipTests -X \
-              -Dsonar.projectKey=cloud-wallet-service-api \
+              -Dsonar.projectKey=wallet-service-api \
               -Dsonar.organization=gustavo1282 \
               -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.login=214710f028711557d94f54aab1be14a66a108294 \
