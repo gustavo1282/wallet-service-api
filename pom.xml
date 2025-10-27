@@ -30,19 +30,19 @@
     <profiles>
         <profile>
             <id>cloud</id>
+			<activation>
+              <activeByDefault>false</activeByDefault> 
+			</activation>
             <properties>
                 <spring.profiles.active>cloud</spring.profiles.active>
                 <sonar.organization>gustavo1282</sonar.organization>
-                <sonar.token>github-actions-wallet-api</sonar.token>
+                <!-- sonar.token>github-actions-wallet-api</sonar.token -->
                 <log.level>INFO</log.level>
             </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
             <dependencies>
             </dependencies>
         </profile>
-
+		
         <profile>
             <id>desenv</id>
             <properties>
@@ -55,7 +55,6 @@
             <build>
             </build>
         </profile>
-
     </profiles>
 
 	<properties>
