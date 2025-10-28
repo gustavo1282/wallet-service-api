@@ -97,7 +97,10 @@ public class TransactionService {
             Long walletId, LocalDateTime dtStart, LocalDateTime dtEnd,
             Pageable pageable) {
 
-        Page<Transaction> resultData = transactionRepository.findByWalletWalletIdAndCreatedAtBetween(walletId, dtStart, dtEnd, pageable);
+        Page<Transaction> resultData = transactionRepository.findByWalletWalletIdAndCreatedAtBetween(walletId,
+                dtStart.withHour(0).withMinute(0).withSecond(0),
+                dtEnd.withHour(23).withMinute(59).withSecond(59),
+                pageable);
 
         if (resultData.getContent().isEmpty()) {
             throw new ResourceNotFoundException("No transactions found");

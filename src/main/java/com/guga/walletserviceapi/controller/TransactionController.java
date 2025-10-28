@@ -5,6 +5,7 @@ import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -24,10 +26,11 @@ import java.util.List;
 @RestController
 @RequestMapping("${controller.path.base}/transactions")
 @Tag(name = "Transaction", description = "Endpoints for managing transactions")
+@RequiredArgsConstructor
 public class TransactionController {
 
     @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
     @Operation(summary = "Create a new transaction", description = "Creates a new transaction with the data provided in the request body.")
     @PostMapping("/transaction")
@@ -76,8 +79,6 @@ public class TransactionController {
                     @SortDefault(sort = "wallet_id", direction = Sort.Direction.ASC),
                     @SortDefault(sort = "created_At", direction = Sort.Direction.DESC)
             }) Pageable pageable) {
-
-        dtEnd.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
 
         Page<Transaction> resultTransaction = transactionService
                 .findByWalletWalletIdAndCreatedAtBetween(walletId, dtStart, dtEnd, pageable);

@@ -45,6 +45,9 @@
 		
         <profile>
             <id>desenv</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <spring.profiles.active>desenv</spring.profiles.active>
                 <sonar.token>wallet-service-api-sonar-token</sonar.token>
@@ -68,6 +71,7 @@
         <sonar.language>java</sonar.language>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -129,6 +133,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>2.5.2</version>
         </dependency>
 	</dependencies>
 

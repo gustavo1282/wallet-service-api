@@ -4,17 +4,21 @@ package com.guga.walletserviceapi.service;
 import com.guga.walletserviceapi.config.ResourceNotFoundException;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.repository.CustomerRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 @Service
 public class CustomerService {
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
@@ -27,9 +31,12 @@ public class CustomerService {
      * @return Customer or null
      */
     public Customer existsCustomer(Long id) {
+
         return customerRepository.findById(id).orElse(null);
+
     }
 
+    @Transactional
     public Customer saveCustomer(Customer customer) {
         Customer newCustomer = customerRepository.save(customer);
 
@@ -40,6 +47,7 @@ public class CustomerService {
         return newCustomer;
     }
 
+    @Transactional
     public Customer updateCustomer(Long id, Customer customerUpdate) {
 
         Customer customer = getCustomerById(id);

@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,7 +23,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         String message = "Data integrity violation: " + ex.getMostSpecificCause().getMessage();
-        //message = "Data integrity error occurred. Please check the input data.";
 
         if (ex.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
             message = "The value provided for the reference ID of other tables is invalid or missing."

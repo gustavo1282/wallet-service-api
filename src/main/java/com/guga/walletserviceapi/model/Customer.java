@@ -26,15 +26,17 @@ public class Customer {
     @Column(name = "customer_Id", nullable = false)
     private Long customerId;
 
-    @Pattern(regexp = "\\d+", message = "Phone number must contain only digits")
     @Column(name = "document_Id", unique = true, nullable = false, length = 20)
     private String documentId;
+
+    @Column(name = "cpf", nullable = false, length = 30)
+    private String firstName;
 
     @Column(name = "birth_Date", nullable = false)
     private LocalDate birthDate;
 
     @Column(name = "first_Name", nullable = false, length = 30)
-    private String firstName;
+    private String cpf;
 
     @Column(name = "last_Name", nullable = false, length = 30)
     private String lastName;

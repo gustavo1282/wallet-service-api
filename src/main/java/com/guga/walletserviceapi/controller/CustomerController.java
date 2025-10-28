@@ -5,11 +5,13 @@ import com.guga.walletserviceapi.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,10 +21,10 @@ import java.util.List;
 @RestController
 @RequestMapping("${controller.path.base}/customers")
 @Tag(name = "Customer", description = "Endpoints for managing customers")
+@RequiredArgsConstructor
 public class CustomerController {
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
     @Operation(summary = "Create a new Customer", description = "Creates a new Customer with the data provided in the request body.")
     @PostMapping("/customer")
@@ -65,7 +67,7 @@ public class CustomerController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(pageCustomers.stream().toList(), HttpStatus.OK);
+        return new ResponseEntity<List<Customer>>(pageCustomers.stream().toList(), HttpStatus.OK);
 
     }
 

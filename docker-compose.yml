@@ -23,14 +23,15 @@ services:
         reservations:
           cpus: '0.25'       # Reserva de 0.25 CPU
           memory: 400M       # Reserva de 128 MB de memória
+    #command: ["java", "-Dspring.profiles.active=desenv", "-jar", "app.jar"]
     volumes:
       - wallet_service_data:/var/lib/wallet_service/data
     # Variáveis de ambiente
     environment:
-      SPRING_PROFILES_ACTIVE: dev  #values{ dev, hml, prd }
+      SPRING_PROFILES_ACTIVE: desenv  #values{ dev, hml, prd }
       SERVICE_NAME: wallet-service-api
 #      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/wallet_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
       SPRING_DATASOURCE_USERNAME: wallet_user
       SPRING_DATASOURCE_PASSWORD: wallet_pass
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -41,9 +42,9 @@ services:
 #      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
     networks:
       - wallet_network
-    depends_on:
-      postgres:
-        condition: service_healthy
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
 #      rabbitmq:
 #        condition: service_started
 
@@ -56,9 +57,9 @@ services:
     restart: unless-stopped
     environment:
       - TX=America/Sao_Paulo
-      - POSTGRES_DB= wallet_db
-      - POSTGRES_USER= wallet_user
-      - POSTGRES_PASSWORD= wallet_pass
+      - POSTGRES_DB=wallet_db
+      - POSTGRES_USER=wallet_user
+      - POSTGRES_PASSWORD=wallet_pass
     ports:
       - "5432:5432"
     deploy:
@@ -90,10 +91,12 @@ services:
         limits:
           memory: 640M
     environment:
-      PGADMIN_DEFAULT_EMAIL: 'mail@wallet.com'
+      PGADMIN_DEFAULT_EMAIL: 'admin@postgres.com'
       PGADMIN_DEFAULT_PASSWORD: wallet_pass
     depends_on:
       - postgres
+    networks:
+      - wallet_network
 
 
 #  # ======================================================================
@@ -143,15 +146,17 @@ services:
 
   sonarqube:
     image: sonarqube:10.5.1-community
-    container_name: sonarqube
+    container_name: cont-sonarqube
     ports:
       - "9000:9000"
     environment:
       - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
-      - SONARQUBE_JDBC_URL=jdbc:postgresql://postgres:5432/sonar
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://localhost:5432/sonar
       - SONARQUBE_JDBC_USERNAME=sonar
       - SONARQUBE_JDBC_PASSWORD=sonar
       - SONARQUBE_TOKEN=SONAR_TOKEN
+    networks:
+      - wallet_network
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
