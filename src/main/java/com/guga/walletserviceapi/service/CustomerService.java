@@ -52,6 +52,7 @@ public class CustomerService {
 
         Customer customer = getCustomerById(id);
 
+        customer.setCpf(customerUpdate.getCpf());
         customer.setUpdatedAt(LocalDateTime.now());
         customer.setPhoneNumber(customerUpdate.getPhoneNumber());
         customer.setEmail(customerUpdate.getEmail());

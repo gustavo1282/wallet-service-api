@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,6 +19,6 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
      ***/
     @Query(value = "SELECT * FROM tb_wallet WHERE customer_id = :customerId Order By created_at DESC LIMIT 1" ,
             nativeQuery = true)
-    Optional<Wallet> findWalletByCustomerId(@Param("customerId") Long customerId);
+    Optional<List<Wallet>> findAllWalletsByCustomerId(@Param("customerId") Long customerId);
 
 }

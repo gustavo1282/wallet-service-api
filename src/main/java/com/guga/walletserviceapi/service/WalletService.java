@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -31,8 +32,9 @@ public class WalletService {
 
         Customer customer = customerService.getCustomerById(wallet.getCustomerId());
 
-        Wallet existingWallet = walletRepository.findWalletByCustomerId(wallet.getCustomerId()).orElse(null);
-        if (existingWallet != null && existingWallet.getCustomerId() != null) {
+        List<Wallet> existingWallet = walletRepository.findAllWalletsByCustomerId(wallet.getCustomerId())
+                .orElse(null);
+        if (existingWallet != null && existingWallet.isEmpty()) {
             throw new ResourceBadRequestException("Customer already has a wallet");
         }
 
@@ -78,9 +80,9 @@ public class WalletService {
         return list;
     }
 
-    public Wallet getWalletByCustomerId(Long id) {
-        return walletRepository.findWalletByCustomerId(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Wallet not found with id: %d", id)));
+    public List<Wallet> getWalletByCustomerId(Long id) {
+        return walletRepository.findAllWalletsByCustomerId(id)
+            .orElseThrow(() -> new ResourceNotFoundException(String.format("Wallet not found with id: %d", id)));
     }
 
 }

@@ -1,3 +1,7 @@
+com\guga\walletserviceapi\controller\WalletControllerTest.class
 com\guga\walletserviceapi\helpers\RandomGenerator.class
 com\guga\walletserviceapi\controller\CustomerControllerTest.class
+com\guga\walletserviceapi\helpers\Helper$1.class
+com\guga\walletserviceapi\controller\TransactionControllerTest.class
+com\guga\walletserviceapi\helpers\Helper.class
 com\guga\walletserviceapi\WalletServiceApplicationTests.class

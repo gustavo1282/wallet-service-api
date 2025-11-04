@@ -87,7 +87,7 @@ public class RandomGenerator {
     }
 
     public static int generateIntNumberByInterval(int init, int end) {
-        return ThreadLocalRandom.current().nextInt(init, end+1);
+        return ThreadLocalRandom.current().nextInt(init, end);
     }
 
     public static LocalDateTime generatePastLocalDateTime(int yearsToSubtract){
@@ -111,13 +111,13 @@ public class RandomGenerator {
         String[] SUFIXOS = {"Jr.", "Filho", "Neto", "Sobrinho"};
 
         for (String prefix : PREFIXOS) {
-            if (text.startsWith(prefix)) {
+            if (text.toUpperCase().startsWith(prefix.toUpperCase())) {
                 text = text.substring(prefix.length()).trim();
                 break;
             }
         }
         for (String suffix : SUFIXOS) {
-            if (text.endsWith(suffix)) {
+            if (text.toUpperCase().endsWith(suffix.toUpperCase())) {
                 text = text.substring(0, text.length() - suffix.length()).trim();
                 break;
             }

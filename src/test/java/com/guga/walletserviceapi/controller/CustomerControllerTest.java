@@ -2,16 +2,16 @@ package com.guga.walletserviceapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.config.ResourceNotFoundException;
+import com.guga.walletserviceapi.helpers.Helper;
 import com.guga.walletserviceapi.helpers.RandomGenerator;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.service.CustomerService;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,20 +24,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -45,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @WithMockUser(username = "user", roles = {"USER"})
-@RequiredArgsConstructor
 class CustomerControllerTest {
 
     // Objeto usado para simular chamadas HTTP
@@ -56,60 +50,61 @@ class CustomerControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // Substitui o CustomerService real por um mock
     @MockitoBean
-    private final CustomerService customerService;
+    private CustomerService customerService;
 
     @Value("${controller.path.base}")
     private String BASE_PATH;
 
-    private String API_NAME = "/customers";
+    private static final String API_NAME = "/customers";
 
     private String URI_API;
 
     private Faker faker;
 
-    List<Customer> customerList;
+    private List<Customer> customers;
 
     @BeforeEach
     void setup() {
+        Mockito.reset(customerService);
         faker = new Faker(new Locale("pt-BR"));
-        createCustomerListMock();
+        customers = Helper.createCustomerListMock();
         URI_API = BASE_PATH.concat(API_NAME);
         System.out.println(("BeforeEach - OK"));
     }
 
+
     @Test
     @DisplayName("Deve retornar 201 Created ao criar um Customer com sucesso")
-     void shouldReturn201_WhenCreateNewCustomer() throws Exception {
+    void shouldReturn201_WhenCreateNewCustomer() throws Exception {
         // Arrange
-        Customer customerInput = customerList.get(RandomGenerator.generateIntNumberByInterval(0, customerList.size()));
-        Customer customerCreated = customerInput.cloneCustomer();
+        Customer customerInput = customers.get(RandomGenerator.generateIntNumberByInterval(0, customers.size()-1));
+        Customer customerCreated = customerInput.toBuilder().build();
 
         // Simula o sucesso da camada de serviço
         when(customerService.saveCustomer(any(Customer.class))).thenReturn(customerCreated);
 
         // Act & Assert
         mockMvc.perform(post(URI_API.concat("/customer"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customerInput)))
-                .andExpect(status().isCreated()) // Verifica o status HTTP 201
-                .andExpect(header().exists("Location")) // Verifica a presença do Header 'Location'
-                .andExpect(jsonPath("$.customerId", is(customerCreated.getCustomerId().intValue()))) // Verifica o ID no corpo da resposta
-                //.andExpect(jsonPath("$.firstName", is(customerCreated.getFirstName())))
-        //is(32L), Long.class)
-            ;
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(customerInput)))
+
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.customerId", is(customerCreated.getCustomerId().intValue())))
+                .andExpect(jsonPath("$.cpf", is(customerCreated.getCpf())))
+        ;
     }
 
     // --------------------------------------------------------------------------------
-    // 2. Teste para GET /{id} (getCustomerById)
+    // Teste para GET /{id} (getCustomerById)
     // --------------------------------------------------------------------------------
     @Test
     @DisplayName("Deve retornar 200 OK e o Customer ao buscar por ID")
     void shouldReturn200_WhenRequestCustomer_WhenExists() throws Exception {
 
         int indexCustomer = RandomGenerator.generateIntNumberByInterval(0, 50);
-        Customer foundCustomer = customerList.get(indexCustomer).cloneCustomer();
+        Customer foundCustomer = customers.get(indexCustomer).toBuilder().build();
         Long customerId = foundCustomer.getCustomerId();
 
         // Simula o retorno de um Customer pelo Service
@@ -117,9 +112,11 @@ class CustomerControllerTest {
 
         // Act & Assert
         mockMvc.perform(get(URI_API.concat("/{id}"), customerId)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
+
                 .andExpect(status().isOk()) // Verifica o status HTTP 200
                 .andExpect(jsonPath("$.customerId", is(customerId.intValue())))
+                .andExpect(jsonPath("$.cpf", is(foundCustomer.getCpf())))
             ;
     }
 
@@ -128,7 +125,7 @@ class CustomerControllerTest {
     void shouldReturn404NotFound_WhenSearchingForCustomer_WithNonExistentId() throws Exception {
 
         Long customerId = (long)RandomGenerator
-                .generateIntNumberByInterval(customerList.size()+2 , customerList.size() + 100);
+                .generateIntNumberByInterval(customers.size()+2 , customers.size() + 100);
 
         when(customerService.getCustomerById(customerId)).thenThrow(new ResourceNotFoundException("Customer not found"));
 
@@ -136,26 +133,42 @@ class CustomerControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    // --- 3. Testes para PUT /{id} ---
 
-//    @Test
-//    @DisplayName("Deve retornar 200 OK ao atualizar um Customer existente")
-//    void deve_Retornar200Ok_AoAtualizarCustomer() throws Exception {
-//        // Arrange
-//        Long customerId = 3L;
-//        Customer customerUpdate = new Customer("Lucas", "Ferreira");
-//        Customer customerUpdated = new Customer(customerId, "Lucas", "Ferreira");
-//
-//        // Simula o retorno do Customer atualizado
-//        when(customerService.updateCustomer(eq(customerId), any(Customer.class))).thenReturn(customerUpdated);
-//
-//        // Act & Assert
-//        mockMvc.perform(put(BASE_PATH + "/{id}", customerId)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(customerUpdate)))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.lastName", is("Ferreira")));
-//    }
+    @Test
+    @DisplayName("Deve retornar 200 OK ao atualizar um Customer existente")
+    void sholdReturn200_WhenUpdateCustomerExistentByID() throws Exception {
+
+        Customer customerInput = getMockCustomer();
+
+        Long customerId = customerInput.getCustomerId();
+
+        when(customerService.getCustomerById(customerId)).thenReturn(customerInput);
+
+        Customer customerUpdated = customerInput.toBuilder()
+                .status(Helper.defineStatus())
+                .phoneNumber(faker.phoneNumber().cellPhone())
+                .build();
+
+        // Simula o retorno do Customer atualizado
+        when(customerService.updateCustomer(eq(customerId), any(Customer.class)))
+                .thenReturn(customerUpdated);
+
+        mockMvc.perform(put(URI_API + "/{id}", customerId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(customerInput))
+                )
+                .andReturn();
+
+    }
+
+    private String getURI_Api() {
+        return URI_API;
+    }
+
+    private Customer getMockCustomer() {
+        int indexCustomer = RandomGenerator.generateIntNumberByInterval(0, customers.size() - 1);
+        return customers.get(indexCustomer);
+    }
 
     // --- 4. Testes para GET /list ---
 
@@ -163,13 +176,12 @@ class CustomerControllerTest {
     @DisplayName("Deve retornar 200 OK e a lista de Customers")
     void shouldReturn200_WhenRequestingCustomerList_WithValidParameters() throws Exception {
 
-        Status statusFilter = Status
-                .fromValue(RandomGenerator.generateIntNumberByInterval(0, Status.values().length));
+        Status statusFilter = Helper.defineStatus();
 
-        List<Customer> customersFiltered = customerList.stream()
+        List<Customer> customersFiltered = customers.stream()
                 .filter(customer -> customer.getStatus().equals(statusFilter) &&
                         customer.getCustomerId() > 0)
-                .collect(Collectors.toList());
+                .toList();
 
         // Simula uma página com conteúdo
         when(customerService.getAllCustomers(any(Pageable.class)))
@@ -177,9 +189,9 @@ class CustomerControllerTest {
 
         // Act & Assert
         mockMvc.perform(get(URI_API.concat("/list")))
-                .andExpect(status().isOk()) // Verifica o status HTTP 200
-                .andExpect(jsonPath("$").isArray()) // Verifica se o retorno é um Array
-                .andExpect(jsonPath("$.length()", is(customersFiltered.size()))) // Verifica o tamanho da lista
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()", is(customersFiltered.size())))
                 .andExpect(jsonPath("$[0].firstName", is(customersFiltered.get(0).getFirstName())));
     }
 
@@ -196,48 +208,41 @@ class CustomerControllerTest {
                 .andExpect(status().isNotFound()); // Verifica o status HTTP 404
     }
 
-    private void createCustomerListMock() {
-        customerList = new ArrayList<Customer>();
-
-        customerList = IntStream.range(0, 50)
-                .mapToObj(i -> {
-                    Customer c = new Customer();
-                    c.setCustomerId( (long)i+1 );
-
-                    c.setStatus(Status.fromValue(RandomGenerator.generateIntNumberByInterval(1, Status.values().length-1)));
-
-                    c.setFullName(RandomGenerator.removeSufixoEPrevixos( faker.name().fullName().toUpperCase() ));
-                    String[] partName = c.getFullName().split(" ");
-                    c.setFirstName(partName[0]);
-                    c.setLastName(partName[partName.length-1]);
-
-                    int year = RandomGenerator.generateIntNumberByInterval(19, 29);
-                    int month = ThreadLocalRandom.current().nextInt(1, 12 + 1);
-                    int day = ThreadLocalRandom.current().nextInt(1, 28);
-                    c.setBirthDate(RandomGenerator.getDateNowMinus(year, month, day));
-
-                    c.setEmail(faker.internet().emailAddress(c.getFirstName()
-                            .concat(".")
-                            .concat(c.getLastName())
-                            .concat(".")
-                            .concat(String.valueOf(c.getBirthDate().getMonthValue()))
-                            .concat(String.valueOf(c.getBirthDate().getYear()))
-                    ));
-
-                    c.setPhoneNumber(faker.phoneNumber().cellPhone());
-                    c.setDocumentId(faker.idNumber().valid());
-                    c.setCpf(faker.cpf().valid());
-
-                    c.setCreatedAt(RandomGenerator.generatePastLocalDateTime(2));
-                    c.setUpdatedAt(c.getCreatedAt());
-
-
-                    System.out.println(c.toString());
-
-                    return c;
-                })
-                .toList();
-    }
-
+//    private void createCustomerListMock() {
+//        customerList = new ArrayList<>();
+//
+//        IntStream.range(0, 100)
+//                .forEach(i -> {
+//
+//                    String fullName = RandomGenerator.removeSufixoEPrevixos( faker.name().fullName().toUpperCase() );
+//                    String[] partName =  fullName.split(" ");
+//                    LocalDate birthDate = HelperTest.defineBirthDateMore18YearOld();
+//                    LocalDateTime dtCreatedAt = RandomGenerator.generatePastLocalDateTime(2);
+//
+//                    Customer CustomerNew = Customer.builder()
+//                            .customerId((long) (i + 1))
+//                            .status(HelperTest.defineStatus())
+//                            .fullName(fullName)
+//                            .firstName(partName[0])
+//                            .lastName( partName[partName.length-1] )
+//                            .birthDate(birthDate)
+//                            .email(faker.internet().emailAddress( partName[0].concat(".")
+//                                    .concat( partName[partName.length -1 ] ).concat(".")
+//                                    .concat( String.valueOf(birthDate.getMonthValue()) )
+//                                    .concat( String.valueOf(birthDate.getYear()) )
+//                            ))
+//                            .phoneNumber(faker.phoneNumber().cellPhone())
+//                            .documentId(faker.idNumber().valid())
+//                            .cpf(faker.cpf().valid())
+//                            .createdAt(dtCreatedAt)
+//                            .updatedAt(dtCreatedAt)
+//
+//                            .build();
+//
+//                    customerList.add(CustomerNew);
+//
+//                    }
+//                );
+//    }
 
 }

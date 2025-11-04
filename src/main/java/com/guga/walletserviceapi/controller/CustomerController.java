@@ -1,21 +1,21 @@
 package com.guga.walletserviceapi.controller;
 
+import com.guga.walletserviceapi.config.ResourceNotFoundException;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -64,10 +64,10 @@ public class CustomerController {
         Page<Customer> pageCustomers = customerService.getAllCustomers(pageable);
 
         if (pageCustomers == null || pageCustomers.isEmpty() || pageCustomers.stream().toList().isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<List<Customer>>(pageCustomers.stream().toList(), HttpStatus.OK);
+        return new ResponseEntity<>(pageCustomers.stream().toList(), HttpStatus.OK);
 
     }
 

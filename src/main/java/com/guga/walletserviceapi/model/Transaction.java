@@ -1,16 +1,20 @@
 package com.guga.walletserviceapi.model;
 
+import com.guga.walletserviceapi.model.converter.ProcessTypeTransactionConverter;
 import com.guga.walletserviceapi.model.converter.TransactionTypeConverter;
+import com.guga.walletserviceapi.model.enums.ProcessTypeTransaction;
 import com.guga.walletserviceapi.model.enums.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 
 @Entity(name = "tb_transaction")
 @Getter
@@ -19,7 +23,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(of = "transactionId")
-public class Transaction {
+@SuperBuilder
+public abstract class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,5 +61,10 @@ public class Transaction {
 
     @Column(name = "current_Balance", nullable = false)
     private BigDecimal currentBalance;
+
+    @Convert(converter = ProcessTypeTransactionConverter.class)
+    @Column(name = "process_type_transaction", nullable = false, length = 2)
+    ProcessTypeTransaction processTypeTransaction;
+
 
 }

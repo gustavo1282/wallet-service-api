@@ -5,7 +5,9 @@ import java.util.stream.Stream;
 public enum TransactionType {
     WITHDRAW(1),
     DEPOSIT(2),
-    TRANSFER(3);
+    TRANSFER_TO(3),
+    TRANSFER_RECEIVED(4)
+    ;
 
     private final Integer value;
 

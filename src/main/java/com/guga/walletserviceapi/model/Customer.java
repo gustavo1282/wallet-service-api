@@ -1,9 +1,11 @@
 package com.guga.walletserviceapi.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.guga.walletserviceapi.model.converter.StatusConverter;
 import com.guga.walletserviceapi.model.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "customerId")
 @Data
+@Builder(toBuilder = true)
 public class Customer {
 
     @Id
@@ -26,18 +29,22 @@ public class Customer {
     @Column(name = "customer_Id", nullable = false)
     private Long customerId;
 
-    @Column(name = "document_Id", unique = true, nullable = false, length = 20)
+    @Pattern(regexp = "\\d+", message = "Document ID field is required")
+    @Column(name = "document_Id", nullable = false, length = 20)
     private String documentId;
 
-    @Column(name = "cpf", nullable = false, length = 30)
-    private String firstName;
-
+    @Pattern(regexp = "\\d+", message = "CPF field is required")
+    @Column(name = "cpf", unique = true, nullable = false, length = 15)
+    private String cpf;
+    
     @Column(name = "birth_Date", nullable = false)
     private LocalDate birthDate;
 
+    @NotBlank(message = "FirstName is required.")
     @Column(name = "first_Name", nullable = false, length = 30)
-    private String cpf;
+    private String firstName;
 
+    @NotBlank(message = "LastName is Required.")
     @Column(name = "last_Name", nullable = false, length = 30)
     private String lastName;
 
@@ -45,52 +52,27 @@ public class Customer {
     @Column(name = "email", unique = true, nullable = false, length = 80)
     private String email;
 
+    @NotBlank(message = "Fullname is required")
     @Column(name = "full_Name", nullable = false, length = 80)
     private String fullName;
 
     @NotNull(message = "Phone number cannot be null")
     @Pattern(regexp = "\\d+", message = "Phone number must contain only digits")
-    @Column(name = "phone_Number", unique = true, nullable = false, length = 14)
+    @Column(name = "phone_Number", nullable = false, length = 14)
     private String phoneNumber;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_At", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "updated_At", nullable = false)
     @CreationTimestamp
     private LocalDateTime updatedAt;
 
     @Convert(converter = StatusConverter.class)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, length = 2)
     private Status status;
-
-    /**
-     * Construtor para realizar uma Cópia Profunda (Deep Copy) do objeto Customer.
-     * Copia todos os campos para uma nova instância.
-     *
-     * @param other O objeto Customer a ser copiado.
-     */
-    public Customer(Customer other) {
-        this.customerId = other.customerId;
-        this.documentId = other.documentId;
-        this.birthDate = other.birthDate;
-        this.firstName = other.firstName;
-        this.lastName = other.lastName;
-        this.email = other.email;
-        this.fullName = other.fullName;
-        this.phoneNumber = other.phoneNumber;
-        this.createdAt = other.createdAt;
-        this.updatedAt = other.updatedAt;
-        this.status = other.status; // Enums são seguras para cópia de referência
-    }
-
-    /**
-     * Retorna uma cópia profunda (Deep Copy) do Customer.
-     * @return Uma nova instância de Customer.
-     */
-    public Customer cloneCustomer() {
-        return new Customer(this);
-    }
-
+    
 }

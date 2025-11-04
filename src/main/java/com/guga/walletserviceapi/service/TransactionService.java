@@ -73,7 +73,7 @@ public class TransactionService {
                     throw new ResourceBadRequestException("Insufficient funds for withdrawal.");
                 }
             }
-            case TRANSFER -> {
+            case TRANSFER_TO -> {
                 newAmount = currentBalance.subtract(amount);
                 if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
                     throw new ResourceBadRequestException("Insufficient funds for transfer.");

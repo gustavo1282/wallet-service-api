@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(of = "walletId")
+@Builder(toBuilder = true)
 public class Wallet {
 
     @Id
@@ -37,7 +38,7 @@ public class Wallet {
     private Customer customer;
 
     @Convert(converter = StatusConverter.class)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, length = 2)
     private Status status;
 
     @Digits(integer = 14, fraction = 2, message = "Current balance must have up to 14 integer digits and 2 decimal places")
@@ -51,10 +52,6 @@ public class Wallet {
     @NotNull(message = "Login user cannot be null")
     @Column(name = "login_User", nullable = false, length = 20)
     private String loginUser;
-
-    @NotNull(message = "Login password cannot be null")
-    @Column(name = "login_Password", nullable = false, length = 256)
-    private String loginPassword;
 
     @Column(name = "created_At", nullable = false)
     @CreationTimestamp
