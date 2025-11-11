@@ -1,7 +1,7 @@
 package com.guga.walletserviceapi.service;
 
 
-import com.guga.walletserviceapi.config.ResourceNotFoundException;
+import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class CustomerService {
 
     @Autowired
-    private final CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)

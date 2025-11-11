@@ -13,7 +13,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity(name = "tb_wallet")
+@Entity
+@Table(name = "tb_wallet")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 public class Wallet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "wallet_Id", nullable = false)
     private Long walletId;
 

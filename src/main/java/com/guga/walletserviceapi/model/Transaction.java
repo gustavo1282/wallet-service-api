@@ -1,9 +1,11 @@
 package com.guga.walletserviceapi.model;
 
-import com.guga.walletserviceapi.model.converter.ProcessTypeTransactionConverter;
-import com.guga.walletserviceapi.model.converter.TransactionTypeConverter;
-import com.guga.walletserviceapi.model.enums.ProcessTypeTransaction;
-import com.guga.walletserviceapi.model.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.guga.walletserviceapi.model.converter.OperationTypeConverter;
+import com.guga.walletserviceapi.model.converter.StatusTransactionConverter;
+import com.guga.walletserviceapi.model.enums.OperationType;
+import com.guga.walletserviceapi.model.enums.StatusTransaction;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
@@ -15,19 +17,34 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
-@Entity(name = "tb_transaction")
+@Entity
+@Table(name = "tb_transaction")
+@Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "operationType"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DepositMoney.class, name = "DEPOSIT"),
+        @JsonSubTypes.Type(value = WithdrawMoney.class, name = "WITHDRAW"),
+        @JsonSubTypes.Type(value = TransferMoneySend.class, name = "TRANSFER_SEND"),
+        @JsonSubTypes.Type(value = TransferMoneyReceived.class, name = "TRANSFER_RECEIVED")
+        }
+)
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
 @EqualsAndHashCode(of = "transactionId")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @SuperBuilder
+//@RequiredArgsConstructor
+//@Builder
 public abstract class Transaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id", nullable = false)
     private Long transactionId;
 
@@ -47,9 +64,9 @@ public abstract class Transaction {
     @JoinColumn(name = "wallet_Id")
     private Wallet wallet;
 
-    @Convert(converter = TransactionTypeConverter.class)
-    @Column(name = "transaction_type", nullable = false)
-    private TransactionType transactionType;
+    @Convert(converter = OperationTypeConverter.class)
+    @Column(name = "operation_type", nullable = false)
+    private OperationType operationType;
 
     @Digits(integer = 14, fraction = 2, message = "Previous balance must have up to 14 integer digits and 2 decimal places")
     @Column(name = "previous_balance", nullable = false)
@@ -62,9 +79,8 @@ public abstract class Transaction {
     @Column(name = "current_Balance", nullable = false)
     private BigDecimal currentBalance;
 
-    @Convert(converter = ProcessTypeTransactionConverter.class)
-    @Column(name = "process_type_transaction", nullable = false, length = 2)
-    ProcessTypeTransaction processTypeTransaction;
-
+    @Convert(converter = StatusTransactionConverter.class)
+    @Column(name = "status_transaction", nullable = false, length = 2)
+    StatusTransaction statusTransaction;
 
 }

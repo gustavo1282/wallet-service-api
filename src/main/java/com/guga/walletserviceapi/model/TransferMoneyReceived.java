@@ -1,26 +1,20 @@
 package com.guga.walletserviceapi.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+
 @Entity
+@Table(name = "tb_transfer_received")
 @Data
-@NoArgsConstructor
+@NoArgsConstructor // ESSA é crucial para o Jackson/Spring
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @SuperBuilder
-public class DepositMoney extends Transaction {
-
-    @Schema(description = "Deposit Sender associated with the transaction", accessMode = Schema.AccessMode.READ_ONLY)
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "deposit_sender_id")
-    private DepositSender depositSender;
+public class TransferMoneyReceived extends Transaction {
 
     @Schema(description = "Transfer Money associated with the wallet", accessMode = Schema.AccessMode.READ_ONLY)
     @OneToOne(cascade = CascadeType.ALL)

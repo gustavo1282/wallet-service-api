@@ -1,6 +1,5 @@
 package com.guga.walletserviceapi.controller;
 
-import com.guga.walletserviceapi.config.ResourceNotFoundException;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
