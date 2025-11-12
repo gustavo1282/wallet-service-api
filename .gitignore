@@ -1,0 +1,6 @@
+# git ignore
+/.github/
+/.mvn/
+/target/
+/.idea/
+/.vscode/
