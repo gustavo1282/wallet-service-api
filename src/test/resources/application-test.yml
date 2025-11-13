@@ -6,7 +6,8 @@ controller:
 spring:
   datasource:
     #url: jdbc:h2:mem:walletdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    url: jdbc:h2:file:~/dados/wallet_db;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+    #jdbc:h2:file:~/dados/wallet_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+    url: jdbc:h2:file:./target/test-data/wallet_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: wallet_user
     password: wallet_pass
@@ -14,7 +15,7 @@ spring:
   h2:
     console:
       enabled: true
-      path: /h2-console
+      path: /h2-console-test
       settings:
         web-allow-others: true
   jpa:
@@ -26,6 +27,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: 'true'
+  jackson:
+    default-property-inclusion: non_null
   application:
     name: wallet-service
   data:
@@ -37,6 +40,9 @@ spring:
         size-parameter: size
 logging:
   level:
-    org:
-      springframework: DEBUG
-    root: DEBUG
+    org.springframework: INFO
+    org.springframework.beans.factory.support: INFO
+    org.springframework.beans.factory.support.DefaultListableBeanFactory: INFO
+    root: INFO
+    net:
+      datafaker: WARN

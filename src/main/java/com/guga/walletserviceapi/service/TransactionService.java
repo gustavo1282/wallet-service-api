@@ -1,19 +1,29 @@
 package com.guga.walletserviceapi.service;
 
-import com.guga.walletserviceapi.config.ResourceBadRequestException;
-import com.guga.walletserviceapi.config.ResourceNotFoundException;
-import com.guga.walletserviceapi.model.Transaction;
-import com.guga.walletserviceapi.model.Wallet;
-import com.guga.walletserviceapi.model.enums.TransactionType;
+import com.guga.walletserviceapi.exception.ResourceBadRequestException;
+import com.guga.walletserviceapi.exception.ResourceNotFoundException;
+import com.guga.walletserviceapi.helpers.TransactionUtils;
+import com.guga.walletserviceapi.model.*;
+import com.guga.walletserviceapi.model.enums.CompareBigDecimal;
+import com.guga.walletserviceapi.model.enums.OperationType;
+import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.model.enums.StatusTransaction;
+import com.guga.walletserviceapi.repository.DepositSenderRepository;
+import com.guga.walletserviceapi.repository.MovementTransferRepository;
 import com.guga.walletserviceapi.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class TransactionService {
 
@@ -21,92 +31,245 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
 
     @Autowired
+    private DepositSenderRepository depositSenderRepository;
+
+    @Autowired
+    private MovementTransferRepository movementTransferRepository;
+
+    @Autowired
     private WalletService walletService;
+
+    public static final BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
+    public static final BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
 
     public Transaction getTransactionById(Long id) {
         return transactionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + String.valueOf(id)));
     }
 
-    public Transaction salvar(Transaction transaction) {
+    public Page<Transaction> getTransactionByWalletId(Long id, Pageable pageable) {
+        return transactionRepository.findTop200ByWalletId(id, pageable);
+    }
 
-        if (transaction.getWalletId() == null) {
+
+    public DepositMoney saveDepositMoney(Long walletId, BigDecimal amount, String cpfSender,
+                                         String terminalId, String senderName)
+    {
+        Wallet wallet = walletService.getWalletById(walletId);
+
+        DepositMoney depositMoney = TransactionUtils.generateDepositMoney(wallet, amount);
+
+        DepositMoney depositMoneySaved = transactionRepository.save(depositMoney);
+
+        if (!depositMoney.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            throw new ResourceBadRequestException("Invalid Business Rules - "
+                    .concat(depositMoney.getStatusTransaction().name())
+            );
+        }
+
+        TransactionUtils.adjustBalanceWallet(wallet, depositMoney);
+        walletService.updateWallet(wallet.getWalletId(), wallet);
+
+        MovementTransaction movement = TransactionUtils
+                .generateMovementTransaction(depositMoneySaved, null);
+        MovementTransaction movementSaved = movementTransferRepository.save(movement);
+        depositMoney.setMovementTransaction(movementSaved);
+
+        if ( senderName != null && senderName.length() > 5 &&
+                cpfSender != null && cpfSender.length() > 5 ) {
+
+            DepositSender depositSender = TransactionUtils.generateDepositSender(depositMoney,
+                    cpfSender, senderName, terminalId);
+
+            DepositSender depositSenderSaved = depositSenderRepository.save(depositSender);
+
+            depositMoney.setDepositSender(depositSenderSaved);
+
+        }
+
+        return depositMoneySaved;
+    }
+
+    /***
+     * Salvar uma transação de Saque
+     * Regra,
+     *     1 - receber o walledId e o valor de saque
+     *     2 - vallidar o walletId
+     *     3 - gerar o objeto de saque (withdraw) - generateWithdraw. neste processo é validado as business rules
+     *     4 - registrar o saque na tabela transactions
+     *     5 - gerar transacao confirmada, atualiza o valor de saldo da wallet
+     *     6 - registra o movimento da transação
+     * @param walletId
+     * @param amount
+     * @return
+     */
+    public WithdrawMoney saveWithdrawMoney(Long walletId, BigDecimal amount) {
+
+        Wallet wallet = walletService.getWalletById(walletId);
+        if (wallet == null || wallet.getWalletId() == null) {
             throw new ResourceBadRequestException("The transaction does not contain a valid wallet");
         }
 
-        Wallet wallet = walletService.getWalletById(transaction.getWalletId());
+        WithdrawMoney withdraw = TransactionUtils.generateWithdraw(wallet, amount);
 
-        if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0.00) {
-            throw new ResourceBadRequestException("The deposit amount must be greater than zero");
+        WithdrawMoney withdrawSaved = transactionRepository.save(withdraw);
+
+        if (!withdraw.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            throw new ResourceBadRequestException("Invalid Business Rules - "
+                    .concat(withdraw.getStatusTransaction().name())
+            );
         }
 
-        BigDecimal newCurrentBalance = applyOperationType(transaction.getTransactionType(), wallet.getCurrentBalance(), transaction.getAmount());
+        if (withdrawSaved.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
 
-        transaction.setPreviousBalance(wallet.getCurrentBalance());
-        transaction.setCurrentBalance(newCurrentBalance);
-        transaction.setWallet(wallet);
+            TransactionUtils.adjustBalanceWallet(wallet, withdrawSaved);
+            walletService.updateWallet( walletId, wallet );
 
-        Transaction newTransaction = transactionRepository.save(transaction);
+            MovementTransaction movement = TransactionUtils
+                    .generateMovementTransaction(withdrawSaved, null);
+            MovementTransaction movementSaved = movementTransferRepository.save(movement);
+            withdrawSaved.setMovementTransaction(movementSaved);
 
+        }
 
-        newTransaction.getWallet().setPreviousBalance(wallet.getCurrentBalance());
-        newTransaction.getWallet().setCurrentBalance(newCurrentBalance);
-
-        walletService.updateWallet(wallet.getWalletId(), newTransaction.getWallet());
-
-        return newTransaction;
+        return withdrawSaved;
     }
 
-    private BigDecimal applyOperationType(
-            TransactionType transactionType,
-            BigDecimal currentBalance,
-            BigDecimal amount) {
+    public TransferMoneySend saveTransferMoneySend(Long walletIdSend, Long walletIdReceived, BigDecimal amount) {
 
-        BigDecimal newAmount = BigDecimal.ZERO;
-        switch (transactionType) {
-            case DEPOSIT -> {
-                newAmount = currentBalance.add(amount);
-            }
-            case WITHDRAW -> {
-                newAmount = currentBalance.subtract(amount);
-                if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
-                    throw new ResourceBadRequestException("Insufficient funds for withdrawal.");
-                }
-            }
-            case TRANSFER_TO -> {
-                newAmount = currentBalance.subtract(amount);
-                if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
-                    throw new ResourceBadRequestException("Insufficient funds for transfer.");
-                }
-            }
+        Wallet walletSend = walletService.getWalletById(walletIdSend);
+
+        Wallet walletReceived = walletService.getWalletById(walletIdReceived);
+
+        TransferMoneySend transferSend = TransactionUtils.generateTransferMoneySend(walletSend,
+                walletReceived, amount);
+
+        TransferMoneyReceived transferReceived = TransferMoneyReceived.builder()
+                .statusTransaction(StatusTransaction.INVALID)
+                .build();
+
+        TransferMoneySend transferSendSaved = transactionRepository.save(transferSend);
+
+        if (!transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS) ||
+                !transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            throw new ResourceBadRequestException("Invalid Business Rules - "
+                    .concat(transferSend.getStatusTransaction().name())
+            );
         }
-        return newAmount;
+
+        if (transferSendSaved.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+
+            TransactionUtils.adjustBalanceWallet(walletSend, transferSend);
+            walletService.updateWallet(walletSend.getWalletId(), walletSend);
+
+            MovementTransaction movementTransactionSend = TransactionUtils.generateMovementTransaction(transferSend, transferReceived);
+            movementTransferRepository.save(movementTransactionSend);
+            transferSendSaved.setMovementTransaction(movementTransactionSend);
+
+
+            transferReceived = TransactionUtils.generateTransferMoneyReceived(walletReceived, amount);
+
+            if (transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)){
+
+                TransactionUtils.adjustBalanceWallet(walletReceived, transferReceived);
+                walletService.updateWallet(walletReceived.getWalletId(), walletReceived);
+
+                MovementTransaction movementReceived = TransactionUtils.generateMovementTransaction(transferReceived, transferSend);
+                MovementTransaction movementReceivedSaved =  movementTransferRepository.save(movementReceived);
+                transferReceived.setMovementTransaction(movementReceivedSaved);
+            }
+
+        }
+
+        return transferSendSaved;
     }
 
-    public Page<Transaction>  getAllTransactions(Pageable pageable) {
-        Page<Transaction> resultData = transactionRepository.findAll(pageable);
+    public Page<Transaction> filterTransactionByWalletIdAndProcessType(Long walletId, StatusTransaction typeTransaction,
+                                                                       Pageable pageable) {
+        List<Specification<Transaction>> specs = new ArrayList<>();
 
-        if (resultData.getContent().isEmpty()) {
-            throw new ResourceNotFoundException("No transactions found");
+        // FILTRO 1: byWalletId (Long)
+        if (walletId != null) {
+            specs.add((root, query, builder) ->
+                    builder.equal(root.get("walletId"), walletId));
         }
 
-        return resultData;
+        // FILTRO 2: byStatus (Enum)
+        if (typeTransaction != null) {
+            specs.add((root, query, builder) ->
+                    builder.equal(root.get("transactionType"), typeTransaction)); // ou 'status' dependendo do nome do campo
+        }
+
+        // 3. Combina todas as especificações com 'AND'
+        Specification<Transaction> combinedSpec = Specification.where(null); // Inicia com Specification.where(null)
+
+        for (Specification<Transaction> spec : specs) {
+            // Usa Specification.and() para combinar todos os filtros
+            combinedSpec = combinedSpec.and(spec);
+        }
+
+        // 4. Executa a consulta paginada
+        return transactionRepository.findAll(combinedSpec, pageable);
+
     }
 
-    public Page<Transaction>  findByWalletWalletIdAndCreatedAtBetween(
-            Long walletId, LocalDateTime dtStart, LocalDateTime dtEnd,
-            Pageable pageable) {
+    public static MovementTransaction generateTransferMoney(Transaction transferSend, Transaction transferReceived) {
+        return MovementTransaction.builder()
+                .movementId( null )
 
-        Page<Transaction> resultData = transactionRepository.findByWalletWalletIdAndCreatedAtBetween(walletId,
-                dtStart.withHour(0).withMinute(0).withSecond(0),
-                dtEnd.withHour(23).withMinute(59).withSecond(59),
-                pageable);
+                .transactionId( transferSend.getTransactionId() )
+                .walletId( transferSend.getWalletId() )
 
-        if (resultData.getContent().isEmpty()) {
-            throw new ResourceNotFoundException("No transactions found");
+                .transactionToId( transferReceived.getTransactionId() )
+                .walletToId( transferReceived.getWalletId() )
+
+                .amount( transferSend.getAmount() )
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public DepositMoney generateDepositMoney(Wallet wallet, BigDecimal amount) {
+        StatusTransaction processType = checkProcessTypeDeposit(wallet, amount);
+
+        return DepositMoney.builder()
+                //.transactionId( null )
+                .walletId(wallet.getWalletId())
+                .createdAt(LocalDateTime.now())
+                .statusTransaction( processType )
+                .amount( amount )
+                .previousBalance( wallet.getCurrentBalance( ))
+                .currentBalance( wallet.getCurrentBalance().add(amount) )
+                .operationType(OperationType.DEPOSIT)
+                .build();
+    }
+
+    private StatusTransaction checkProcessTypeDeposit(Wallet wallet, BigDecimal amount) {
+        StatusTransaction processType = chekProcessTypeGeral(wallet);
+
+        // se as validações gerais foram bem sucessidas, continua para as especificas da transação
+        if (processType.equals(StatusTransaction.SUCCESS)) {
+            // VALIDA SE O VALOR DA TRANSAÇÃO É MENOR QUE O MÍNIMO DE DEPOSITO
+            if (amount.compareTo(AMOUNT_MIN_TO_DEPOSIT) == CompareBigDecimal.LESS_THAN.getValue()) {
+                processType = StatusTransaction.AMOUNT_DEPOSIT_INSUFFICIENT;
+            }
         }
 
-        return resultData;
+        return processType;
+    }
+
+    private StatusTransaction chekProcessTypeGeral(Wallet wallet) {
+        StatusTransaction processType = StatusTransaction.SUCCESS;
+
+        // verifica se o status dO cliente da wallet é ativa
+        if (!wallet.getCustomer().getStatus().equals(Status.ACTIVE)) {
+            processType = StatusTransaction.CUSTOMER_STATUS_INVALID;
+        }
+        // verifica se o status da wallet é ativa
+        else if (!wallet.getStatus().equals(Status.ACTIVE)) {
+            processType = StatusTransaction.WALLET_STATUS_INVALID;
+        }
+
+        return processType;
     }
 
 }

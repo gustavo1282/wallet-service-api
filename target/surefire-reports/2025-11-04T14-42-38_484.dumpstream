@@ -1,5 +1,0 @@
-# Created at 2025-11-04T14:42:39.715
-Boot Manifest-JAR contains absolute paths in classpath 'D:\Desenv\projects\git-gustavo1282\feature-junit-test-v1\wallet-service-api\target\test-classes'
-Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-'other' has different root
-

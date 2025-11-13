@@ -1,7 +1,7 @@
 package com.guga.walletserviceapi.service;
 
-import com.guga.walletserviceapi.config.ResourceBadRequestException;
-import com.guga.walletserviceapi.config.ResourceNotFoundException;
+import com.guga.walletserviceapi.exception.ResourceBadRequestException;
+import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.repository.WalletRepository;
@@ -51,22 +51,25 @@ public class WalletService {
         return newWallet;
     }
 
-    public Wallet updateWallet(Long id, Wallet walletUpdate) {
+    public Wallet updateWallet(Long walletId, Wallet walletUpdate) {
 
-        Wallet wallet = getWalletById(id);
+        Wallet wallet = getWalletById(walletId);
 
-        Customer customer = customerService.getCustomerById(walletUpdate.getCustomerId());
+        if (!wallet.getStatus().equals(walletUpdate.getStatus())) {
+            wallet.setStatus( walletUpdate.getStatus() );
+        }
+
+        if (!wallet.getCurrentBalance().equals(walletUpdate.getCurrentBalance())) {
+            wallet.setCurrentBalance( walletUpdate.getCurrentBalance() );
+        }
+
+        if (!wallet.getPreviousBalance().equals(walletUpdate.getPreviousBalance())) {
+            wallet.setPreviousBalance( walletUpdate.getPreviousBalance() );
+        }
 
         wallet.setUpdatedAt(LocalDateTime.now());
-        wallet.setCurrentBalance(walletUpdate.getCurrentBalance());
-        wallet.setPreviousBalance(walletUpdate.getPreviousBalance());
-        wallet.setCustomerId(walletUpdate.getCustomerId());
-        wallet.setCustomer(customer);
-        wallet.setStatus(walletUpdate.getStatus());
-        wallet.setPreviousBalance(wallet.getPreviousBalance());
 
         return walletRepository.save(wallet);
-
     }
 
     public Page<Wallet> getAllWallets(Pageable pageable) {
