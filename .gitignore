@@ -1,0 +1,11 @@
+# Maven/Gradle generated files
+target/
+*.class
+
+# Logs
+*.log
+
+# IDE files (IntelliJ, VSCode)
+.idea/
+.vscode/
+*.iml
