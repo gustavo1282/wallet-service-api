@@ -1,20 +1,36 @@
 package com.guga.walletserviceapi.helpers;
 
-import com.guga.walletserviceapi.model.*;
-import com.guga.walletserviceapi.model.enums.OperationType;
-import com.guga.walletserviceapi.model.enums.Status;
-import com.guga.walletserviceapi.model.enums.StatusTransaction;
-import net.datafaker.Faker;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
+import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.DepositMoney;
+import com.guga.walletserviceapi.model.DepositSender;
+import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.TransferMoneyReceived;
+import com.guga.walletserviceapi.model.TransferMoneySend;
+import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.WithdrawMoney;
+import com.guga.walletserviceapi.model.enums.OperationType;
+import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.model.enums.StatusTransaction;
+
+import net.datafaker.Faker;
 
 public class TransactionUtilsMock {
 
@@ -29,11 +45,11 @@ public class TransactionUtilsMock {
     public static final int LIMIT_LIST_WALLET = 80;
 
     public static final int INI_TRANSACTION_ID = 1;
-    public static final int MAX_TRANSACTION_ID = 2000;
+    public static final int MAX_TRANSACTION_ID = 450;
 
     public static final int RANGE_TRANSACTION = 11000;
-    public static final int RANGE_TRANSFER_MONEY = 12000;
-    public static final int RANGE_DEPOSIT_SENDER = 12900;
+    public static final int RANGE_TRANSFER_MONEY = 11500;
+    public static final int RANGE_DEPOSIT_SENDER = 12000;
     public static final int RANGE_MOVEMENT_TRANSACTION = 13000;
 
     public static final Double MONEY_MIN = 10D;
@@ -57,7 +73,7 @@ public class TransactionUtilsMock {
 
                 Customer customer = Customer.builder()
                     .customerId((long) (i + 1))
-                    .status( defineStatus())
+                    .status(defineStatus())
                     .fullName(fullName)
                     .firstName(partName[0])
                     .lastName( partName[partName.length-1] )
@@ -103,26 +119,47 @@ public class TransactionUtilsMock {
                 Customer customer = customers.get(indexCustomer);
                 LocalDateTime createAt = TransactionUtilsMock.defineLocalDAteTimeBetweenYear();
 
+                List<Wallet> walletCheck = wallets.stream()
+                    .filter(w -> w.getCustomer().getCustomerId().equals(customer.getCustomerId()) 
+                                    && w.getStatus().equals(Status.ACTIVE) )
+                    .toList()
+                    ;
+
                 Long walletId = (long)i;
+               
+                Status status = defineStatus();
+
+                if (customer.getCustomerId().equals(1002L)) {
+                    System.out.println("Customer 1002 - " + status);
+                }
+
+                if (status.equals(Status.ACTIVE) && !walletCheck.isEmpty() && walletCheck.size() == 2){
+                    status = Status.INACTIVE;
+                }
 
                 Wallet wallet = Wallet.builder()
-                        .walletId( walletId )
-                        .customerId(customer.getCustomerId())
-                        .customer(customer)
-                        .status(defineStatus())
-                        .currentBalance( BigDecimal.ZERO )
-                        .previousBalance( BigDecimal.ZERO )
-                        .createdAt(createAt)
-                        .updatedAt(createAt)
-                        .build();
-
+                .walletId( walletId )
+                .customerId(customer.getCustomerId())
+                .customer(customer)
+                .status( status )
+                .currentBalance( BigDecimal.ZERO )
+                .previousBalance( BigDecimal.ZERO )
+                .createdAt(createAt)
+                .updatedAt(createAt)
+                .loginUser("system")
+                .build();
+                
                 wallets.add(wallet);
-           }
-           );
+
+            }
+        );
         return wallets;
     }
 
-    public static List<Transaction> createTransactionListMock(List<Wallet> walletInput, List<MovementTransaction> movementTransactionList) {
+    public static Map<String, List<?>> createTransactionListMock(List<Wallet> walletInput) {
+
+        Map<String, List<?>> resultsMap = new HashMap<>();
+
         List<Wallet> walletsMock = new ArrayList<>(walletInput);
 
         if ( walletsMock.isEmpty() ) {
@@ -138,6 +175,11 @@ public class TransactionUtilsMock {
         final int totalWalletItems = wallets.size();
 
         List<Transaction> transactions = new ArrayList<>();
+
+        List<MovementTransaction> movements = new ArrayList<>();
+
+        List<DepositSender> depositSenders = new ArrayList<>();
+
 
         //movementTransactionList = (movementTransactionList == null || movementTransactionList.isEmpty()) ? new ArrayList<>() : movementTransactionList;
 
@@ -160,18 +202,22 @@ public class TransactionUtilsMock {
                 case DEPOSIT:
                     DepositMoney depositMoney = TransactionUtils.generateDepositMoney(walletSend, amount);
                     depositMoney.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION );
+                    depositMoney.setLogin(RandomMock.loginFakeMock());
                     if (depositMoney.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
                         TransactionUtils.adjustBalanceWallet(walletSend, depositMoney);
 
                         movement = TransactionUtils.generateMovementTransaction(depositMoney, null);
                         movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
-                        movementTransactionList.add(movement);
+                        movements.add(movement);
+
+                        depositMoney.setMovementTransaction(movement);
                     }
 
                     // Para Mock, gerar dinamicamente o Deposit Sender
                     if ( RandomMock.generateIntNumber (2) == 0 ) {
                         DepositSender depositSender = generateDepositSenderMock(depositMoney);
-                        //depositMoney.setDepositSender(depositSender);
+                        depositSenders.add(depositSender);
+
                         depositMoney.setDepositSender(depositSender);
                     }
 
@@ -181,13 +227,15 @@ public class TransactionUtilsMock {
                 case WITHDRAW:
                     WithdrawMoney withdraw = TransactionUtils.generateWithdraw(walletSend, amount );
                     withdraw.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION);
+                    withdraw.setLogin(RandomMock.loginFakeMock());
                     if (withdraw.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
                         TransactionUtils.adjustBalanceWallet(walletSend, withdraw);
 
-                        movement = TransactionUtils
-                                .generateMovementTransaction(withdraw, null);
+                        movement = TransactionUtils.generateMovementTransaction(withdraw, null);
                         movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
-                        movementTransactionList.add(movement);
+                        movements.add(movement);
+
+                        withdraw.setMovementTransaction(movement);
                     }
 
                     transactions.add(withdraw);
@@ -196,52 +244,43 @@ public class TransactionUtilsMock {
                 case TRANSFER_SEND:
                     TransferMoneySend transferSend = TransactionUtils.generateTransferMoneySend(walletSend, walletReceived, amount);
                     transferSend.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION );
-
-                    TransferMoneyReceived transferReceived = TransferMoneyReceived.builder()
-                            .statusTransaction(StatusTransaction.INVALID)
-                            .build();
+                    transferSend.setLogin(RandomMock.loginFakeMock());
 
                     if (transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
-
                         TransactionUtils.adjustBalanceWallet(walletSend, transferSend);
-
-                    }
-
-                    // Gera o movimento de transferencia da transação Envio
-                    if (transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
-                        movement = TransactionUtils.generateMovementTransaction(transferSend, transferReceived);
-                        movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
-                        movementTransactionList.add(movement);
-
-                        transferSend.setMovementTransaction(movement);
-                    }
-
-                    transactions.add( transferSend );
-
-                    // Registra transaction Received conforme Business Rules
-                    if (transferReceived != null &&
-                            transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
-
+                            
                         SEQUENCE_TRANSACTION++;
-                        transferReceived = TransactionUtils.generateTransferMoneyReceived(walletReceived, amount);
+                        TransferMoneyReceived transferReceived = TransactionUtils.generateTransferMoneyReceived(walletReceived, amount);
                         transferReceived.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION );
-
+                        transferReceived.setLogin(RandomMock.loginFakeMock());
+                        
                         if (transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)){
                             TransactionUtils.adjustBalanceWallet(walletReceived, transferReceived);
-
+                            
                             // Gera o movimento de transferencia da transação Destino
                             movement = TransactionUtils.generateMovementTransaction(transferReceived, transferSend);
                             movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
-                            movementTransactionList.add(movement);
+                            movements.add(movement);
+                            
                             transferReceived.setMovementTransaction(movement);
+
+                            transactions.add( transferReceived );
+                        } 
+                        else {
+                            transferSend.setStatusTransaction(transferReceived.getStatusTransaction());
+                        }
+                        
+                        // Gera o movimento de transferencia da transação Envio
+                        if (transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS) &&
+                                transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+                            movement = TransactionUtils.generateMovementTransaction(transferSend, transferReceived);
+                            movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
+                            movements.add(movement);
+
+                            transferSend.setMovementTransaction(movement);
                         }
 
-                        if (transferReceived.getStatusTransaction().equals(StatusTransaction.INVALID)) {
-                            System.out.println("Transacao Invalida de: " + walletSend.toString());
-                        }
-
-                        transactions.add( transferReceived );
-
+                        transactions.add( transferSend );
                     }
                     break;
 
@@ -250,7 +289,11 @@ public class TransactionUtilsMock {
             }
         }
 
-        return transactions;
+        resultsMap.put("transactions", transactions);
+        resultsMap.put("movements", movements);
+        resultsMap.put("depositSenders", depositSenders);
+
+        return resultsMap;
     }
 
     public static List<Customer> getCustomersByStatus(List<Customer> customers, Status status) {
@@ -280,8 +323,6 @@ public class TransactionUtilsMock {
 
         return DepositSender.builder()
                 .senderId( RANGE_DEPOSIT_SENDER + SEQUENCE_TRANSACTION )
-                .transactionId( depositMoney.getTransactionId() )
-                .walletId( depositMoney.getWalletId() )
                 .fullName( RandomMock.removeSufixoEPrevixos( faker.name().fullName() ).toUpperCase() )
                 .terminalId( RandomMock.generateRandomNumbers( 3 ) )
                 .amount( depositMoney.getAmount() )
@@ -290,11 +331,6 @@ public class TransactionUtilsMock {
                 .build();
 
     }
-
-//    private static OperationType defineOperationType() {
-//        int id = RandomMock.generateIntNumberByInterval(1, OperationType.values().length + 1);
-//        return OperationType.fromValue(id);
-//    }
 
     public static LocalDate defineBirthDateMore18YearOld() {
         int year = RandomMock.generateIntNumberByInterval(19, 29);
@@ -398,16 +434,6 @@ public class TransactionUtilsMock {
                         Sort.Order.asc("transactionId")
                 )
         );
-    }
-
-    public static String cpfFake() {
-        Faker faker = new Faker(new Locale("pt-BR"));
-        return faker.cpf().valid();
-    }
-
-    public static String fullNameFake() {
-        Faker faker = new Faker(new Locale("pt-BR"));
-        return RandomMock.removeSufixoEPrevixos( faker.name().fullName() ).toUpperCase();
     }
 
 }

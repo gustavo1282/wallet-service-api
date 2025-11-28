@@ -1,13 +1,21 @@
 package com.guga.walletserviceapi.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.guga.walletserviceapi.exception.ResourceNotFoundException;
-import com.guga.walletserviceapi.helpers.RandomMock;
-import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
-import com.guga.walletserviceapi.model.Customer;
-import com.guga.walletserviceapi.model.Wallet;
-import com.guga.walletserviceapi.service.WalletService;
-import net.datafaker.Faker;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,24 +24,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guga.walletserviceapi.exception.ResourceNotFoundException;
+import com.guga.walletserviceapi.helpers.RandomMock;
+import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
+import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.service.WalletService;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import net.datafaker.Faker;
 
 
 @WebMvcTest(WalletController.class)
@@ -86,7 +96,7 @@ class WalletControllerTests {
 
         when(walletService.saveWallet(any(Wallet.class))).thenReturn(walletCreated);
         walletCreated.setWalletId(walletId);
-        Long customerId = walletCreated.getCustomerId();
+        Long customerId = walletCreated.getCustomer().getCustomerId();
 
         // Act & Assert
         mockMvc.perform(post(URI_API.concat("/wallet"))

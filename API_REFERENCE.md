@@ -1,33 +1,75 @@
+# API Reference
+
+Documentação dos endpoints disponíveis no Wallet Service API.
 
 ---
 
-## 🧭 API_REFERENCE.md
+# 🧍 Customer
+
+## POST /customers
+Cria um novo cliente.
+
+## GET /customers/{id}
+Retorna cliente por ID.
+
+## GET /customers?status=ACTIVE
+Lista clientes filtrando por status.
+
+## PUT /customers/{id}
+Atualiza dados do cliente.
+
+## PATCH /customers/{id}/status
+Altera o status do cliente.
 
 ---
 
-## Endpoints principais (resumo)
+# 💼 Wallet
 
-### Base path: /wallet-services/api (conforme application.yml).
-
-### application
-
-- POST /wallets — Criar wallet para um customer.
-
-- GET /wallets/{id} — Recuperar dados da wallet.
-
-- GET /wallets/{id}/balance — Saldo atual.
-
-- GET /wallets/{id}/balance/history?at={timestamp} — Saldo em um timestamp passado.
-
-- POST /wallets/{id}/deposit — Depositar valor.
-
-- POST /wallets/{id}/withdraw — Sacar valor.
-
-- POST /wallets/transfer — Transferir entre wallets.
-
-- CRUD Customers: /customers endpoints (list/create/get/update/delete).
-
-- CRUD Transactions: /transactions endpoints (list/get).
+## GET /wallets/{customerId}
+Retorna informações da wallet do cliente.
 
 ---
 
+# 💰 Depósitos
+
+## POST /deposits
+Cria depósito.
+
+---
+
+# 🔄 Movements
+
+## GET /movements?walletId=xxx
+Lista movimentações.
+
+---
+
+# 🔁 Transferências
+
+## POST /transfers
+Realiza transferência entre contas.
+
+---
+
+# 🧾 Transactions
+
+## GET /transactions?walletId=xxx
+Lista transações.
+
+---
+
+# 🧪 Respostas Comuns
+
+### 400  
+Erros de validação.
+
+### 404  
+Registro não encontrado.
+
+### 422  
+Regra de negócio não atendida.
+
+### 500  
+Erro interno inesperado.
+
+---

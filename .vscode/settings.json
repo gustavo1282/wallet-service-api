@@ -1,0 +1,29 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "editor.codeActionsOnSave": {
+
+        "source.organizeImports": "explicit"
+    },
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "C:/Program Files/Java/jdk-21",
+            "default": true
+        }
+    ],
+    "java.configuration.maven.userSettings": "",
+    "java.jdt.ls.java.home": "C:/Program Files/Java/jdk-21",
+    "editor.formatOnSave": false,    
+    // Configuração específica para Java
+    "[java]": {
+        "editor.formatOnSave": false
+    },
+    // Se o problema for em arquivos HTML/CSS/JS, desative também:
+    "[html]": {
+        "editor.formatOnSave": false
+    },
+    "[javascript]": {
+        "editor.formatOnSave": false
+    }
+}

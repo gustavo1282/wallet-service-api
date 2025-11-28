@@ -1,8 +1,3 @@
-# 💼 Wallet Service
-
-Serviço de carteira digital desenvolvido em **Java 17 + Spring Boot 3.4.10**, responsável por gerenciar saldos e transações de usuários (depósito, saque e transferência), com rastreabilidade completa e observabilidade integrada.
-
----
 
 ## 👤 Autor
 
@@ -12,186 +7,155 @@ Serviço de carteira digital desenvolvido em **Java 17 + Spring Boot 3.4.10**, r
 
 ---
 
-## 🧩 Objetivo Geral
-
-Criar um **serviço de carteira digital (wallet service)** que permita:
-- Gerenciar saldos e movimentações financeiras entre usuários;
-- Garantir **transações ACID**, **integridade dos dados** e **rastreabilidade total**;
-- Disponibilizar métricas e logs estruturados para auditoria e observabilidade.
+# Wallet Service API  
+Sistema de carteira digital para gerenciamento de clientes, contas, depósitos, transferências e movimentações financeiras.
 
 ---
 
-## ⚙️ Tecnologias Utilizadas
+## 📌 Visão Geral
 
-- **Java 17**
-- **Spring Boot 3.4.10**
-- **Spring Data JPA (Hibernate)**
-- **PostgreSQL 15.3-alpine**
-- **Prometheus v2.51.0**
-- **Grafana 10.2.3**
-- **Docker & Docker Compose**
+O **Wallet Service API** é um sistema completo de carteira digital desenvolvido com foco em:
 
----
+- Arquitetura limpa
+- Escalabilidade
+- Observabilidade
+- Segurança
+- Boas práticas de engenharia
+- Domínio claro do problema financeiro
 
-## 📋 Requisitos (Resumo)
-
-> Detalhamento completo em [ARCHITECTURE_AND_DESIGN.md](./ARCHITECTURE_AND_DESIGN.md#requisitos).
-
-### Requisitos Funcionais
-- Criar e consultar carteiras;
-- Consultar saldo atual e histórico;
-- Depositar, sacar e transferir fundos.
-
-### Requisitos Não Funcionais
-- Alta disponibilidade;
-- Auditoria completa de transações;
-- Persistência e consistência de dados.
+O projeto evoluiu a partir de um estudo avançado de Java + Spring Boot, mas ganhou maturidade e agora se comporta como um **serviço real**, servindo como base para aprendizado, referência arquitetural e demonstração técnica.
 
 ---
 
-## 🔒 Boas Práticas e Considerações Técnicas
+## 🚀 Objetivos do Projeto
 
-- Uso de **transações atômicas (@Transactional)**;
-- **Lock pessimista** para evitar concorrência no saldo;
-- **Logs de auditoria** completos (tabela `Transaction`);
-- **Testes unitários e de integração** com JUnit + Testcontainers;
-- **DTOs e Services** para separação de responsabilidades.
-
----
-
-## ⚙️ Configurações Importantes
-
-Arquivo `application.yml` (trecho):
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://host.docker.internal:5432/wallet_db
-    username: wallet_user
-    password: wallet_pass
-```
-
-Prometheus coleta métricas em:
-```
-http://host.docker.internal:8080/actuator/prometheus
-```
+- Demonstrar uma arquitetura sólida e modular  
+- Criar um sistema de operações financeiras consistente  
+- Aderência às boas práticas do mercado  
+- Possibilitar evolução por novos colaboradores  
+- Documentação clara e completa  
+- Base para futuras pesquisas, melhorias e experimentações
 
 ---
 
-## 🔗 Endpoints Principais
+## 🧱 Estrutura do Projeto
 
-> Caminho base: `/api`
+com.guga.walletserviceapi
+├── controller
+├── dto
+├── domain
+├── entity
+├── exception
+├── handler
+├── mapper
+├── model
+├── record
+├── repository
+├── seeder
+└── service
 
-| Método   | Endpoint                                       | Descrição                        |
-|:---------|:-----------------------------------------------|:---------------------------------|
-| POST     | `/wallets`                                     | Criar carteira para um cliente   |
-| GET      | `/wallets/{id}`                                | Consultar carteira               |
-| GET      | `/wallets/{id}/balance`                        | Consultar saldo atual            |
-| GET      | `/wallets/{id}/balance/history?at={timestamp}` | Consultar saldo histórico        |
-| POST     | `/wallets/{id}/deposit`                        | Depositar fundos                 |
-| POST     | `/wallets/{id}/withdraw`                       | Sacar fundos                     |
-| POST     | `/wallets/transfer`                            | Transferir entre carteiras       |
-| CRUD     | `/customers`                                   | CRUD de clientes                 |
-| CRUD     | `/transactions`                                | Histórico de transações          |
 
-📘 **Swagger / OpenAPI:**  
-[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+Cada camada possui responsabilidades bem definidas, seguindo princípios como:
+
+- Coesão
+- Baixo acoplamento
+- Separação de preocupações
+- Código modular e testável
 
 ---
 
-## 🧪 Testes e Integração Contínua
+## 🧩 Principais Funcionalidades
 
-Executar todos os testes:
+### ✔️ Customer
+- Cadastro
+- Atualização
+- Consulta por ID e por Status
+- Alteração de status
+- Seed inicial opcional
+
+### ✔️ Wallet
+- Criação automática vinculada ao cliente
+- Consulta de saldo
+- Limites operacionais
+
+### ✔️ Depósitos
+- Entrada de valores com origem (DepositSender)
+- Associação automática com Wallet e Transação
+
+### ✔️ Movimentações (Movements)
+- Crédito
+- Débito
+- Registro auditável
+- Controle transacional
+
+### ✔️ Transferências
+- Transferências entre contas internas
+- Operação atômica com compensação
+- Registro completo da transação
+
+### ✔️ Transações
+- Histórico de eventos financeiros
+- Rastreabilidade completa
+- Auditoria técnica
+
+---
+
+## 🏛️ Arquitetura (Resumo)
+
+- Controllers → entrada da API e validações
+- Services → regras de negócio
+- Repositories → persistência com JPA
+- Entity → modelo de banco
+- Domain → enums, regras específicas de domínio
+- DTO/Record → transporte de dados
+- Exception Handler global
+- Seeders → carga inicial opcional de dados
+
+O detalhamento técnico está disponível em **ARCHITECTURE_AND_DESIGN.md**.
+
+---
+
+## 🔧 Tecnologias Utilizadas
+
+- Java 21  
+- Spring Boot  
+- JPA / Hibernate  
+- PostgreSQL  
+- Docker Compose  
+- MapStruct  
+- Lombok  
+- JUnit / Mockito  
+- Maven  
+
+---
+
+## ▶️ Como Executar
+
+### Docker
 ```bash
-./mvnw test
+docker-compose up --build
 ```
 
-### Stack de Testes
-- **Testes Unitários:** JUnit 5 + Mockito
-- **Testes de Integração:** Spring Boot Test + Testcontainers (Postgres)
-- **Pipeline CI (sugestão):**
-    - `mvnw clean verify`
-    - build da imagem Docker
-    - push para o registry (se aplicável)
-
----
-
-## 🗄️ Banco de Dados e Migrations
-
-- Recomendado: **Flyway** ou **Liquibase** para versionar o schema.
-- Em desenvolvimento: `spring.jpa.hibernate.ddl-auto=update` (não recomendado para produção).
-- Tabelas principais:
-    - `customer`
-    - `wallet`
-    - `transaction`
-
----
-
-## 📊 Observabilidade
-
-Métricas e healthchecks expostos via Spring Boot Actuator:
-
-| Componente      | Endpoint / Porta                                                                       | Descrição                    |
-|-----------------|----------------------------------------------------------------------------------------|------------------------------|
-| **Prometheus**  | [http://localhost:9090](http://localhost:9090)                                         | Coleta métricas da aplicação |
-| **Grafana**     | [http://localhost:3000](http://localhost:3000)                                         | Dashboards e alertas         |
-| **API Metrics** | [http://localhost:8080/actuator/prometheus](http://localhost:8080/actuator/prometheus) | Métricas da aplicação        |
-
-Mais detalhes técnicos em [ARCHITECTURE_AND_DESIGN.md](./ARCHITECTURE_AND_DESIGN.md#observabilidade).
-
----
-
-## 🚀 Quickstart
-
-Subir todo o ambiente (Postgres + API + Observabilidade):
-```bash
-./start_dev_app.sh
+### Localmente
+```
+mvn clean install
+mvn spring-boot:run
 ```
 
-## ⚙️ Perfis de Execução (Profiles)
 
-O projeto utiliza perfis Spring Boot para gerenciar ambientes:
-
-| Cenário                         | Forma Mais Clara/Usual        | Onde Configurar                     | Exemplo                            |
-|:--------------------------------|:------------------------------|:------------------------------------|:-----------------------------------|
-| **Testes (JUnit)**              | Anotação Java                 | Na classe de teste                  | `@ActiveProfiles("test")`          |
-| **Desenvolvimento Local (IDE)** | VM Options                    | Run Configuration do IDE.           | `-Dspring.profiles.active=desenv`  |
-| **Validação via Docker**        | Variável de Ambiente (S.O.)   | No Dockerfile/docker-compose ou K8s | `SPRING_PROFILES_ACTIVE=homolog`   |
-| **Containers (Docker/Prod)**    | Variável de Ambiente (S.O.)   | No Dockerfile/docker-compose ou K8s | `SPRING_PROFILES_ACTIVE=homolog`   |
-
-
-### Como ativar um profile
-
-#### Via terminal
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-
-
-Rodar apenas o serviço localmente:
-```bash
-./mvnw spring-boot:run
+### Testes
+```
+mvn test
 ```
 
-#### Via Docker Compose
-```bash
-environment:
-- SPRING_PROFILES_ACTIVE=homolog
-```
+📚 Documentos Complementares
 
-#### Via variável de ambiente (produção)
-```bash
-export SPRING_PROFILES_ACTIVE=prod
-```
+- [ARCHITECTURE_AND_DESIGN.md](./ARCHITECTURE_AND_DESIGN.md)
+- [API_REFERENCE.md](./API_REFERENCE.md)
+- [OBSERVABILITY.md](./OBSERVABILITY.md)
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [DATA_MODEL.md](./DATA_MODEL.md)
+- [DOMAIN_MODEL.md](./DOMAIN_MODEL.md)
+- [SECURITY.md](./SECURITY.md)
+- [BUILD_AND_CI.md](./BUILD_AND_CI.md)
 
-### Cada profile possui um arquivo de configuração específico:
-- application-dev.yml
-- application-homolog.yml
-- application-prod.yml
-
----
-
-## 📚 Documentação Complementar
-
-| Documento                                                  | Descrição                               |
-|------------------------------------------------------------|-----------------------------------------|
-| [ARCHITECTURE_AND_DESIGN.md](./ARCHITECTURE_AND_DESIGN.md) | Design técnico e decisões arquiteturais |
-| [CONTRIBUTING.md](./CONTRIBUTING.md)                       | Como contribuir e rodar localmente      |

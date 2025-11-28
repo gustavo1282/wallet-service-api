@@ -1,20 +1,37 @@
+# Observability
+
+Este documento descreve abordagens de logs, métricas e rastreamento do Wallet Service API.
 
 ---
 
-## 🧭 **3. OBSERVABILITY.md**
+# 📝 Logs
+
+- Log centralizado em todas as operações financeiras
+- Identificação única por transação
+- Logs estruturados
+- Registro de erros com stacktrace
 
 ---
 
-## O que deve conter
+# 🔍 Tracing
 
-| Seção               | O que incluir                                                             |
-|:--------------------|:--------------------------------------------------------------------------|
-| **Overview**        | Importância da observabilidade no contexto do projeto                     |
-| **Prometheus**      | Configuração (`prometheus.yml`), métricas expostas, intervalos, labels    |
-| **Grafana**         | Datasource, dashboards e painéis sugeridos                                |
-| **Spring Actuator** | Endpoints habilitados, uso de `/actuator/prometheus`, `/health`, `/info`  |
-| **Alert Rules**     | Sugestões de alertas em PromQL (erro 5xx, latência, etc.)                 |
-| **Logs & Tracing**  | Estratégia de logs estruturados, MDC/traceId, futu
+- Cada request recebe um identificador
+- Movimentações e transações são rastreáveis
 
+---
 
+# 📈 Métricas Recomendadas (não implementadas, mas sugeridas)
 
+- Total de depósitos por hora
+- Total de transferências
+- Saldo agregado por dia
+- Movimentações por wallet
+- Erros por tipo
+
+---
+
+# 🚨 Alertas Recomendados
+
+- Wallet com saldo negativo inesperado
+- Falha recorrente de transferências
+- Operações lentas
