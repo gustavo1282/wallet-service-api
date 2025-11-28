@@ -1,20 +1,22 @@
 package com.guga.walletserviceapi.config;
 
+import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfig {
 
+    final String securitySchemeName = "basicAuth";
+
     @Bean
-    public OpenAPI customOpenAPI() {
-        // 1. Nome interno do esquema de segurança
-        final String securitySchemeName = "basicAuth";
+    public OpenAPI walletOpenAPI() {
 
         return new OpenAPI()
                 .info(new Info().title("Wallet Service API")
@@ -31,6 +33,11 @@ public class OpenApiConfig {
                           """
                         )
                 )
+
+                //.servers(List.of(
+                //        new Server().url(serverUrl)
+                //        )
+                //)
 
                 // 2. Adiciona o esquema de segurança aos componentes
                 .components(new Components()
@@ -63,6 +70,14 @@ public class OpenApiConfig {
 
                 // 3. Aplica este esquema de segurança globalmente a TODOS os endpoints
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));
+    }
+
+    @Bean
+    public GroupedOpenApi apiV1() {
+        return GroupedOpenApi.builder()
+                .group("v1")
+                .pathsToMatch("/api/v1/**")
+                .build();
     }
 
 }

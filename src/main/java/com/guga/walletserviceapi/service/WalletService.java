@@ -1,18 +1,25 @@
 package com.guga.walletserviceapi.service;
 
-import com.guga.walletserviceapi.exception.ResourceBadRequestException;
-import com.guga.walletserviceapi.exception.ResourceNotFoundException;
-import com.guga.walletserviceapi.model.Customer;
-import com.guga.walletserviceapi.model.Wallet;
-import com.guga.walletserviceapi.repository.WalletRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guga.walletserviceapi.exception.ResourceBadRequestException;
+import com.guga.walletserviceapi.exception.ResourceNotFoundException;
+import com.guga.walletserviceapi.helpers.FileUtils;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.repository.WalletRepository;
 
 @Service
 public class WalletService {
@@ -30,11 +37,11 @@ public class WalletService {
 
     public Wallet saveWallet(Wallet wallet) {
 
-        Customer customer = customerService.getCustomerById(wallet.getCustomerId());
+        Customer customer = customerService.getCustomerById(wallet.getCustomer().getCustomerId());
 
-        List<Wallet> existingWallet = walletRepository.findAllWalletsByCustomerId(wallet.getCustomerId())
-                .orElse(null);
-        if (existingWallet != null && existingWallet.isEmpty()) {
+        Page<Wallet> findAllCustomer = walletRepository.findByCustomer_CustomerId(wallet.getCustomer().getCustomerId(), GlobalHelper.getDefaultPageable());
+
+        if (findAllCustomer.isEmpty() || !findAllCustomer.hasContent()) {
             throw new ResourceBadRequestException("Customer already has a wallet");
         }
 
@@ -74,18 +81,54 @@ public class WalletService {
 
     public Page<Wallet> getAllWallets(Pageable pageable) {
 
-        Page<Wallet> list = walletRepository.findAll(pageable);
+        Page<Wallet> findResult = walletRepository.findAll(pageable);
 
-        if (list.getContent().isEmpty()) {
-            throw new ResourceNotFoundException("No wallets found");
+        if (findResult.isEmpty() || !findResult.hasContent()) {
+            throw new ResourceNotFoundException("Transactions not found");
         }
 
-        return list;
+        return findResult;
+
     }
 
-    public List<Wallet> getWalletByCustomerId(Long id) {
-        return walletRepository.findAllWalletsByCustomerId(id)
-            .orElseThrow(() -> new ResourceNotFoundException(String.format("Wallet not found with id: %d", id)));
+    /***
+     * Função responsável por realizar carga inicial de dados para a tabela correspondente a partir de um 
+     * arquivo no formato JSON
+     * @param file
+     * @throws Exception
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void loadCsvAndSave(MultipartFile file) throws Exception {
+        try {
+            ObjectMapper mapper = FileUtils.instanceObjectMapper();
+
+            TypeReference<List<Wallet>> walletTypeRef = new TypeReference<List<Wallet>>() { };
+
+            List<Wallet> wallets = mapper.readValue(file.getInputStream(), walletTypeRef);
+
+            for (int i = 0; i < wallets.size(); i += GlobalHelper.BATCH_SIZE) {
+
+                int end = Math.min(wallets.size(), i + GlobalHelper.BATCH_SIZE);
+                
+                List<Wallet> lote = wallets.subList(i, end);
+
+                walletRepository.saveAll(lote);
+
+            }
+        } catch (Exception e) {
+            throw new ResourceBadRequestException(e.getMessage());
+        }
+    }
+
+    public Page<Wallet> getWalletByCustomerId(Long customerId, Pageable pageable) {
+
+        Page<Wallet> findResult = walletRepository.findByCustomer_CustomerId(customerId, pageable);
+
+        if (findResult.isEmpty() || !findResult.hasContent()) {
+            throw new ResourceNotFoundException("Wallets not found by Customer Id");
+        }
+
+        return findResult;
     }
 
 }

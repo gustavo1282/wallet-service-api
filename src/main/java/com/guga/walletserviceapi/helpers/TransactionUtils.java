@@ -1,13 +1,20 @@
 package com.guga.walletserviceapi.helpers;
 
-import com.guga.walletserviceapi.model.*;
-import com.guga.walletserviceapi.model.enums.CompareBigDecimal;
-import com.guga.walletserviceapi.model.enums.StatusTransaction;
-import com.guga.walletserviceapi.model.enums.Status;
-import com.guga.walletserviceapi.model.enums.OperationType;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.guga.walletserviceapi.model.DepositMoney;
+import com.guga.walletserviceapi.model.DepositSender;
+import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.TransferMoneyReceived;
+import com.guga.walletserviceapi.model.TransferMoneySend;
+import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.WithdrawMoney;
+import com.guga.walletserviceapi.model.enums.CompareBigDecimal;
+import com.guga.walletserviceapi.model.enums.OperationType;
+import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.model.enums.StatusTransaction;
 
 public class TransactionUtils {
 
@@ -35,10 +42,11 @@ public class TransactionUtils {
     public static BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
 
     public static DepositMoney generateDepositMoney(Wallet wallet, BigDecimal amount) {
-        StatusTransaction statusTransaction = chekProcessTypeDeposit(amount, wallet);
+        StatusTransaction statusTransaction = chekProcessTypeDeposit(wallet, amount);
 
         return DepositMoney.builder()
-                .walletId(wallet.getWalletId())
+                //.walletId(wallet.getWalletId())
+                .wallet(wallet)
                 .createdAt(LocalDateTime.now())
                 .statusTransaction( statusTransaction )
                 .amount( amount )
@@ -49,13 +57,14 @@ public class TransactionUtils {
     }
 
     public static WithdrawMoney generateWithdraw(Wallet wallet, BigDecimal amount) {
-        StatusTransaction processType = chekProcessTypeWithdraw(amount, wallet);
+        StatusTransaction sttType = chekProcessTypeWithdraw(wallet, amount);
 
         return WithdrawMoney.builder()
                 .transactionId( null )
-                .walletId(wallet.getWalletId())
+                //.walletId(wallet.getWalletId())
+                .wallet(wallet)
                 .createdAt(LocalDateTime.now())
-                .statusTransaction(processType)
+                .statusTransaction(sttType)
                 .amount( amount )
                 .previousBalance( wallet.getCurrentBalance())
                 .currentBalance( wallet.getCurrentBalance().subtract(amount) )
@@ -64,14 +73,14 @@ public class TransactionUtils {
     }
 
     public static TransferMoneySend generateTransferMoneySend(Wallet wallet, Wallet walletTo, BigDecimal amount) {
-
-        StatusTransaction processType = chekProcessTypeTransfer(amount, wallet, walletTo);
+        StatusTransaction sttType = chekProcessTypeTransfer(wallet, walletTo, amount);
 
         return TransferMoneySend.builder()
                 //.transactionId( null )
-                .walletId(wallet.getWalletId())
+                //.walletId(wallet.getWalletId())
+                .wallet(wallet)
                 .createdAt(LocalDateTime.now())
-                .statusTransaction(processType)
+                .statusTransaction(sttType)
                 .amount( amount )
                 .previousBalance( wallet.getCurrentBalance() )
                 .currentBalance( wallet.getCurrentBalance().subtract( amount ) )
@@ -85,7 +94,8 @@ public class TransactionUtils {
 
         return TransferMoneyReceived.builder()
                 //.transactionId( null )
-                .walletId( walletReceivedId )
+                //.walletId( walletReceivedId )
+                .wallet(walletReceived)
                 .createdAt(LocalDateTime.now())
                 .statusTransaction( StatusTransaction.SUCCESS )
                 .amount( amount )
@@ -102,15 +112,16 @@ public class TransactionUtils {
 
         return MovementTransaction.builder()
                 .transactionId( transferSend.getTransactionId() )
-                .walletId( transferSend.getWalletId() )
+                .walletId( transferSend.getWallet().getWalletId() )
 
-                .transactionToId( containReceived ? transferReceived.getTransactionId() : null )
-                .walletToId( containReceived ? transferReceived.getWalletId() : null )
+                .transactionReferenceId( containReceived ? transferReceived.getTransactionId() : null )
+                .walletReferenceId( containReceived ? transferReceived.getWallet().getWalletId() : null )
 
                 .amount( transferSend.getAmount() )
                 .createdAt(LocalDateTime.now())
 
                 .operationType(transferSend.getOperationType())
+                .statusTransaction(transferSend.getStatusTransaction())
 
                 .build();
     }
@@ -118,8 +129,7 @@ public class TransactionUtils {
     public static DepositSender generateDepositSender(DepositMoney depositMoney, String cpfSender, String senderName, String terminalId) {
 
         return DepositSender.builder()
-                .transactionId(depositMoney.getTransactionId())
-                .walletId(depositMoney.getWalletId())
+                //.transaction(depositMoney)
                 .cpf(cpfSender)
                 .terminalId(terminalId)
                 .fullName(senderName)
@@ -127,91 +137,83 @@ public class TransactionUtils {
                 .build();
     }
 
-//    public static void adjustBalanceWallet(Wallet wallet, BigDecimal previousBalance, BigDecimal currentBalance) {
-//        wallet.setPreviousBalance( previousBalance );
-//        wallet.setCurrentBalance( currentBalance );
-//        wallet.setUpdatedAt( LocalDateTime.now() );
-//    }
-
     public static void adjustBalanceWallet(Wallet wallet, Transaction transaction) {
         wallet.setPreviousBalance( transaction.getPreviousBalance() );
         wallet.setCurrentBalance( transaction.getCurrentBalance() );
         wallet.setUpdatedAt( LocalDateTime.now() );
     }
 
-    public static StatusTransaction chekProcessTypeTransfer(BigDecimal amount, Wallet wallet, Wallet walletTo) {
-        StatusTransaction processType = chekProcessTypeGeral(wallet);
+    public static StatusTransaction chekProcessTypeTransfer(Wallet wallet, Wallet walletTo, BigDecimal amount) {
+        StatusTransaction sttType = chekProcessTypeGeral(wallet);
 
         // se as validações gerais foram bem sucessidas, continua para as especificas da transação
-        if (processType.equals(StatusTransaction.SUCCESS)) {
+        if (sttType.equals(StatusTransaction.SUCCESS)) {
             // Valida se a wallet to é diferente da wallet de transferencia
             if (wallet.getWalletId().equals(walletTo.getWalletId())) {
-                processType = StatusTransaction.SAME_WALLET;
+                sttType = StatusTransaction.SAME_WALLET;
             }
             // Valida se o valor da transferência é maior do que o saldo existente
             else if (wallet.getCurrentBalance().compareTo( amount ) == CompareBigDecimal.LESS_THAN.getValue() ) {
-                processType = StatusTransaction.INSUFFICIENT_BALANCE;
+                sttType = StatusTransaction.INSUFFICIENT_BALANCE;
             }
             else if (!walletTo.getCustomer().getStatus().equals(Status.ACTIVE)) {
-                processType = StatusTransaction.CUSTOMER_STATUS_INVALID;
+                sttType = StatusTransaction.CUSTOMER_STATUS_INVALID;
             }
             else if (!walletTo.getStatus().equals(Status.ACTIVE)) {
-                processType = StatusTransaction.WALLET_STATUS_INVALID;
+                sttType = StatusTransaction.WALLET_STATUS_INVALID;
             }
             else if (amount.compareTo(AMOUNT_MIN_TO_TRANSFER) == CompareBigDecimal.LESS_THAN.getValue()) {
-                processType = StatusTransaction.AMOUNT_TRANSFER_INVALID;
+                sttType = StatusTransaction.AMOUNT_TRANSFER_INVALID;
             }
         }
-        return processType;
+        return sttType;
     }
 
-    public static StatusTransaction chekProcessTypeDeposit(BigDecimal amount, Wallet wallet) {
-        StatusTransaction processType = chekProcessTypeGeral(wallet);
+    public static StatusTransaction chekProcessTypeDeposit(Wallet wallet, BigDecimal amount) {
+        StatusTransaction sttType = chekProcessTypeGeral(wallet);
 
         // se as validações gerais foram bem sucessidas, continua para as especificas da transação
-        if (processType.equals(StatusTransaction.SUCCESS)) {
+        if (sttType.equals(StatusTransaction.SUCCESS)) {
             // VALIDA SE O VALOR DA TRANSAÇÃO É MENOR QUE O MÍNIMO DE DEPOSITO
             if (amount.compareTo(AMOUNT_MIN_TO_DEPOSIT) == CompareBigDecimal.LESS_THAN.getValue()) {
-                processType = StatusTransaction.AMOUNT_DEPOSIT_INSUFFICIENT;
+                sttType = StatusTransaction.AMOUNT_DEPOSIT_INSUFFICIENT;
             }
         }
-
-        return processType;
+        return sttType;
     }
 
-    public static StatusTransaction chekProcessTypeWithdraw(BigDecimal amount, Wallet wallet) {
-        StatusTransaction processType = chekProcessTypeGeral(wallet);
+    public static StatusTransaction chekProcessTypeWithdraw(Wallet wallet, BigDecimal amount) {
+        StatusTransaction sttType = chekProcessTypeGeral(wallet);
 
         // se as validações gerais foram bem sucessidas, continua para as especificas da transação
-        if (processType.equals(StatusTransaction.SUCCESS)) {
+        if (sttType.equals(StatusTransaction.SUCCESS)) {
             // se o valor da transação for menor que mínimo permitido não será criado a transação
             if (wallet.getCurrentBalance().compareTo(amount) == CompareBigDecimal.LESS_THAN.getValue()) {
-                processType = StatusTransaction.INSUFFICIENT_BALANCE;
+                sttType = StatusTransaction.INSUFFICIENT_BALANCE;
             }
         }
-
-        return processType;
+        return sttType;
     }
 
     private static StatusTransaction chekProcessTypeGeral(Wallet wallet) {
-        StatusTransaction processType = StatusTransaction.SUCCESS;
+        StatusTransaction sttType = StatusTransaction.SUCCESS;
 
         if (wallet == null || wallet.getWalletId() == null) {
-            processType = StatusTransaction.WALLET_INVALID;
+            sttType = StatusTransaction.WALLET_INVALID;
         }
         else if (wallet.getCustomer() == null || wallet.getCustomer().getCustomerId() == null) {
-            processType = StatusTransaction.CUSTOMER_INVALID;
+            sttType = StatusTransaction.CUSTOMER_INVALID;
         }
         // verifica se o status dO cliente da wallet é ativa
         else if (!wallet.getCustomer().getStatus().equals(Status.ACTIVE)) {
-            processType = StatusTransaction.CUSTOMER_STATUS_INVALID;
+            sttType = StatusTransaction.CUSTOMER_STATUS_INVALID;
         }
         // verifica se o status da wallet é ativa
         else if (!wallet.getStatus().equals(Status.ACTIVE)) {
-            processType = StatusTransaction.WALLET_STATUS_INVALID;
+            sttType = StatusTransaction.WALLET_STATUS_INVALID;
         }
 
-        return processType;
+        return sttType;
     }
 
 

@@ -1,21 +1,28 @@
 package com.guga.walletserviceapi.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.guga.walletserviceapi.exception.ResourceNotFoundException;
-import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
-import com.guga.walletserviceapi.helpers.RandomMock;
-import com.guga.walletserviceapi.model.Customer;
-import com.guga.walletserviceapi.model.enums.Status;
-import com.guga.walletserviceapi.service.CustomerService;
-import net.datafaker.Faker;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -24,21 +31,21 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guga.walletserviceapi.exception.ResourceNotFoundException;
+import com.guga.walletserviceapi.helpers.RandomMock;
+import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
+import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.service.CustomerService;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import net.datafaker.Faker;
 
 
+//@SpringBootTest
 @WebMvcTest(CustomerController.class)
-@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @WithMockUser(username = "user", roles = {"USER"})
 class CustomerControllerTests {
 
@@ -53,9 +60,6 @@ class CustomerControllerTests {
     @MockitoBean
     private CustomerService customerService;
 
-    @Value("${controller.path.base}")
-    private String BASE_PATH;
-
     private static final String API_NAME = "/customers";
 
     private String URI_API;
@@ -64,12 +68,25 @@ class CustomerControllerTests {
 
     private List<Customer> customers;
 
+    @Autowired
+    private Environment env;
+
     @BeforeEach
     void setup() {
         Mockito.reset(customerService);
         faker = new Faker(new Locale("pt-BR"));
         customers = TransactionUtilsMock.createCustomerListMock();
-        URI_API = BASE_PATH.concat(API_NAME);
+
+        
+
+        URI_API = env.getProperty("server.protocol-type")
+                    .concat("://" + env.getProperty("server.hostname"))
+                    .concat(":" + env.getProperty("server.port") + "/")
+                    .concat(env.getProperty("server.servlet.context-path"))
+                    .concat(env.getProperty("controller.path.base"))
+                    .concat(API_NAME)
+                    ;
+
         System.out.println(("BeforeEach - OK"));
     }
 
@@ -161,10 +178,6 @@ class CustomerControllerTests {
 
     }
 
-    private String getURI_Api() {
-        return URI_API;
-    }
-
     private Customer getMockCustomer() {
         int indexCustomer = RandomMock.generateIntNumberByInterval(0, customers.size() - 1);
         return customers.get(indexCustomer);
@@ -184,11 +197,12 @@ class CustomerControllerTests {
                 .toList();
 
         // Simula uma página com conteúdo
-        when(customerService.getAllCustomers(any(Pageable.class)))
+        when(customerService.filterByStatus(eq(statusFilter), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(customersFiltered));
 
         // Act & Assert
-        mockMvc.perform(get(URI_API.concat("/list")))
+        mockMvc.perform(get(URI_API.concat("/list"))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()", is(customersFiltered.size())))
@@ -200,7 +214,7 @@ class CustomerControllerTests {
     void shouldReturn404WhenNoCustomersFound() throws Exception {
         // Arrange
         // Simula uma página vazia
-        when(customerService.getAllCustomers(any(Pageable.class)))
+        when(customerService.filterByStatus( any(Status.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.emptyList()));
 
         // Act & Assert

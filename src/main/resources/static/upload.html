@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload de CSV Genérico</title>
+    <meta charset="UTF-8">
+    <style>
+        /* ... Seu CSS existente ... */
+        .feedback {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: none; /* Escondido por padrão */
+        }
+        .success { border: 1px solid green; background-color: #e6ffe6; color: green; }
+        .error { border: 1px solid red; background-color: #ffe6e6; color: red; }
+
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input[type="file"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+                body { font-family: Arial, sans-serif; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Upload de Arquivo CSV (Genérico)</h2>
+        
+        <form id="uploadForm" method="post" enctype="multipart/form-data">
+            <label for="entitySelector">Selecione o Tipo de Importação:</label>
+            <select id="entitySelector" required>
+                <option value="" disabled selected>-- Escolha a Entidade --</option>
+                <option value="customers">Customer</option>
+                <option value="wallets">Wallet</option>
+                <option value="transactions">Transaction</option>
+                <option value="movements">Movement</option>
+            </select>
+
+            <label for="fileInput">Selecione o Arquivo CSV:</label>
+            <input type="file" name="file" id="fileInput" accept=".csv" required/>
+
+            <input type="submit" value="Upload CSV"/>
+        </form>
+        
+        <div id="feedbackMessage" class="feedback"></div>
+    </div>
+
+    <script>
+        const BASE_URL = "http://localhost:8080/wallet-services-api/api/";
+        const form = document.getElementById('uploadForm');
+        const selector = document.getElementById('entitySelector');
+        const fileInput = document.getElementById('fileInput');
+        const feedbackDiv = document.getElementById('feedbackMessage');
+
+        // --- FUNÇÃO PARA EXIBIR MENSAGEM ---
+        function displayFeedback(message, isSuccess) {
+            feedbackDiv.textContent = message;
+            feedbackDiv.className = 'feedback ' + (isSuccess ? 'success' : 'error');
+            feedbackDiv.style.display = 'block';
+        }
+
+        // --- MANUSEIO DO ENVIO DO FORMULÁRIO ---
+        form.addEventListener('submit', async function(event) {
+            // 1. Intercepta o envio padrão do formulário
+            event.preventDefault(); 
+            feedbackDiv.style.display = 'none'; // Esconde a mensagem anterior
+
+            const selectedEntity = selector.value;
+            if (!selectedEntity) {
+                displayFeedback("Por favor, selecione o tipo de importação.", false);
+                return;
+            }
+
+            const uploadUrl = BASE_URL + selectedEntity + '/upload';
+            
+            // 2. Prepara os dados (multipart/form-data)
+            const formData = new FormData();
+            // Pega o arquivo do input (name="file")
+            formData.append('file', fileInput.files[0]); 
+
+            try {
+                // 3. Envia a requisição assíncrona
+                const response = await fetch(uploadUrl, {
+                    method: 'POST',
+                    body: formData // Fetch API lida automaticamente com o 'multipart/form-data'
+                });
+
+                // 4. Captura a resposta
+                if (response.ok) { // Código 200-299 (Sucesso)
+                    const data = await response.json();
+                    // Assumimos que o corpo da resposta de sucesso contém os dados (lista de objetos)
+                    displayFeedback(`Sucesso! ${data.length} registros de ${selectedEntity} importados.`, true);
+                    
+                } else { // Código 4xx ou 5xx (Erro)
+                    // Tenta ler o corpo do erro (pode ser JSON ou texto)
+                    let errorBody;
+                    try {
+                        errorBody = await response.json();
+                    } catch (e) {
+                        errorBody = { message: await response.text() };
+                    }
+                    
+                    // Exibe o status e a mensagem de erro da API
+                    const errorMessage = `Erro ${response.status}: Falha na importação. Detalhe: ${errorBody.message || errorBody}`;
+                    displayFeedback(errorMessage, false);
+                }
+
+            } catch (error) {
+                // Erro de rede ou erro na execução do fetch
+                displayFeedback(`Erro de conexão: Não foi possível alcançar o servidor. Detalhe: ${error.message}`, false);
+            }
+        });
+
+        // Remove a função anterior, pois a nova lógica de submit cuida de tudo
+        // selector.addEventListener('change', function() { /* ... */ });
+    </script>
+
+</body>
+</html>

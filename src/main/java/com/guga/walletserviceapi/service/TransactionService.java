@@ -1,9 +1,35 @@
 package com.guga.walletserviceapi.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
+import com.guga.walletserviceapi.helpers.FileUtils;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.helpers.TransactionUtils;
-import com.guga.walletserviceapi.model.*;
+import com.guga.walletserviceapi.model.DepositMoney;
+import com.guga.walletserviceapi.model.DepositSender;
+import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.TransferMoneyReceived;
+import com.guga.walletserviceapi.model.TransferMoneySend;
+import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.WithdrawMoney;
 import com.guga.walletserviceapi.model.enums.CompareBigDecimal;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.Status;
@@ -11,17 +37,8 @@ import com.guga.walletserviceapi.model.enums.StatusTransaction;
 import com.guga.walletserviceapi.repository.DepositSenderRepository;
 import com.guga.walletserviceapi.repository.MovementTransferRepository;
 import com.guga.walletserviceapi.repository.TransactionRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -48,9 +65,16 @@ public class TransactionService {
     }
 
     public Page<Transaction> getTransactionByWalletId(Long id, Pageable pageable) {
-        return transactionRepository.findTop200ByWalletId(id, pageable);
-    }
+        
+        Optional<Page<Transaction>> findResult = transactionRepository.findByWallet_WalletId(id, pageable);
 
+        if (findResult.isEmpty() || !findResult.get().hasContent()) {
+            throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(id));
+        }
+
+        return findResult.get();
+
+    }
 
     public DepositMoney saveDepositMoney(Long walletId, BigDecimal amount, String cpfSender,
                                          String terminalId, String senderName)
@@ -214,14 +238,17 @@ public class TransactionService {
     }
 
     public static MovementTransaction generateTransferMoney(Transaction transferSend, Transaction transferReceived) {
+
+        boolean containReceived = !(transferReceived == null || transferReceived.getTransactionId() == null) ;
+
         return MovementTransaction.builder()
                 .movementId( null )
 
                 .transactionId( transferSend.getTransactionId() )
-                .walletId( transferSend.getWalletId() )
+                .walletId( transferSend.getWallet().getWalletId() )
 
-                .transactionToId( transferReceived.getTransactionId() )
-                .walletToId( transferReceived.getWalletId() )
+                .transactionReferenceId( containReceived ? transferReceived.getTransactionId() : null )
+                .walletReferenceId( containReceived ? transferReceived.getWallet().getWalletId() : null)
 
                 .amount( transferSend.getAmount() )
                 .createdAt(LocalDateTime.now())
@@ -233,7 +260,8 @@ public class TransactionService {
 
         return DepositMoney.builder()
                 //.transactionId( null )
-                .walletId(wallet.getWalletId())
+                .wallet(wallet)
+                //.walletId(wallet.getWalletId())
                 .createdAt(LocalDateTime.now())
                 .statusTransaction( processType )
                 .amount( amount )
@@ -270,6 +298,35 @@ public class TransactionService {
         }
 
         return processType;
+    }
+
+    /***
+     * Função responsável por realizar carga inicial de dados para a tabela correspondente a partir de um 
+     * arquivo no formato JSON
+     * @param file
+     * @throws Exception
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void loadCsvAndSave(MultipartFile file) throws Exception {
+        try {
+            ObjectMapper mapper = FileUtils.instanceObjectMapper();
+
+            TypeReference<List<Transaction>> transactionTypeRef = new TypeReference<List<Transaction>>() { };
+
+            List<Transaction> transactions = mapper.readValue(file.getInputStream(), transactionTypeRef);
+
+            for (int i = 0; i < transactions.size(); i += GlobalHelper.BATCH_SIZE) {
+
+                int end = Math.min(transactions.size(), i + GlobalHelper.BATCH_SIZE);
+                
+                List<Transaction> lote = transactions.subList(i, end);
+
+                transactionRepository.saveAll(lote);
+
+            }
+        } catch (Exception e) {
+            throw new ResourceBadRequestException(e.getMessage());
+        }
     }
 
 }

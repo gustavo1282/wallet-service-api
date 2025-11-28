@@ -1,55 +1,64 @@
 package com.guga.walletserviceapi.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table( name = "deposit_sender" )
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
+
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Digits;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@Builder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Entity
+@Table(name = "tb_deposit_sender")
 @EqualsAndHashCode(of = "senderId")
-@SuperBuilder
 public class DepositSender {
 
     @Id
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "deposit_sender_id", nullable = false)
+    @JsonProperty("senderId")
+    @Access(AccessType.FIELD)
     private Long senderId;
 
-    @Column(name = "transaction_id", nullable = false)
-    private Long transactionId;
-
-    @NotNull(message = "Wallet ID cannot be null")
-    @Column(name = "wallet_id", insertable = false, updatable = false)
-    private Long walletId;
-
-    @Column(name = "terminalId", length = 12)
+    //@CsvBindByName(column = "terminalId")
+    @Column(name = "terminal_id", nullable = true)
     private String terminalId;
 
-    @Column(name = "senderName", length = 40)
+    //@CsvBindByName(column = "fullName")
+    //@NotBlank(message = "FullName is required.")
+    @Column(name = "full_name", nullable = true, length = 30)
     private String fullName;
 
-    @Column(name = "cpf", length = 18)
+    //@CsvBindByName(column = "cpf")
+    @Column(name = "cpf", nullable = true, length = 20)
     private String cpf;
 
+    //@CsvBindByName(column = "amount")
     @Digits(integer = 14, fraction = 2, message = "Amount must have up to 14 integer digits and 2 decimal places")
     @Column(name = "amount", nullable = true)
     private BigDecimal amount;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Column(name = "created_at", nullable = false)
-    @CreationTimestamp
+    //@CsvCustomBindByName(column = "createdAt", converter = LocalDateTimeCsvConverter.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = GlobalHelper.PATTERN_FORMAT_DATE_TIME)
+    @Column(name = "created_at", nullable = true)
     private LocalDateTime createdAt;
 
 }
