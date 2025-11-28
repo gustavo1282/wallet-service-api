@@ -33,6 +33,7 @@ public class SpringSecurityConfig  {
                 .authorizeHttpRequests(authorize -> authorize
                         // REGRAS PÚBLICAS (usando AntPathRequestMatcher)
                         .requestMatchers(
+                                AntPathRequestMatcher.antMatcher("/swagger-ui.html"),
                                 AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
                                 AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),
                                 AntPathRequestMatcher.antMatcher("/actuator/**"),

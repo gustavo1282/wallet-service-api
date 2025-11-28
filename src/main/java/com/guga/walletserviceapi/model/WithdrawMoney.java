@@ -1,26 +1,23 @@
 package com.guga.walletserviceapi.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import lombok.*;
+import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@RequiredArgsConstructor
 @Entity
+@Table(name = "tb_withdraw")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @SuperBuilder
 public class WithdrawMoney extends Transaction {
 
-    @Schema(description = "Transfer Money associated with the wallet", accessMode = Schema.AccessMode.READ_ONLY)
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "movement_id", nullable = false)
-    private MovementTransaction movementTransaction;
-
+    /* 
+    @CsvBindByName(column = "movementId")
+    @Column(name = "movement_id_fk", insertable = false, updatable = false)
+    private Long movementId;
+    */
 }

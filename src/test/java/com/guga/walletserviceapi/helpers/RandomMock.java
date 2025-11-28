@@ -3,8 +3,11 @@ package com.guga.walletserviceapi.helpers;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
+import net.datafaker.Faker;
 
 /**
  * Classe utilitária para geração de strings e sequências aleatórias.
@@ -127,6 +130,21 @@ public class RandomMock {
 
     public static String generateHexaBetween100And999() {
         return Integer.toHexString(generateIntNumberByInterval(100, 999) );
+    }
+
+    public static String cpfFake() {
+        Faker faker = new Faker(new Locale("pt-BR"));
+        return faker.cpf().valid();
+    }
+
+    public static String loginFakeMock() {
+        int idx = ThreadLocalRandom.current().nextInt(3);
+        String[] logins = new String[]{"uKEIX0992", "uMAAEQ5210", "uBEWP5021"};
+        try {
+            return logins[idx];
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

@@ -1,26 +1,34 @@
 package com.guga.walletserviceapi.controller;
 
 
-import com.guga.walletserviceapi.model.DepositMoney;
-import com.guga.walletserviceapi.model.Transaction;
-import com.guga.walletserviceapi.model.TransferMoneySend;
-import com.guga.walletserviceapi.model.enums.StatusTransaction;
-import com.guga.walletserviceapi.service.TransactionService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.net.URI;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.math.BigDecimal;
-import java.net.URI;
+import com.guga.walletserviceapi.model.DepositMoney;
+import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.TransferMoneySend;
+import com.guga.walletserviceapi.model.enums.StatusTransaction;
+import com.guga.walletserviceapi.service.TransactionService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${controller.path.base}/transactions")
@@ -104,15 +112,17 @@ public class TransactionController {
 
     @Operation(summary = "Get transactions by Wallet ID",
             description = "Retrieves a list transaction by Wallet ID provided in the request body.")
-    @GetMapping(value = "/search", params = { "walletId", "!typeTransaction" })
+    @GetMapping(value = "/search-wallet", params = { "walletId", "!typeTransaction" })
     public ResponseEntity<Page<Transaction>> getTransactionByWalletId(
-            @RequestParam(required = true) Long walletId,
+            @RequestParam(required = true) Long walletId) {
 
-            @PageableDefault(page = 0, size = 200)
-            @SortDefault(sort = "walletId", direction = Sort.Direction.ASC)
-            @SortDefault(sort = "transactionId", direction = Sort.Direction.ASC)
-            Pageable pageable) {
-
+        Pageable pageable = PageRequest.of(0, 20,
+                Sort.by(
+                    Sort.Order.asc("wallet.walletId"),
+                    Sort.Order.asc("createdAt")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                )
+            );
+        
         Page<Transaction> pageTransaction = transactionService.getTransactionByWalletId(walletId, pageable);
 
         return new ResponseEntity<>(pageTransaction, HttpStatus.OK);

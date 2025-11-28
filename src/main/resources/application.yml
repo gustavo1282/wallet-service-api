@@ -1,0 +1,53 @@
+spring:
+  profiles.active: local
+  servlet:
+    multipart:
+      enabled: true # Deve estar 'true' (geralmente é o padrão)
+      max-file-size: 10MB # Certifique-se de que o arquivo não excede o limite
+      max-request-size: 10MB
+  jpa:
+    properties:
+      jdbc.batch_size: 1000
+      order_inserts: true               # Essencial para otimizar INSERTS
+      order_updates: true               # Essencial para otimizar UPDATES
+      jdbc.batch_versioned_data: true   # Mantenha a versão do dado no batch
+
+# Define o componente uma vez - referente a carga de arquivo csv e upload
+components:
+  requestBodies:
+    FileUpload:
+      description: Arquivo CSV a ser importado.
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              file:
+                type: string
+                format: binary # A chave para o input de arquivo
+paths:
+  /api/customers/upload:
+    post:
+      summary: Importa dados de Clientes via CSV.
+      requestBody: # E aqui
+        $ref: '#/components/requestBodies/FileUpload'
+      responses:
+        '200':
+          description: Upload bem-sucedido.
+  /api/wallets/upload:
+    post:
+      summary: Importa dados de Carteiras via CSV.
+      requestBody: # Referencia o componente aqui
+        $ref: '#/components/requestBodies/FileUpload'
+      responses:
+        '200':
+          description: Upload bem-sucedido.
+  /api/transactions/upload:
+    post:
+      summary: Importa dados de Carteiras via CSV.
+      requestBody: # Referencia o componente aqui
+        $ref: '#/components/requestBodies/FileUpload'
+      responses:
+        '200':
+          description: Upload bem-sucedido.

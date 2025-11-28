@@ -1,6 +1,7 @@
 package com.guga.walletserviceapi.model.converter;
 
 import com.guga.walletserviceapi.model.enums.OperationType;
+
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -20,6 +21,6 @@ public class OperationTypeConverter implements AttributeConverter<OperationType,
         if (value == 0) {
             return null;
         }
-        return OperationType.fromValue(value);
+        return OperationType.fromCode(value);
     }
 }
