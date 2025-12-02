@@ -4,9 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.converter.LocalDateTimeCsvConverter;
+import com.guga.walletserviceapi.model.converter.OperationTypeConverter;
 import com.guga.walletserviceapi.model.converter.StatusConverter;
+import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
@@ -30,7 +35,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//@Data
+@JsonPropertyOrder({
+    "walletId", "status", "customerId", "lastOperationType", "previousBalance", "currentBalance", "loginUser", "createdAt", "updatedAt"
+})
 
 @Builder(toBuilder = true)
 @Getter
@@ -47,17 +54,27 @@ public class Wallet {
     @Column(name = "wallet_id", nullable = false, unique = true)
     private Long walletId;
 
+
     @CsvBindByName(column = "customerId", required = true)
     @NotNull(message = "Customer ID cannot be null")
-    @Column(name = "customer_id_fk", insertable = true, updatable = true)
+    @Column(name = "customer_id", insertable = true, updatable = true)
     private Long customerId;
 
 
+    @JsonIgnore
     @Schema(description = "Customer associated with the wallet", accessMode = Schema.AccessMode.READ_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id_fk", referencedColumnName = "customer_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "customer_id", nullable = true, insertable = false, updatable = false)
     private Customer customer;
 
+
+    @Convert(converter = OperationTypeConverter.class)
+    @Column(name = "last_operation_type", nullable = true, length = 2, insertable = true, updatable = true)
+    @JsonProperty("lastOperationType")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private OperationType lastOperationType;
+
+    
     @CsvBindByName(column = "previousBalance")
     @Digits(integer = 14, fraction = 2, message = "Previous balance must have up to 14 integer digits and 2 decimal places")
     @Column(name = "previous_balance", nullable = false)

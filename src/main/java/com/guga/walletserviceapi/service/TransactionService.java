@@ -91,13 +91,13 @@ public class TransactionService {
             );
         }
 
-        TransactionUtils.adjustBalanceWallet(wallet, depositMoney);
+        TransactionUtils.setAdjustBalanceWallet(wallet, depositMoney);
         walletService.updateWallet(wallet.getWalletId(), wallet);
 
         MovementTransaction movement = TransactionUtils
                 .generateMovementTransaction(depositMoneySaved, null);
         MovementTransaction movementSaved = movementTransferRepository.save(movement);
-        depositMoney.setMovementTransaction(movementSaved);
+        depositMoney.setMovement(movementSaved);
 
         if ( senderName != null && senderName.length() > 5 &&
                 cpfSender != null && cpfSender.length() > 5 ) {
@@ -146,13 +146,13 @@ public class TransactionService {
 
         if (withdrawSaved.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
 
-            TransactionUtils.adjustBalanceWallet(wallet, withdrawSaved);
+            TransactionUtils.setAdjustBalanceWallet(wallet, withdrawSaved);
             walletService.updateWallet( walletId, wallet );
 
             MovementTransaction movement = TransactionUtils
                     .generateMovementTransaction(withdrawSaved, null);
             MovementTransaction movementSaved = movementTransferRepository.save(movement);
-            withdrawSaved.setMovementTransaction(movementSaved);
+            withdrawSaved.setMovement(movementSaved);
 
         }
 
@@ -183,24 +183,24 @@ public class TransactionService {
 
         if (transferSendSaved.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
 
-            TransactionUtils.adjustBalanceWallet(walletSend, transferSend);
+            TransactionUtils.setAdjustBalanceWallet(walletSend, transferSend);
             walletService.updateWallet(walletSend.getWalletId(), walletSend);
 
             MovementTransaction movementTransactionSend = TransactionUtils.generateMovementTransaction(transferSend, transferReceived);
             movementTransferRepository.save(movementTransactionSend);
-            transferSendSaved.setMovementTransaction(movementTransactionSend);
+            transferSendSaved.setMovement(movementTransactionSend);
 
 
             transferReceived = TransactionUtils.generateTransferMoneyReceived(walletReceived, amount);
 
             if (transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)){
 
-                TransactionUtils.adjustBalanceWallet(walletReceived, transferReceived);
+                TransactionUtils.setAdjustBalanceWallet(walletReceived, transferReceived);
                 walletService.updateWallet(walletReceived.getWalletId(), walletReceived);
 
                 MovementTransaction movementReceived = TransactionUtils.generateMovementTransaction(transferReceived, transferSend);
                 MovementTransaction movementReceivedSaved =  movementTransferRepository.save(movementReceived);
-                transferReceived.setMovementTransaction(movementReceivedSaved);
+                transferReceived.setMovement(movementReceivedSaved);
             }
 
         }

@@ -15,33 +15,27 @@ services:
     ports:
       - "8080:8080" # Porta da aplicação
       - "5005:5005" # Porta do debug
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'        # Limite de 1 CPU
-          memory: 640M       # Limite de 512 MB de memória
-        reservations:
-          cpus: '0.25'       # Reserva de 0.25 CPU
-          memory: 400M       # Reserva de 128 MB de memória
-    #command: ["java", "-Dspring.profiles.active=desenv", "-jar", "app.jar"]
+    #command: ["java", "-Dspring.profiles.active=develop", "-jar", "app.jar"]
     volumes:
       - wallet_service_data:/var/lib/wallet_service/data
     # Variáveis de ambiente
     environment:
-      SPRING_PROFILES_ACTIVE: desenv  #values{ dev, hml, prd }
+      SPRING_PROFILES_ACTIVE: local  #values{ local, develop, hml, prd }
       SERVICE_NAME: wallet-service-api
 #      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
       SPRING_DATASOURCE_USERNAME: wallet_user
       SPRING_DATASOURCE_PASSWORD: wallet_pass
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - wallet_network
+
+
     #      # Conexão com RabbitMQ
 #      SPRING_RABBITMQ_HOST: rabbitmq
 #      SPRING_RABBITMQ_PORT: 5672
 #      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"
 #      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
-    networks:
-      - wallet_network
 #    depends_on:
 #      postgres:
 #        condition: service_healthy
@@ -62,10 +56,6 @@ services:
       - POSTGRES_PASSWORD=wallet_pass
     ports:
       - "5432:5432"
-    deploy:
-      resources:
-        limits:
-          memory: 640M         # Limite de 1 GB para o banco de dados
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -86,10 +76,6 @@ services:
     restart: unless-stopped
     ports:
       - "5050:80" # Porta para acessar o pgAdmin
-    deploy:
-      resources:
-        limits:
-          memory: 640M
     environment:
       PGADMIN_DEFAULT_EMAIL: 'admin@postgres.com'
       PGADMIN_DEFAULT_PASSWORD: wallet_pass
@@ -138,8 +124,6 @@ services:
     user: "472"
     ports:
       - "3000:3000"
-    #depends_on:
-    #  - prometheus
     networks:
       - wallet_network
 

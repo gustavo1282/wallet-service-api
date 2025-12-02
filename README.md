@@ -40,6 +40,7 @@ O projeto evoluiu a partir de um estudo avançado de Java + Spring Boot, mas gan
 
 ## 🧱 Estrutura do Projeto
 
+```
 com.guga.walletserviceapi
 ├── controller
 ├── dto
@@ -150,12 +151,12 @@ mvn test
 
 📚 Documentos Complementares
 
-- [ARCHITECTURE_AND_DESIGN.md](./ARCHITECTURE_AND_DESIGN.md)
-- [API_REFERENCE.md](./API_REFERENCE.md)
-- [OBSERVABILITY.md](./OBSERVABILITY.md)
-- [CONTRIBUTING.md](./CONTRIBUTING.md)
-- [DATA_MODEL.md](./DATA_MODEL.md)
-- [DOMAIN_MODEL.md](./DOMAIN_MODEL.md)
-- [SECURITY.md](./SECURITY.md)
-- [BUILD_AND_CI.md](./BUILD_AND_CI.md)
+- [ARCHITECTURE_AND_DESIGN.md](data/docs/ARCHITECTURE_AND_DESIGN.md)
+- [API_REFERENCE.md](data/docs/API_REFERENCE.md)
+- [OBSERVABILITY.md](data/docs/OBSERVABILITY.md)
+- [CONTRIBUTING.md](data/docs/CONTRIBUTING.md)
+- [DATA_MODEL.md](data/docs/DATA_MODEL.md)
+- [DOMAIN_MODEL.md](data/docs/DOMAIN_MODEL.md)
+- [SECURITY.md](data/docs/SECURITY.md)
+- [BUILD_AND_CI.md](data/docs/BUILD_AND_CI.md)
 

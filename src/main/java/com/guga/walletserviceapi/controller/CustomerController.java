@@ -25,10 +25,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-//@RequestMapping("${controller.path.base}/customers")
+
 @RestController
-@RequestMapping("/api/customers")
-@Tag(name = "Customer", description = "Endpoints for managing customers")
+@RequestMapping("${controller.path.base}/customers")
+@Tag(name = "Customer", description = "Endpoints for managing wallets")
 @RequiredArgsConstructor
 public class CustomerController {
 
@@ -54,16 +54,6 @@ public class CustomerController {
     }
 
 
-    @Operation(summary = "Update customer by ID", description = "Updates a Customer by their ID provided in the request body.")
-    @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(
-            @PathVariable Long id,
-            @RequestBody @Valid Customer customerUpdate) {
-        Customer customer = customerService.updateCustomer(id, customerUpdate);
-        return new ResponseEntity<>(customer, HttpStatus.OK);
-    }
-
-
     @Operation(summary = "Get customer by ID", description = "Retrieves a Customer by their ID provided in the request body.")
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getById(@PathVariable Long id) {
@@ -74,12 +64,21 @@ public class CustomerController {
         
     }
 
+    @Operation(summary = "Update customer by ID", description = "Updates a Customer by their ID provided in the request body.")
+    @PutMapping("/{id}")
+    public ResponseEntity<Customer> updateCustomer(
+            @PathVariable Long id,
+            @RequestBody @Valid Customer customerUpdate) {
+        Customer customer = customerService.updateCustomer(id, customerUpdate);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
+    }
+
+
     @Operation(summary = "Get all customers", description = "Retrieves all customers.")
     @GetMapping("/list")
     public ResponseEntity<Page<Customer>> list(
         @RequestParam(name = "status", required = false) 
             Status status,
-
             Pageable pageable ) {
 
         Page<Customer> resultCustomers = customerService.filterByStatus(status, pageable);

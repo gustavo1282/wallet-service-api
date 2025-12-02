@@ -1,8 +1,9 @@
 package com.guga.walletserviceapi.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.guga.walletserviceapi.model.MovementTransaction;
 import com.guga.walletserviceapi.repository.MovementTransferRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class MovementTransferService {
 

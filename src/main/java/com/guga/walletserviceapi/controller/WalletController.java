@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.service.WalletService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -68,18 +69,14 @@ public class WalletController {
 
     @Operation(summary = "Get all Wallets", description = "Retrieves all Wallets.")
     @GetMapping("/list")
-    public ResponseEntity<Page<Wallet>> getAllWallets() {
+    public ResponseEntity<Page<Wallet>> list(
+        @RequestParam(name = "status", required = false) 
+            Status status,
+            Pageable pageable ) {
 
-        Pageable pageable = PageRequest.of(0, 20,
-                Sort.by(
-                    Sort.Order.asc("walletId"),
-                    Sort.Order.asc("createdAt")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-                )
-            );
+        Page<Wallet> walletResult = walletService.findByStatus(status, pageable);
 
-        Page<Wallet> pageWallet = walletService.getAllWallets(pageable);
-
-        return new ResponseEntity<>(pageWallet, HttpStatus.OK);
+        return new ResponseEntity<>(walletResult, HttpStatus.OK);
 
     }
 

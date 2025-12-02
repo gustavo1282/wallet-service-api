@@ -263,14 +263,15 @@ public class FileUtils {
     }
 
     public static ObjectMapper instanceObjectMapper() {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // Mantenha false, mas é bom saber
-            mapper.findAndRegisterModules(); // Importante para LocalDateTime
-            //mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true); // Tente TRUE
+        ObjectMapper mapper = new ObjectMapper();
+        
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // Mantenha false, mas é bom saber
+        mapper.findAndRegisterModules(); // Importante para LocalDateTime
+        //mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true); // Tente TRUE
 
-            if (!mapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310")) {
-                mapper.registerModule(new JavaTimeModule());
-            }
+        if (!mapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310")) {
+            mapper.registerModule(new JavaTimeModule());
+        }
 
         return mapper;
     }
