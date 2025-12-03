@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
@@ -13,6 +15,7 @@ import com.guga.walletserviceapi.model.converter.OperationTypeConverter;
 import com.guga.walletserviceapi.model.converter.StatusTransactionConverter;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.StatusTransaction;
+import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +30,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,19 +40,22 @@ import lombok.experimental.SuperBuilder;
 
 @Inheritance(strategy = InheritanceType.JOINED)
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "operationType",
-        visible = true
-        )
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "operationType",
+    visible = true
+    )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = DepositMoney.class, name = "DEPOSIT"),
-        @JsonSubTypes.Type(value = WithdrawMoney.class, name = "WITHDRAW"),
-        @JsonSubTypes.Type(value = TransferMoneySend.class, name = "TRANSFER_SEND"),
-        @JsonSubTypes.Type(value = TransferMoneyReceived.class, name = "TRANSFER_RECEIVED")
+    @JsonSubTypes.Type(value = DepositMoney.class, name = "DEPOSIT"),
+    @JsonSubTypes.Type(value = WithdrawMoney.class, name = "WITHDRAW"),
+    @JsonSubTypes.Type(value = TransferMoneySend.class, name = "TRANSFER_SEND"),
+    @JsonSubTypes.Type(value = TransferMoneyReceived.class, name = "TRANSFER_RECEIVED")
 })
-//@JsonTypeIdResolver(OperationTypeIdResolver.class)
-//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonPropertyOrder({
+    "transactionId", "operationType", "walletId", "login", "previousBalance", "amount", "currentBalance", "statusTransaction", "movementId", "createdAt"
+})
+
+
 @Entity
 @Table(name = "tb_transaction")
 @SuperBuilder
@@ -66,10 +73,15 @@ public abstract class Transaction {
     @Column(name = "login", nullable = false, length = 25)
     private String login;
 
+    @CsvBindByName(column = "walletId", required = true)
+    @NotNull(message = "Wallet ID cannot be null")
+    @Column(name = "wallet_id", insertable = true, updatable = true)
+    private Long walletId;
 
-    @Schema(description = "Wallet associated with the transaction", accessMode = Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
+    @Schema(description = "Wallet associated with the transaction", accessMode = Schema.AccessMode.READ_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id_fk", referencedColumnName = "wallet_Id", nullable = false, insertable = true, updatable = false)
+    @JoinColumn(name = "wallet_id_fk", referencedColumnName = "wallet_Id", nullable = true, insertable = false, updatable = false)
     private Wallet wallet;
 
     @Convert(converter = OperationTypeConverter.class)
@@ -103,9 +115,14 @@ public abstract class Transaction {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @CsvBindByName(column = "movementId", required = true)
+    @Column(name = "movementId", insertable = true, updatable = false)
+    private Long movementId;
+
+    @JsonIgnore
     @Schema(description = "Transfer Money associated with the moviment", accessMode = Schema.AccessMode.READ_WRITE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movement_id_fk", referencedColumnName = "movement_id", nullable = true, insertable = true, updatable = false)
-    private MovementTransaction movementTransaction;
+    @JoinColumn(name = "movement_id_fk", referencedColumnName = "movement_id", nullable = true, insertable = false, updatable = false)
+    private MovementTransaction movement;
 
 }

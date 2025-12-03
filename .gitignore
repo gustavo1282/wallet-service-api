@@ -1,0 +1,46 @@
+# Arquivos e Pastas de Build e Execução (Must-Have)
+######################################
+
+# Pasta de saída de compilação (geralmente gerada pelo Maven ou Gradle)
+target/
+
+# Logs e arquivos temporários
+*.log
+log/
+tmp/
+temp/
+
+# Arquivos de Testes (saída)
+**/surefire-reports/
+**/failsafe-reports/
+
+# Cache de dependências (se aplicável, como node_modules)
+# node_modules/
+
+
+# Configurações de IDEs e Editores
+######################################
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Sistema Operacional
+######################################
+
+# Arquivos temporários do macOS
+.DS_Store
+
+# Arquivos temporários do Windows
+Thumbs.db

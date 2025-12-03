@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.converter.LocalDateCsvConverter;
 import com.guga.walletserviceapi.model.converter.LocalDateTimeCsvConverter;
@@ -27,7 +28,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// @Data
+@JsonPropertyOrder({
+    "customerId", "status", "cpf", "documentId", "phoneNumber", "birthDate", "firstName", "lastName", "fullName", "email", "createdAt", "updatedAt"
+})
+
 @Builder(toBuilder = true)
 @Getter
 @Setter

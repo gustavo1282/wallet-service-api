@@ -4,24 +4,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("test")
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
+@ActiveProfiles("test")
+@WithMockUser(username = "user", roles = {"USER"})
 class WalletServiceApplicationTests {
-
-    private String BASE_PATH;
 
     @Test
 	void contextLoads() {
         System.out.println("============================================");
         System.out.println("WalletServiceApplicationTests > contextLoads()");
-//
-//        System.out.println("spring.profiles.active = ".concat(activeProfile) );
-//        System.out.println("BASE_PATH = ".concat(BASE_PATH) );
-//
-//        System.out.println("============================================");
+        System.out.println("============================================");
     }
 
 }

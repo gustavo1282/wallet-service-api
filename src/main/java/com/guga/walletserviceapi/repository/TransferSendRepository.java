@@ -1,7 +1,8 @@
 package com.guga.walletserviceapi.repository;
 
-import com.guga.walletserviceapi.model.TransferMoneySend;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.guga.walletserviceapi.model.TransferMoneySend;
 
 public interface TransferSendRepository extends JpaRepository<TransferMoneySend, Long> {
 }

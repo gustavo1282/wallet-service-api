@@ -23,6 +23,7 @@ public class FileUtils {
 
     public static final String FOLDER_DEFAULT_FILE_JSON = "./data/seed/";
 
+    public static final String JSON_FILE_PARAMS_APP = "params_app.json";
     public static final String JSON_FILE_CUSTOMER = "customers.json";
     public static final String JSON_FILE_WALLET = "wallets.json";
     public static final String JSON_FILE_TRANSACTION = "transactions.json";
@@ -263,14 +264,15 @@ public class FileUtils {
     }
 
     public static ObjectMapper instanceObjectMapper() {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // Mantenha false, mas é bom saber
-            mapper.findAndRegisterModules(); // Importante para LocalDateTime
-            //mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true); // Tente TRUE
+        ObjectMapper mapper = new ObjectMapper();
+        
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // Mantenha false, mas é bom saber
+        mapper.findAndRegisterModules(); // Importante para LocalDateTime
+        //mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true); // Tente TRUE
 
-            if (!mapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310")) {
-                mapper.registerModule(new JavaTimeModule());
-            }
+        if (!mapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310")) {
+            mapper.registerModule(new JavaTimeModule());
+        }
 
         return mapper;
     }
