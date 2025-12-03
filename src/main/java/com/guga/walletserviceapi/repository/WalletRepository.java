@@ -11,7 +11,7 @@ import com.guga.walletserviceapi.model.enums.Status;
 @Repository
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
-    Page<Wallet> findByCustomer_CustomerId(Long customerId, Pageable pageable);
+    Page<Wallet> findByCustomerId(Long customerId, Pageable pageable);
     
     Page<Wallet> findByStatus(Status status, Pageable pageable);
 

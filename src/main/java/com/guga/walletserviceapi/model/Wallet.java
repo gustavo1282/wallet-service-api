@@ -27,7 +27,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -56,7 +55,6 @@ public class Wallet {
 
 
     @CsvBindByName(column = "customerId", required = true)
-    @NotNull(message = "Customer ID cannot be null")
     @Column(name = "customer_id", insertable = true, updatable = true)
     private Long customerId;
 
@@ -69,7 +67,7 @@ public class Wallet {
 
 
     @Convert(converter = OperationTypeConverter.class)
-    @Column(name = "last_operation_type", nullable = true, length = 2, insertable = true, updatable = true)
+    @Column(name = "last_operation_type", nullable = true, length = 2, insertable = true, updatable = false)
     @JsonProperty("lastOperationType")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private OperationType lastOperationType;
@@ -95,7 +93,7 @@ public class Wallet {
 
     @CsvBindByName(column = "status")
     @Convert(converter = StatusConverter.class)
-    @Column(name = "status", nullable = false, length = 2)
+    @Column(name = "status", nullable = true, length = 2, insertable = true, updatable = false)
     private Status status;
 
 

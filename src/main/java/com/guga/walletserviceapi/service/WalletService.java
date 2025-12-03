@@ -40,7 +40,7 @@ public class WalletService {
 
         Customer customer = customerService.getCustomerById(wallet.getCustomer().getCustomerId());
 
-        Page<Wallet> findAllCustomer = walletRepository.findByCustomer_CustomerId(wallet.getCustomer().getCustomerId(), GlobalHelper.getDefaultPageable());
+        Page<Wallet> findAllCustomer = walletRepository.findByCustomerId(wallet.getCustomer().getCustomerId(), GlobalHelper.getDefaultPageable());
 
         if (findAllCustomer.isEmpty() || !findAllCustomer.hasContent()) {
             throw new ResourceBadRequestException("Customer already has a wallet");
@@ -128,12 +128,12 @@ public class WalletService {
         }
     }
 
-    public Page<Wallet> getWalletByCustomerId(Long customerId, Pageable pageable) {
+    public Page<Wallet> findByCustomerId(Long customerId, Pageable pageable) {
 
-        Page<Wallet> findResult = walletRepository.findByCustomer_CustomerId(customerId, pageable);
+        Page<Wallet> findResult = walletRepository.findByCustomerId(customerId, pageable);
 
         if (findResult.isEmpty() || !findResult.hasContent()) {
-            throw new ResourceNotFoundException("Wallets not found by Customer Id");
+            throw new ResourceNotFoundException("Wallets not found by Customer Id: " + customerId);
         }
 
         return findResult;

@@ -45,6 +45,7 @@ import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.Wallet;
@@ -64,7 +65,7 @@ import com.guga.walletserviceapi.service.TransactionService;
 class TransactionControllerTests {
 
     private static boolean SAVE_JSON = true;
-    private static boolean LOAD_JSON = true;
+    private static boolean LOAD_JSON = false;
 
     @Autowired
     private MockMvc mockMvc;
@@ -100,6 +101,8 @@ class TransactionControllerTests {
     private List<MovementTransaction> movements;
 
     private List<DepositSender> depositSenders;
+
+    private List<ParamApp> paramsApp;
 
     private static long sequenceTransaction;
 
@@ -147,6 +150,9 @@ class TransactionControllerTests {
                         MovementTransaction.class);
 
             } else {
+
+                paramsApp = TransactionUtilsMock.createParamsAppMock();
+
                 customers = TransactionUtilsMock.createCustomerMock();
                 TransactionUtilsMock.findCustomersByStatus(customers, Status.ACTIVE);
 
@@ -159,6 +165,9 @@ class TransactionControllerTests {
                 if (SAVE_JSON) {
 
                     objectMapper = FileUtils.instanceObjectMapper();
+
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_PARAMS_APP),
+                            objectMapper.writeValueAsString(paramsApp));
 
                     FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_CUSTOMER),
                             objectMapper.writeValueAsString(customers));

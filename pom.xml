@@ -76,6 +76,12 @@
 
 	<dependencies>
 
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-couchbase</artifactId>
+        </dependency>
+
+
 	    <dependency>
 	        <groupId>com.opencsv</groupId>
 	        <artifactId>opencsv</artifactId>

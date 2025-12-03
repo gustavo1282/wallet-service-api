@@ -65,7 +65,7 @@ spring:
         web-allow-others: true
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update #none | validate | update | create | create-drop
       use_sql_comments: true
       #enable_lazy_load_no_trans: true
     generate-ddl: true

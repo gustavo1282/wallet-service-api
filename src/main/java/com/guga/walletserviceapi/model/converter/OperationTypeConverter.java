@@ -18,7 +18,7 @@ public class OperationTypeConverter implements AttributeConverter<OperationType,
 
     @Override
     public OperationType convertToEntityAttribute(Integer value) {
-        if (value == 0) {
+        if (value == null || value == 0) {
             return null;
         }
         return OperationType.fromCode(value);

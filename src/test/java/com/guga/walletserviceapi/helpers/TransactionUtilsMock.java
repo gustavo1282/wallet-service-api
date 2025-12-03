@@ -21,6 +21,7 @@ import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.TransferMoneyReceived;
 import com.guga.walletserviceapi.model.TransferMoneySend;
@@ -471,6 +472,21 @@ public class TransactionUtilsMock {
                         Sort.Order.asc("transactionId")
                 )
         );
+    }
+
+
+    public static List<ParamApp> createParamsAppMock() {
+
+        List<ParamApp> paramApps = new ArrayList();
+
+        paramApps.add(ParamApp.newParam("seqCustomerId", "Id Sequencial de Customer.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqWalletId", "Id Sequencial de Wallet.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqTransactionId", "Id Sequencial de Transaction.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqDepositSenderId", "Id Sequencial de DepositSender.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqMovementId", "Id Sequencial de Movement.Id", Long.valueOf("0")));
+
+        return paramApps;
+
     }
 
 }

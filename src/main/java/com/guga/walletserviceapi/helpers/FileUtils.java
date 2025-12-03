@@ -23,6 +23,7 @@ public class FileUtils {
 
     public static final String FOLDER_DEFAULT_FILE_JSON = "./data/seed/";
 
+    public static final String JSON_FILE_PARAMS_APP = "params_app.json";
     public static final String JSON_FILE_CUSTOMER = "customers.json";
     public static final String JSON_FILE_WALLET = "wallets.json";
     public static final String JSON_FILE_TRANSACTION = "transactions.json";

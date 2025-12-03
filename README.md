@@ -40,21 +40,30 @@ O projeto evoluiu a partir de um estudo avançado de Java + Spring Boot, mas gan
 
 ## 🧱 Estrutura do Projeto
 
+``` bash
+├───src
+│   ├───main
+│   │   ├───java
+│   │   │   └───com
+│   │   │       └───guga
+│   │   │           └───walletserviceapi
+│   │   │               ├───components
+│   │   │               ├───config
+│   │   │               ├───controller
+│   │   │               ├───exception
+│   │   │               ├───handler
+│   │   │               ├───helpers
+│   │   │               ├───model
+│   │   │               │   ├───converter
+│   │   │               │   ├───enums
+│   │   │               │   ├───mapping
+│   │   │               │   ├───mongodb
+│   │   │               │   └───serializers
+│   │   │               ├───repository
+│   │   │               │   └───mongodb
+│   │   │               ├───seeder
+│   │   │               └───service
 ```
-com.guga.walletserviceapi
-├── controller
-├── dto
-├── domain
-├── entity
-├── exception
-├── handler
-├── mapper
-├── model
-├── record
-├── repository
-├── seeder
-└── service
-
 
 Cada camada possui responsabilidades bem definidas, seguindo princípios como:
 
