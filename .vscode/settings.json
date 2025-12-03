@@ -17,7 +17,9 @@
     "editor.formatOnSave": false,    
     // Configuração específica para Java
     "[java]": {
-        "editor.formatOnSave": false
+        "editor.tabSize": 4,
+        "editor.formatOnSave": false,
+        "editor.insertSpaces": true
     },
     // Se o problema for em arquivos HTML/CSS/JS, desative também:
     "[html]": {

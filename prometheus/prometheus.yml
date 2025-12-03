@@ -15,13 +15,17 @@ global:
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: "job-prometheus-wallet-operations"
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/wallet-services-api/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
       - targets: ['host.docker.internal:8080']
         labels:
           instance: 'instance-prometheus-wallet'
-          environment: 'env-desenv'
+          environment: 'env-local'
+
+  - job_name: "grafana-self-monitoring"
+    static_configs:
+      - targets: ['host.docker.internal:3000'] # Usa o nome do container Grafana na rede Docker
 
 #  - job_name: "prometheus"
 #    static_configs:

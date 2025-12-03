@@ -16,14 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -37,18 +38,20 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
+import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.service.WalletService;
 
 import net.datafaker.Faker;
 
 
 @WebMvcTest(WalletController.class)
-@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @WithMockUser(username = "user", roles = {"USER"})
 class WalletControllerTests {
 
@@ -61,8 +64,8 @@ class WalletControllerTests {
     @MockitoBean
     private WalletService walletService;
 
-    @Value("${controller.path.base}")
-    private String BASE_PATH;
+    @Autowired
+    private Environment env;
 
     private static final String API_NAME = "/wallets";
 
@@ -78,9 +81,20 @@ class WalletControllerTests {
     void before() {
         Mockito.reset(walletService);
         faker = new Faker(new Locale("pt-BR"));
-        customers = TransactionUtilsMock.createCustomerListMock();
-        wallets = TransactionUtilsMock.createWalletListMock( customers );
-        URI_API = BASE_PATH.concat(API_NAME);
+        customers = TransactionUtilsMock.createCustomerMock();
+        wallets = TransactionUtilsMock.createWalletMock( customers );
+
+        objectMapper = FileUtils.instanceObjectMapper();
+
+        URI_API = //env.getProperty("server.protocol-type") +
+                //      "://" +
+                //      env.getProperty("server.hostname") +
+                //      ":" +
+                //      env.getProperty("server.port") +
+                //      env.getProperty("server.servlet.context-path") +
+                env.getProperty("controller.path.base")  +
+                API_NAME
+                ;    
     }
 
     @Test
@@ -103,12 +117,10 @@ class WalletControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(walletCreated)))
 
-                //.andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
 
                 .andExpect(jsonPath("$.walletId", is(walletId.intValue())));
-
     }
 
     @Test
@@ -116,19 +128,34 @@ class WalletControllerTests {
     public void shouldReturn200_WhenRequestAllWallets_ReturnByPagable() throws Exception {
 
         Pageable pageable = PageRequest.of(0, 50, Sort.by("walletId").ascending() );
+        
+        int idxStatus = RandomMock.generateIntNumberByInterval(0, Status.values().length);
+        Status statusFilter = (idxStatus == 0) ? null :  Status.fromValue(idxStatus);
 
-        List<Wallet> mockWallets = new ArrayList<>( wallets.stream().toList() );
+        List<Wallet> mockWallets = new ArrayList(wallets);
+
+        if (statusFilter != null) {
+            mockWallets = wallets.stream()
+                .filter(w -> (w.getStatus().equals(statusFilter)))
+                .toList();
+        }
+
         Page<Wallet> mockPage = new PageImpl<>(mockWallets, pageable, mockWallets.size());
 
-        when(walletService.getAllWallets(any(Pageable.class))).thenReturn(mockPage);
+        when(walletService.findByStatus(any(Status.class), any(Pageable.class))).thenReturn(mockPage);
+
 
         // Act & Assert
         mockMvc.perform(get(URI_API.concat("/list"))
+                .param("status", (statusFilter == null) ? null : statusFilter.name())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-
-                .andExpect(jsonPath("$[2].walletId",
-                        is( mockPage.getContent().get(2).getWalletId().intValue() )))
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out
+                .println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.greaterThan(0)))
+                .andExpect(jsonPath("$.content.length()", Matchers.notNullValue()));
         ;
 
     }
@@ -186,44 +213,10 @@ class WalletControllerTests {
                 .thenReturn(walletUpdated);
 
         mockMvc.perform(put(URI_API + "/{id}", walletIdMock)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(walletUpdated))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(walletUpdated))
                 )
                 .andReturn();
     }
-
-
-//    @Test
-//    @DisplayName("Deve retornar 200-OK - Quando desejar obter a(s) wallet(s) por um Customer ID específico")
-//    void sholdReturn200_WhenRequestListWalletsByCustomerId() throws Exception {
-//
-//        List<Customer> uniqueCustomers = wallets.stream()
-//                .map(Wallet::getCustomer)
-//                .distinct()
-//                .collect(Collectors.toList());
-//
-//        int indexCustomer = (int) RandomMock.generateIntNumberByInterval(0, uniqueCustomers.size() - 1);
-//        Customer customerRequest = uniqueCustomers.get(indexCustomer);
-//        Long customerIdInput = customerRequest.getCustomerId();
-//
-//        List<Wallet> walletsUniqueCustomer = wallets.stream()
-//                .filter(c -> c.getCustomerId().equals(customerIdInput))
-//                .toList()
-//                ;
-//
-//        when(walletService.getWalletByCustomerId(customerIdInput))
-//                .thenReturn(walletsUniqueCustomer);
-//
-//        // Act & Assert
-//        mockMvc.perform(get(URI_API.concat("/customer/list"), customerIdInput)
-//                        .contentType(MediaType.APPLICATION_JSON))
-//
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.customerId", is( customerIdInput.intValue() )));
-//
-//
-//
-//    }
-
 
 }

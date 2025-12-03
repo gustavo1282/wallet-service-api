@@ -30,6 +30,8 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    private final ParamAppService paramAppService;
+
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + String.valueOf(id)));
@@ -49,6 +51,8 @@ public class CustomerService {
 
     @Transactional
     public Customer saveCustomer(Customer customer) {
+        customer.setCustomerId(getNextCustomerId());
+        
         Customer newCustomer = customerRepository.save(customer);
 
         if (newCustomer.getCustomerId() == null) {
@@ -117,5 +121,11 @@ public class CustomerService {
             throw new ResourceBadRequestException(e.getMessage());
         }
     }
-    
+
+    public Long getNextCustomerId() {
+        return paramAppService
+            .getNextSequenceId("seqCustomerId")
+            .getValueLong();
+    }
+
 }

@@ -3,6 +3,7 @@ package com.guga.walletserviceapi.controller;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,19 +21,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.service.WalletService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${controller.path.base}/wallets")
 @Tag(name = "Wallet", description = "Endpoints for managing wallets")
+@RequiredArgsConstructor
 public class WalletController {
 
     @Autowired
     private WalletService walletService;
+
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int defaultPageSize;    
 
     @Operation(summary = "Create a new Wallet", description = "Creates a new Wallet with the data provided in the request body.")
     @PostMapping("/wallet")
@@ -49,6 +56,7 @@ public class WalletController {
         return ResponseEntity.created(location).body(createdWallet);
     }
 
+
     @Operation(summary = "Get Wallet by ID", description = "Retrieves a Wallet by their ID provided in the request body.")
     @GetMapping("/{id}")
     public ResponseEntity<Wallet> getWalletById(@PathVariable Long id) {
@@ -56,6 +64,7 @@ public class WalletController {
         return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
     
+
     @Operation(summary = "Update user by ID", description = "Updates a user by their ID provided in the request body.")
     @PutMapping("/{id}")
     public ResponseEntity<Wallet> updateWallet(
@@ -66,20 +75,21 @@ public class WalletController {
         return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
 
+
     @Operation(summary = "Get all Wallets", description = "Retrieves all Wallets.")
     @GetMapping("/list")
-    public ResponseEntity<Page<Wallet>> getAllWallets() {
+    public ResponseEntity<Page<Wallet>> list(
+        @RequestParam(name = "status", required = false) 
+            Status status,
+        @RequestParam(defaultValue = "0") int page) {
 
-        Pageable pageable = PageRequest.of(0, 20,
-                Sort.by(
-                    Sort.Order.asc("walletId"),
-                    Sort.Order.asc("createdAt")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-                )
-            );
+        Sort sort = Sort.by("walletId").ascending();
 
-        Page<Wallet> pageWallet = walletService.getAllWallets(pageable);
+        Pageable pageable = PageRequest.of(page, defaultPageSize, sort);
 
-        return new ResponseEntity<>(pageWallet, HttpStatus.OK);
+        Page<Wallet> walletResult = walletService.findByStatus(status, pageable);
+
+        return new ResponseEntity<>(walletResult, HttpStatus.OK);
 
     }
 
@@ -87,16 +97,15 @@ public class WalletController {
             description = "Retrieves a list Wallets by Customer ID provided in the request body.")
     @GetMapping(value = "/search-by-customer")
     public ResponseEntity<Page<Wallet>> getWalletByCustomerId(
-            @RequestParam(required = true) Long customerId) {
+            @RequestParam(required = true) Long customerId,
+            @RequestParam(defaultValue = "0") int page) {
 
-        Pageable pageable = PageRequest.of(0, 20,
-                Sort.by(
-                    Sort.Order.asc("customerId"),
-                    Sort.Order.asc("walletId")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-                )
-            );
+        Sort sort = Sort.by("status").ascending()
+                .and(Sort.by("updatedAt").descending());
+
+        Pageable pageable = PageRequest.of(page, defaultPageSize, sort);
         
-        Page<Wallet> findResult = walletService.getWalletByCustomerId(customerId, pageable);
+        Page<Wallet> findResult = walletService.findByCustomerId(customerId, pageable);
 
         return new ResponseEntity<>(findResult, HttpStatus.OK);
     }

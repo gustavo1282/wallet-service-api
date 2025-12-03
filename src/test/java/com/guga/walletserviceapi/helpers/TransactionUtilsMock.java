@@ -21,6 +21,7 @@ import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.TransferMoneyReceived;
 import com.guga.walletserviceapi.model.TransferMoneySend;
@@ -42,7 +43,7 @@ public class TransactionUtilsMock {
     public static final boolean APPLY_FILTER_WALLET_BY_STATUS = true;
     public static final int RANGE_WALLET_ID = 2000;
     public static final int TOTAL_WALLET_ID = 2150;
-    public static final int LIMIT_LIST_WALLET = 80;
+    public static final int LIMIT_LIST_WALLET = 150;
 
     public static final int INI_TRANSACTION_ID = 1;
     public static final int MAX_TRANSACTION_ID = 450;
@@ -60,7 +61,7 @@ public class TransactionUtilsMock {
 
     private static long SEQUENCE_TRANSACTION;
 
-    public static List<Customer> createCustomerListMock() {
+    public static List<Customer> createCustomerMock() {
         Faker faker = new Faker(new Locale("pt-BR"));
         List<Customer> customers = new ArrayList<>();
 
@@ -96,14 +97,15 @@ public class TransactionUtilsMock {
         return customers;
     }
 
-    public static List<Wallet> createWalletListMock(List<Customer> customersInput) {
+
+    public static List<Wallet> createWalletMock(List<Customer> customersInput) {
         List<Customer> customersMock = new ArrayList<>(customersInput);
 
         if (customersMock.isEmpty()) {
-            customersMock = createCustomerListMock();
+            customersMock = createCustomerMock();
         }
 
-        customersMock = getCustomersByStatus(customersMock, Status.ACTIVE);
+        customersMock = findCustomersByStatus(customersMock, Status.ACTIVE);
 
         customersMock = applyLimiteCustomer(customersMock);
 
@@ -113,64 +115,82 @@ public class TransactionUtilsMock {
 
         List<Wallet> wallets = new ArrayList<>();
 
+        List<Integer> customersProcess = new ArrayList<>();
+
+
         IntStream.range(RANGE_WALLET_ID, TOTAL_WALLET_ID)
            .forEach(i -> {
-                int indexCustomer = RandomMock.generateIntNumberByInterval(0, totalCustomerItems - 1);
-                Customer customer = customers.get(indexCustomer);
-                LocalDateTime createAt = TransactionUtilsMock.defineLocalDAteTimeBetweenYear();
+                
+                Customer customer = null;
+                boolean isCreateWallet = false;
+                int indexCustomer = -1;
+                List<Wallet> walletCheck = new ArrayList<>();
 
-                List<Wallet> walletCheck = wallets.stream()
-                    .filter(w -> w.getCustomer().getCustomerId().equals(customer.getCustomerId()) 
-                                    && w.getStatus().equals(Status.ACTIVE) )
-                    .toList()
-                    ;
+                if (customersProcess.size() >= (totalCustomerItems - 1)) {
+                    return;
+                }
+
+                for(int j = 0; j < 3; j++) {                    
+                    indexCustomer = RandomMock.generateNumberByIntervalAndException(0, totalCustomerItems-1, customersProcess);
+                    if (indexCustomer >= 0) {
+                        customer = customers.get(indexCustomer);                        
+                        walletCheck = findWalletActiveByCustomerId(wallets, customer.getCustomerId());
+                    }
+
+                    if (walletCheck.isEmpty() && walletCheck.size() == 0) {
+                        isCreateWallet = true;
+                        break;
+                    }
+                }
+
+                if (!isCreateWallet || customer == null) {
+                    return;
+                }
 
                 Long walletId = (long)i;
                
                 Status status = defineStatus();
 
-                if (customer.getCustomerId().equals(1002L)) {
-                    System.out.println("Customer 1002 - " + status);
-                }
-
-                if (status.equals(Status.ACTIVE) && !walletCheck.isEmpty() && walletCheck.size() == 2){
-                    status = Status.INACTIVE;
-                }
+                LocalDateTime createAt = TransactionUtilsMock.defineLocalDAteTimeBetweenYear();
 
                 Wallet wallet = Wallet.builder()
-                .walletId( walletId )
-                .customerId(customer.getCustomerId())
-                .customer(customer)
-                .status( status )
-                .currentBalance( BigDecimal.ZERO )
-                .previousBalance( BigDecimal.ZERO )
-                .createdAt(createAt)
-                .updatedAt(createAt)
-                .loginUser("system")
-                .build();
+                    .walletId( walletId )
+                    .customerId(customer.getCustomerId())
+                    .customer(customer)
+                    .status( status )
+                    .currentBalance( BigDecimal.ZERO )
+                    .previousBalance( BigDecimal.ZERO )
+                    .createdAt(createAt)
+                    .updatedAt(createAt)
+                    .loginUser("system")
+                    .build();
                 
                 wallets.add(wallet);
 
+                if (wallet.getStatus().equals(Status.ACTIVE)) {
+                    customersProcess.add(indexCustomer);
+                }
             }
         );
         return wallets;
     }
 
-    public static Map<String, List<?>> createTransactionListMock(List<Wallet> walletInput) {
+
+    public static Map<String, List<?>> createTransactionMock(List<Wallet> walletInput) {
 
         Map<String, List<?>> resultsMap = new HashMap<>();
 
         List<Wallet> walletsMock = new ArrayList<>(walletInput);
 
         if ( walletsMock.isEmpty() ) {
-            walletsMock = createWalletListMock(null);
+            walletsMock = createWalletMock(null);
         }
 
-        walletsMock = getWalletsByStatus(walletsMock, Status.ACTIVE);
+        walletsMock = findWalletsByStatus(walletsMock, Status.ACTIVE);
 
         walletsMock = applyLimiteWallet(walletsMock);
 
-        final List<Wallet> wallets = walletsMock;
+        final List<Wallet> wallets = new ArrayList<>(walletsMock);
 
         final int totalWalletItems = wallets.size();
 
@@ -204,21 +224,23 @@ public class TransactionUtilsMock {
                     depositMoney.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION );
                     depositMoney.setLogin(RandomMock.loginFakeMock());
                     if (depositMoney.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
-                        TransactionUtils.adjustBalanceWallet(walletSend, depositMoney);
+                        TransactionUtils.setAdjustBalanceWallet(walletSend, depositMoney);
 
                         movement = TransactionUtils.generateMovementTransaction(depositMoney, null);
                         movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
                         movements.add(movement);
 
-                        depositMoney.setMovementTransaction(movement);
+                        depositMoney.setMovementId(movement.getMovementId());
+                        depositMoney.setMovement(movement);
                     }
 
                     // Para Mock, gerar dinamicamente o Deposit Sender
                     if ( RandomMock.generateIntNumber (2) == 0 ) {
-                        DepositSender depositSender = generateDepositSenderMock(depositMoney);
+                        DepositSender depositSender = buildDepositSenderMock(depositMoney);
                         depositSenders.add(depositSender);
 
                         depositMoney.setDepositSender(depositSender);
+                        depositMoney.setDepositSenderId(depositSender.getSenderId());
                     }
 
                     transactions.add(depositMoney);
@@ -229,13 +251,14 @@ public class TransactionUtilsMock {
                     withdraw.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION);
                     withdraw.setLogin(RandomMock.loginFakeMock());
                     if (withdraw.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
-                        TransactionUtils.adjustBalanceWallet(walletSend, withdraw);
+                        TransactionUtils.setAdjustBalanceWallet(walletSend, withdraw);
 
                         movement = TransactionUtils.generateMovementTransaction(withdraw, null);
                         movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
                         movements.add(movement);
 
-                        withdraw.setMovementTransaction(movement);
+                        withdraw.setMovementId(movement.getMovementId());
+                        withdraw.setMovement(movement);
                     }
 
                     transactions.add(withdraw);
@@ -247,41 +270,48 @@ public class TransactionUtilsMock {
                     transferSend.setLogin(RandomMock.loginFakeMock());
 
                     if (transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
-                        TransactionUtils.adjustBalanceWallet(walletSend, transferSend);
                             
                         SEQUENCE_TRANSACTION++;
                         TransferMoneyReceived transferReceived = TransactionUtils.generateTransferMoneyReceived(walletReceived, amount);
-                        transferReceived.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION );
+                        transferReceived.setTransactionId( transferSend.getTransactionId() + 1 );
                         transferReceived.setLogin(RandomMock.loginFakeMock());
                         
                         if (transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)){
-                            TransactionUtils.adjustBalanceWallet(walletReceived, transferReceived);
-                            
+                            TransactionUtils.setAdjustBalanceWallet(walletSend, transferSend);
+                            TransactionUtils.setAdjustBalanceWallet(walletReceived, transferReceived);
+                        }
+                        else {
+                            transferSend.setStatusTransaction(transferReceived.getStatusTransaction());
+                        }
+                        
+                        if (transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS) &&
+                                transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+
                             // Gera o movimento de transferencia da transação Destino
                             movement = TransactionUtils.generateMovementTransaction(transferReceived, transferSend);
                             movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
                             movements.add(movement);
                             
-                            transferReceived.setMovementTransaction(movement);
+                            transferReceived.setMovementId(movement.getMovementId());
+                            transferReceived.setMovement(movement);
 
-                            transactions.add( transferReceived );
-                        } 
-                        else {
-                            transferSend.setStatusTransaction(transferReceived.getStatusTransaction());
+                            transactions.add(transferReceived);
                         }
-                        
+
                         // Gera o movimento de transferencia da transação Envio
                         if (transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS) &&
                                 transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+
                             movement = TransactionUtils.generateMovementTransaction(transferSend, transferReceived);
                             movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
                             movements.add(movement);
 
-                            transferSend.setMovementTransaction(movement);
+                            transferSend.setMovementId(movement.getMovementId());
+                            transferSend.setMovement(movement);
                         }
-
-                        transactions.add( transferSend );
                     }
+
+                    transactions.add( transferSend );                    
                     break;
 
                 default:
@@ -296,7 +326,7 @@ public class TransactionUtilsMock {
         return resultsMap;
     }
 
-    public static List<Customer> getCustomersByStatus(List<Customer> customers, Status status) {
+    public static List<Customer> findCustomersByStatus(List<Customer> customers, Status status) {
         if (!APPLY_FILTER_CUSTOMER_BY_STATUS) {
             return customers;
         }
@@ -306,7 +336,7 @@ public class TransactionUtilsMock {
                 .toList();
     }
 
-    public static List<Wallet> getWalletsByStatus(List<Wallet> wallets, Status status) {
+    public static List<Wallet> findWalletsByStatus(List<Wallet> wallets, Status status) {
 
         if (!APPLY_FILTER_WALLET_BY_STATUS) {
             return wallets;
@@ -318,7 +348,15 @@ public class TransactionUtilsMock {
     }
 
 
-    private static DepositSender generateDepositSenderMock(DepositMoney depositMoney) {
+    public static List<Wallet> findWalletActiveByCustomerId(List<Wallet> wallets, Long customerId) {
+        return wallets.stream()
+                .filter(w -> w.getStatus().equals(Status.ACTIVE)
+                        && w.getCustomerId().equals(customerId))
+                .toList();
+    }
+
+
+    private static DepositSender buildDepositSenderMock(DepositMoney depositMoney) {
         Faker faker = new Faker(new Locale("pt-BR"));
 
         return DepositSender.builder()
@@ -396,31 +434,31 @@ public class TransactionUtilsMock {
     public static Status generateStatusByWeight() {
         int randomPercentage = RandomMock.generateIntNumber(100);
 
-        if (randomPercentage < 60) {
-            return Status.ACTIVE;       // 0-59 (60%)
+        if (randomPercentage < 45) {
+            return Status.ACTIVE;
+        } else if (randomPercentage < 55) {
+            return Status.WAITING_VERIFICATION;
+        } else if (randomPercentage < 60) {
+            return Status.PENDING;
         } else if (randomPercentage < 70) {
-            return Status.PENDING;      // 60-69 (10%)
+            return Status.REVIEW;
         } else if (randomPercentage < 80) {
-            return Status.INACTIVE;     // 70-79 (10%)
-        } else if (randomPercentage < 85) {
-            return Status.BLOCKED;      // 80-84 (5%)
+            return Status.BLOCKED;
         } else if (randomPercentage < 90) {
-            return Status.REVIEW;       // 85-89 (5%)
-        } else if (randomPercentage < 95) {
-            return Status.WAITING_VERIFICATION; // 90-94 (5%)
+            return Status.INACTIVE;
         } else {
-            return Status.ARCHIVED;     // 95-99 (5%)
+            return Status.ARCHIVED;
         }
     }
 
     public static OperationType generateOperationTypeByWeight() {
         int randomPercentage = RandomMock.generateIntNumber(100);
 
-        if (randomPercentage < 50) {
+        if (randomPercentage < 90) {
             return OperationType.DEPOSIT;               // 0-45 (45%)
-        } else if (randomPercentage < 75) {
+        } else if (randomPercentage < 60) {
             return OperationType.TRANSFER_SEND;         // 46-65 (20%)
-        } else if (randomPercentage < 99) {
+        } else if (randomPercentage < 30) {
             return OperationType.WITHDRAW;              // 66-85 (20%)
         }
         else {
@@ -434,6 +472,21 @@ public class TransactionUtilsMock {
                         Sort.Order.asc("transactionId")
                 )
         );
+    }
+
+
+    public static List<ParamApp> createParamsAppMock() {
+
+        List<ParamApp> paramApps = new ArrayList();
+
+        paramApps.add(ParamApp.newParam("seqCustomerId", "Id Sequencial de Customer.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqWalletId", "Id Sequencial de Wallet.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqTransactionId", "Id Sequencial de Transaction.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqDepositSenderId", "Id Sequencial de DepositSender.Id", Long.valueOf("0")));
+        paramApps.add(ParamApp.newParam("seqMovementId", "Id Sequencial de Movement.Id", Long.valueOf("0")));
+
+        return paramApps;
+
     }
 
 }

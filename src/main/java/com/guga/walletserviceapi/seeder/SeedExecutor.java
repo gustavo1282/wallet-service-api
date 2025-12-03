@@ -25,10 +25,14 @@ public class SeedExecutor {
     //}
 
     public <T> void loadJSONAndSaveRepository(String filePath, Class<T> clazz) {
-
-        // 1. Carrega o CSV e transforma em objetos
-        //List<T> items = seedLoader.loadSeed(filePath, clazz);
-        List<T> items = FileUtils.loadJSONToListObject(filePath, clazz); //jsonSeedLoader.loadList(filePath, clazz);
+        List<T> items;
+        
+        try {
+            items = FileUtils.loadJSONToListObject(filePath, clazz); //jsonSeedLoader.loadList(filePath, clazz);
+        } catch (Exception e) {
+            System.out.println("Problemas ao carregar: " + filePath + "\\n" + e.getMessage());
+            return;
+        }
 
         String repositoryBeanName = Introspector.decapitalize(clazz.getSimpleName()) + "Repository";
 
@@ -36,7 +40,10 @@ public class SeedExecutor {
         JpaRepository<T, ?> repository = (JpaRepository<T, ?>)
                 context.getBean(repositoryBeanName);
 
-        // 3. Salva tudo
-        repository.saveAll(items);
+
+        if (repository.count() == 0) {
+            // 3. Salva tudo    
+            repository.saveAll(items);
+        }
     }
 }
