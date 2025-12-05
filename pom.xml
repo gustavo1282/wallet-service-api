@@ -75,6 +75,34 @@
 	</properties>
 
 	<dependencies>
+
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+	        <version>3.5.3</version>
+	    </dependency>
+
+
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt</artifactId>
+	        <version>0.12.6</version>
+	    </dependency>
+
+
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-impl</artifactId>
+	        <version>0.12.6</version>
+	    </dependency>
+
+
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-api</artifactId>
+	        <version>0.12.6</version>
+	    </dependency>
+
 	    <dependency>
 	        <groupId>com.opencsv</groupId>
 	        <artifactId>opencsv</artifactId>
