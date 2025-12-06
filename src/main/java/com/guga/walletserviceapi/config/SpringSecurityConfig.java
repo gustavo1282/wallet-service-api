@@ -1,73 +1,62 @@
 package com.guga.walletserviceapi.config;
 
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-public class SpringSecurityConfig  {
+public class SpringSecurityConfig {
 
-    // O SecurityFilterChain agora só protege o resto
+    private final JwtAuthenticationFilter jwtFilter;
+
+    public SpringSecurityConfig(JwtAuthenticationFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(csrf -> csrf.disable())
-                .formLogin(form -> form.disable())
-
-                // Permite que o console H2 seja carregado em frames (necessário para a UI)
-                .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable))
-
-                .authorizeHttpRequests(authorize -> authorize
-                        // REGRAS PÚBLICAS (usando AntPathRequestMatcher)
-                        .requestMatchers(
-                                AntPathRequestMatcher.antMatcher("/swagger-ui.html"),
-                                AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
-                                AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),
-                                AntPathRequestMatcher.antMatcher("/actuator/**"),
-                                AntPathRequestMatcher.antMatcher("/wallet-service-api/**"),
-                                AntPathRequestMatcher.antMatcher("/wallet-service-api/api/**"),
-                                AntPathRequestMatcher.antMatcher("/h2-console/**")
-                        ).permitAll()
-
-                        // REGRA GERAL (O que sobrou, autentica)
-                        .anyRequest().authenticated()
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(publicMatchers()).permitAll()
+                    .anyRequest().authenticated()
                 )
-
-                .httpBasic(Customizer.withDefaults());
-
-        return http.build();
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Retorna o delegating encoder padrão. Este encoder é inteligente e
-        // reconhece o prefixo {noop}, {bcrypt}, etc.
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.builder()
-                .username("user")
-                .password("{noop}password")
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(userDetails);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
+    private RequestMatcher[] publicMatchers() {
+        List<String> matchers = GlobalHelper.matchers();
+
+        return matchers.stream()
+                .map(AntPathRequestMatcher::antMatcher)
+                .toArray(RequestMatcher[]::new);
+    }
 }

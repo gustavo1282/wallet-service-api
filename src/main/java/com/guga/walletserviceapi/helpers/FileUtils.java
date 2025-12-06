@@ -114,7 +114,7 @@ public class FileUtils {
 
     public static <T> List<T> loadJSONToListObject(String filePathString, Class<T> clazz) {
 
-        Path filePath = Paths.get(filePathString).normalize();
+         Path filePath = Paths.get(filePathString).normalize();
         
         if (!Files.exists(filePath)) {
             throw new RuntimeException("Arquivo não encontrado no Sistema de Arquivos: " + filePathString);

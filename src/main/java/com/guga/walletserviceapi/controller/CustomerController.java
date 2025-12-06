@@ -25,9 +25,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-//@RequestMapping("${controller.path.base}/customers")
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("${controller.path.base}/customers")
 @Tag(name = "Customer", description = "Endpoints for managing customers")
 @RequiredArgsConstructor
 public class CustomerController {
