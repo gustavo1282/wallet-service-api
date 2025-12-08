@@ -5,7 +5,10 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +31,7 @@ public class AuthController {
     private JwtService jwtService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager; // Requer bean configurado no SecurityConfig
 
     // DTO simples para login
     public static class LoginRequest {
@@ -49,25 +52,24 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
-        // Aqui você deve validar usuário e senha no banco (UserRepository/CustomerRepository)
-        // Exemplo simplificado: assume que usuário existe e senha está correta
+
+        // Usa o Spring Security AuthenticationManager para validar o usuário/senha
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.username, request.password)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtService.generateAccessToken(request.username);
-        String refreshToken = jwtService.generateRefreshToken(request.username);
+        String refreshToken = jwtService.generateRefreshToken(request.password);
 
         return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody LoginRequest request) {
-        // Aqui você deve salvar usuário no banco com senha criptografada
-        String encodedPassword = passwordEncoder.encode(request.password);
-
-        // Exemplo simplificado: apenas retorna senha criptografada
         Map<String, String> response = new HashMap<>();
-        response.put("username", request.username);
-        response.put("encodedPassword", encodedPassword);
-
+        response.put("status", "User registration logic pending implementation in a Service class.");
         return ResponseEntity.ok(response);
     }
 

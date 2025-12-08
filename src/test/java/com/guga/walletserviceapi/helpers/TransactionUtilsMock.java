@@ -13,19 +13,25 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
+import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.TransferMoneyReceived;
 import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.WithdrawMoney;
+import com.guga.walletserviceapi.model.enums.LoginAuthType;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.model.enums.StatusTransaction;
@@ -38,6 +44,7 @@ public class TransactionUtilsMock {
     private static final int RANGE_CUSTOMER_ID = 1000;
     private static final int TOTAL_CUSTOMER_ID = 1050;
     private static final int LIMIT_LIST_CUSTOMER = 30;
+    private static final int RANGE_LOGIN_AUTH_ID = 0;
 
     public static final boolean APPLY_FILTER_WALLET_BY_STATUS = true;
     public static final int RANGE_WALLET_ID = 2000;
@@ -59,9 +66,19 @@ public class TransactionUtilsMock {
     public static final BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
 
     private static long SEQUENCE_TRANSACTION;
+    private static long SEQUENCE_LOGIN_AUTH_ID;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     public static List<Customer> createCustomerListMock() {
+
         Faker faker = new Faker(new Locale("pt-BR"));
+        
         List<Customer> customers = new ArrayList<>();
 
         IntStream.range(RANGE_CUSTOMER_ID, TOTAL_CUSTOMER_ID)
@@ -70,6 +87,7 @@ public class TransactionUtilsMock {
                 String[] partName =  fullName.split(" ");
                 LocalDate birthDate = defineBirthDateMore18YearOld();
                 LocalDateTime dtCreatedAt = RandomMock.generatePastLocalDateTime(2);
+                String cellPhone = faker.phoneNumber().cellPhone();
 
                 Customer customer = Customer.builder()
                     .customerId((long) (i + 1))
@@ -88,17 +106,68 @@ public class TransactionUtilsMock {
                     .cpf(faker.cpf().valid())
                     .createdAt(dtCreatedAt)
                     .updatedAt(dtCreatedAt)
+                    .loginAuthId(null)
                     .build();
 
-                    customers.add(customer);
+                customers.add(customer);
 
-            });
+        });
+
         return customers;
+
     }
 
-    public static List<Wallet> createWalletListMock(List<Customer> customersInput) {
-        List<Customer> customersMock = new ArrayList<>(customersInput);
+    public static List<LoginAuth> createLoginAuthListMock(List<Customer> customers) {
 
+        List<LoginAuth> loginAuths = new ArrayList<>();
+
+        for (Customer customer : customers) {
+
+            String lastFourNumbersPhone = customer.getPhoneNumber()
+                .substring( customer.getPhoneNumber().length() - 4 );
+            
+            String loginAccess = "l"
+                .concat(customer.getFirstName())
+                .concat(lastFourNumbersPhone)
+                .toLowerCase();
+            
+            String accessKey = "k3Y_".concat(lastFourNumbersPhone);
+            
+            LoginAuthType loginAuthType = LoginAuthType.fromValue(RandomMock.generateIntNumberByInterval(0, 3));
+            switch (loginAuthType) {
+                case CPF:
+                    loginAccess = customer.getCpf();
+                    break;
+                case E_MAIL:
+                    loginAccess = customer.getEmail();
+                    break;                    
+                default:
+                    break;
+            }
+
+            SEQUENCE_LOGIN_AUTH_ID++;
+
+            loginAuths.add(
+                LoginAuth.builder()
+                    .id( (long)(RANGE_LOGIN_AUTH_ID + SEQUENCE_LOGIN_AUTH_ID) )
+                    .customerId(customer.getCustomerId())
+                    .login(loginAccess)
+                    .accessKey(accessKey)
+                    .loginAuthType(loginAuthType)
+                    .createdAt(customer.getCreatedAt())
+                    .updatedAt(customer.getCreatedAt())
+                    .loginAuthType(loginAuthType)
+                    .build()
+            );
+        }
+        return loginAuths;
+    }
+    
+
+    public static List<Wallet> createWalletListMock(List<Customer> customersInput) {
+        
+        List<Customer> customersMock = new ArrayList<>(customersInput);
+        
         if (customersMock.isEmpty()) {
             customersMock = createCustomerListMock();
         }
@@ -434,6 +503,19 @@ public class TransactionUtilsMock {
                         Sort.Order.asc("transactionId")
                 )
         );
+    }
+
+    public static List<ParamApp> createParamsAppMock() {
+
+        List<ParamApp> paramApps = List.of(
+            ParamApp.newParam("seq-customer-id", "Id Sequencial de Customer.Id", Long.valueOf("0")),
+            ParamApp.newParam("seq-wallet-id", "Id Sequencial de Wallet.Id", Long.valueOf("0")),            
+            ParamApp.newParam("seq-transaction-id", "Id Sequencial de Transaction.Id", Long.valueOf("0")),
+            ParamApp.newParam("seq-deposit-sender-id", "Id Sequencial de DepositSender.Id", Long.valueOf("0")),
+            ParamApp.newParam("seq-movement-id", "Id Sequencial de Movement.Id", Long.valueOf("0")),
+            ParamApp.newParam("seq-login-auth-id", "Id Sequencial de LoginAuth  .Id", Long.valueOf("0"))
+        );
+        return paramApps;
     }
 
 }

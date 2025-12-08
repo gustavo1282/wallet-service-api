@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
-import com.guga.walletserviceapi.model.converter.LocalDateTimeCsvConverter;
+import com.guga.walletserviceapi.model.converter.OperationTypeConverter;
 import com.guga.walletserviceapi.model.converter.StatusConverter;
+import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.Status;
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvCustomBindByName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -43,11 +43,10 @@ import lombok.Setter;
 public class Wallet {
 
     @Id // Chave primária simples, campo único
-    @CsvBindByName(column = "walletId")
     @Column(name = "wallet_id", nullable = false, unique = true)
     private Long walletId;
 
-    @CsvBindByName(column = "customerId", required = true)
+
     @NotNull(message = "Customer ID cannot be null")
     @Column(name = "customer_id_fk", insertable = true, updatable = true)
     private Long customerId;
@@ -58,37 +57,40 @@ public class Wallet {
     @JoinColumn(name = "customer_id_fk", referencedColumnName = "customer_id", nullable = false, insertable = false, updatable = false)
     private Customer customer;
 
-    @CsvBindByName(column = "previousBalance")
+
+    @Convert(converter = OperationTypeConverter.class)
+    @JsonProperty("lastOperationType")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @Column(name = "last_operation_type", nullable = true, length = 2, insertable = true, updatable = true)
+    private OperationType lastOperationType;
+
+    
     @Digits(integer = 14, fraction = 2, message = "Previous balance must have up to 14 integer digits and 2 decimal places")
     @Column(name = "previous_balance", nullable = false)
     private BigDecimal previousBalance;
 
 
-    @CsvBindByName(column = "currentBalance")
+
     @Digits(integer = 14, fraction = 2, message = "Current balance must have up to 14 integer digits and 2 decimal places")
     @Column(name = "current_balance", nullable = false)
     private BigDecimal currentBalance;
 
 
-    @CsvBindByName(column = "loginUser")
     @NotBlank(message = "Login user cannot be null or empty")
     @Column(name = "login_user", length = 20)
     private String loginUser;
 
 
-    @CsvBindByName(column = "status")
     @Convert(converter = StatusConverter.class)
-    @Column(name = "status", nullable = false, length = 2)
+    @Column(name = "status", nullable = false, length = 2, insertable = true, updatable = true)
     private Status status;
 
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = GlobalHelper.PATTERN_FORMAT_DATE_TIME)
-    @CsvCustomBindByName(column = "createdAt", converter = LocalDateTimeCsvConverter.class)
     @Column(name = "created_At", nullable = false)
     private LocalDateTime createdAt;
 
 
-    @CsvCustomBindByName(column = "updatedAt", converter = LocalDateTimeCsvConverter.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = GlobalHelper.PATTERN_FORMAT_DATE_TIME)
     @Column(name = "updated_At", nullable = false)
     private LocalDateTime updatedAt;

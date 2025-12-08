@@ -14,13 +14,31 @@ import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.DepositSender;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.repository.DepositSenderRepository;
 
 @Service
-public class DepositSenderService {
+public class DepositSenderService implements IWalletApiService{
 
     @Autowired
     private DepositSenderRepository depositSenderRepository;
+
+    @Autowired
+    private ParamAppService paramAppService;
+
+
+    public DepositSender saveDepositSender(DepositSender depositSender) {
+        depositSender.setSenderId(nextIdGenerate());
+        DepositSender depositSenderSaved = depositSenderRepository.save(depositSender);
+        return depositSenderSaved;
+    }
+
+    @Override
+    public Long nextIdGenerate() {
+        return paramAppService
+            .getNextSequenceId(ParamApp.SEQ_DEPOSIT_SENDER_ID)
+            .getValueLong();
+    }
 
 
     /***

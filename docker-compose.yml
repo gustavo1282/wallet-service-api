@@ -138,6 +138,9 @@ services:
     user: "472"
     ports:
       - "3000:3000"
+    #environment: # <<< ADICIONE ESTA SEÇÃO
+    #  GF_SECURITY_ADMIN_USER: wallet_user # Seu usuário de login
+    #  GF_SECURITY_ADMIN_PASSWORD: wallet_pass # Sua senha forte
     #depends_on:
     #  - prometheus
     networks:

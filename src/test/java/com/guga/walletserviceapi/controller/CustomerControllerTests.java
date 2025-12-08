@@ -75,9 +75,8 @@ class CustomerControllerTests {
     void setup() {
         Mockito.reset(customerService);
         faker = new Faker(new Locale("pt-BR"));
-        customers = TransactionUtilsMock.createCustomerListMock();
 
-        
+        customers = TransactionUtilsMock.createCustomerListMock();
 
         URI_API = env.getProperty("server.protocol-type")
                     .concat("://" + env.getProperty("server.hostname"))

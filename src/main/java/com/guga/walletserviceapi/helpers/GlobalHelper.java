@@ -29,15 +29,14 @@ public class GlobalHelper {
     public static List<String> matchers() {
         List<String> matchers = Arrays.asList(
             "/actuator/**",
+            "/wallet-services-api/api/auth/login",
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/refresh",
             "/h2-console/**",
             "/swagger-ui.html",
             "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/wallet-service-api/**",
-            "/wallet-service-api/api/**"
+            "/v3/api-docs/**"
             );
         return matchers;
     }

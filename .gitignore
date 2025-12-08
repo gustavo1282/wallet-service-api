@@ -2,7 +2,7 @@
 # Ignora todo o diretório de build
 target/
 
-# Arquivos de empacotamento
+### Arquivos de empacotamento
 *.jar
 *.war
 *.ear
