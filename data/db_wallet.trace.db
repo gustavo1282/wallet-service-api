@@ -1366,3 +1366,300 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: The connection wa
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:690)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 16 more
+2025-12-06 01:58:33.792843-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:58:33.805078-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:58:33.810096-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:58:33.817415-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:58:33.822486-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:58:33.829486-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:59:22.300645-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:59:22.304644-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:59:22.320642-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:59:22.331461-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:59:22.334458-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 01:59:22.346461-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:13:48.269141-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:13:48.283141-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:13:48.288137-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:13:48.294136-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:13:48.310136-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:13:48.349563-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:26:33.647991-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:26:33.656991-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:26:33.659692-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:26:33.667696-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:26:33.690507-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:26:33.699495-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:35:45.593080-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:35:45.623737-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:35:45.644490-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:35:45.646459-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:35:45.664459-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 02:35:45.678077-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 03:36:57.686657-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 03:36:57.700769-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 03:36:57.730256-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 03:36:57.755993-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 03:36:57.773749-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-06 03:36:57.779071-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:18:19.962765-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:18:20.029378-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:18:20.067678-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:18:20.076684-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:18:20.081107-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:18:20.088110-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:20:55.954067-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:20:55.958066-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:20:55.968228-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:20:55.971228-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:20:55.975226-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:20:55.984224-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:25:04.547213-03:00 jdbc[33]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:25:04.553215-03:00 jdbc[33]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:25:04.564216-03:00 jdbc[33]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:25:04.566858-03:00 jdbc[33]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:25:04.570584-03:00 jdbc[33]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:25:04.580584-03:00 jdbc[33]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:27:36.462693-03:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:27:36.466063-03:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:27:36.473012-03:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:27:36.485160-03:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:27:36.498160-03:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:27:36.502781-03:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-07 13:49:00.699110-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]TB_CUSTOMER"; expected "TRUNCATE"; SQL statement:
+TB_CUSTOMER [42001-232]
+2025-12-08 02:15:17.069637-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]TB_PARAM_APP"; expected "TRUNCATE"; SQL statement:
+TB_PARAM_APP [42001-232]
+2025-12-08 03:39:46.392115-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:39:46.410118-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:39:46.440115-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:39:46.456115-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:39:46.471115-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:39:46.485116-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:46:09.926435-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:46:09.962259-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:46:09.973379-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:46:09.987014-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:46:09.998013-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:46:10.006015-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:47:34.777698-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:47:34.799703-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:47:34.809704-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:47:34.829697-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:47:34.846697-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 03:47:34.855700-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 12:26:08.717011-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 12:26:08.728009-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 12:26:08.734010-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 12:26:08.760009-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 12:26:08.764008-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 12:26:08.773007-03:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 13:04:41.712813-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HT_tb_transaction(transaction_id bigint not null, primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 13:04:41.729817-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSACTION" already exists; SQL statement:
+create global temporary table HTE_tb_transaction(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 13:04:41.733817-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_RECEIVED" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_received(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 13:04:41.763816-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_TRANSFER_SEND" already exists; SQL statement:
+create global temporary table HTE_tb_transfer_send(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 13:04:41.769816-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_WITHDRAW" already exists; SQL statement:
+create global temporary table HTE_tb_withdraw(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 13:04:41.779816-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_TB_DEPOSIT_MONEY" already exists; SQL statement:
+create global temporary table HTE_tb_deposit_money(amount numeric(16,2), current_balance numeric(16,2), operation_type integer, previous_balance numeric(16,2), status_transaction integer, created_at timestamp(6), deposit_sender_id_fk bigint, movement_id_fk bigint, transaction_id bigint not null, wallet_id_fk bigint, login varchar(25), primary key (transaction_id)) TRANSACTIONAL [42101-232]
+2025-12-08 14:36:52.809732-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]'k3Y_' || right(Login, 4) as xxx,"; SQL statement:
+'k3Y_' || right(Login, 4) as xxx, [42000-232]
+2025-12-08 14:36:55.051761-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]l.ACCESS_KEY , l.CREATED_AT, l.LAST_LOGIN_AT, l.UPDATED_AT\000d\000aFROM TB_LOGIN_AUTH l"; SQL statement:
+l.ACCESS_KEY , l.CREATED_AT, l.LAST_LOGIN_AT, l.UPDATED_AT
+FROM TB_LOGIN_AUTH l [42000-232]
+2025-12-08 14:37:06.341143-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]'k3Y_' || rigth(Login, 4) as xxx,"; SQL statement:
+'k3Y_' || rigth(Login, 4) as xxx, [42000-232]
+2025-12-08 14:37:08.325751-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]l.ACCESS_KEY , l.CREATED_AT, l.LAST_LOGIN_AT, l.UPDATED_AT\000d\000aFROM TB_LOGIN_AUTH l"; SQL statement:
+l.ACCESS_KEY , l.CREATED_AT, l.LAST_LOGIN_AT, l.UPDATED_AT
+FROM TB_LOGIN_AUTH l [42000-232]
+2025-12-08 14:38:38.036729-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]'k3Y_' || SUBSTR(l.LOGIN, -4) AS XXXX,"; SQL statement:
+'k3Y_' || SUBSTR(l.LOGIN, -4) AS XXXX, [42000-232]
+2025-12-08 14:38:40.059716-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]l.ACCESS_KEY , l.CREATED_AT, l.LAST_LOGIN_AT, l.UPDATED_AT\000d\000aFROM TB_LOGIN_AUTH l"; SQL statement:
+l.ACCESS_KEY , l.CREATED_AT, l.LAST_LOGIN_AT, l.UPDATED_AT
+FROM TB_LOGIN_AUTH l [42000-232]

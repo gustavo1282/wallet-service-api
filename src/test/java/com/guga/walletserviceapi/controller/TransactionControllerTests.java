@@ -20,15 +20,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -44,27 +47,45 @@ import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
+import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.WithdrawMoney;
 import com.guga.walletserviceapi.model.enums.CompareBigDecimal;
-import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.model.enums.StatusTransaction;
 import com.guga.walletserviceapi.repository.CustomerRepository;
 import com.guga.walletserviceapi.repository.TransactionRepository;
 import com.guga.walletserviceapi.repository.WalletRepository;
+import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.service.LoginAuthService;
 import com.guga.walletserviceapi.service.TransactionService;
 
+//@SpringBootTest(classes = TransactionController.class)
 @WebMvcTest(TransactionController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-@WithMockUser(username = "user", roles = {"USER"})
-class TransactionControllerTests {
+@WithMockUser(username = "user", roles = { "USER" })
+@Import({
+    // Importe a configuração de segurança se necessário
+    //com.guga.walletserviceapi.service.LoginAuthService.class, 
+    //com.guga.walletserviceapi.security.JwtAuthenticationFilter.class,
+    //com.guga.walletserviceapi.security.JwtService.class,
+    com.guga.walletserviceapi.config.SpringSecurityConfig.class
+})
+public class TransactionControllerTests {
 
-        private static boolean SAVE_JSON = true;
-        private static boolean LOAD_JSON = true;
+        @MockitoBean
+        private JwtService jwtService;
+
+        @MockitoBean
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+        @MockitoBean 
+        private LoginAuthService loginAuthService;
 
         @Autowired
         private MockMvc mockMvc;
@@ -101,11 +122,20 @@ class TransactionControllerTests {
 
         private List<DepositSender> depositSenders;
 
-        private static long sequenceTransaction;
+        private List<ParamApp> paramsApp;
+
+        private List<LoginAuth> loginAuths;
+
+        private static boolean SAVE_JSON = true;
+        private static boolean LOAD_JSON = true;
+
+        @Autowired 
+        private PasswordEncoder passwordEncoder;
 
         @BeforeEach
         void setUp() throws JsonProcessingException {
                 Mockito.reset(transactionService);
+                MockitoAnnotations.openMocks(this);
                 URI_API = BASE_PATH.concat(API_NAME);
 
                 objectMapper = FileUtils.instanceObjectMapper();
@@ -116,73 +146,98 @@ class TransactionControllerTests {
         private void simularTransacoes() {
 
                 boolean isOlderThanFiveMinutes = FileUtils.isOlderThanFiveMinutes(
-                                createFileJson(FileUtils.JSON_FILE_CUSTOMER)
-                        );
+                                createFileJson(FileUtils.JSON_FILE_CUSTOMER));
 
                 try {
                         if (SAVE_JSON && LOAD_JSON && !isOlderThanFiveMinutes) {
-  
-                                customers = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_CUSTOMER), Customer.class);
 
-                                wallets = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_WALLET), Wallet.class);
+                                customers = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_CUSTOMER),
+                                                Customer.class);
 
-                                depositSenders = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER), DepositSender.class);
-                                
-                                transactions = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_TRANSACTION), Transaction.class);
-                                
-                                movements = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_MOVIMENT), MovementTransaction.class);
-                                
+                                wallets = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_WALLET),
+                                                Wallet.class);
+
+                                depositSenders = FileUtils.loadJSONToListObject(
+                                                createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER),
+                                                DepositSender.class);
+
+                                transactions = FileUtils.loadJSONToListObject(
+                                                createFileJson(FileUtils.JSON_FILE_TRANSACTION), Transaction.class);
+
+                                movements = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_MOVIMENT),
+                                                MovementTransaction.class);
+
                         } else {
+                                Map<String, List<?>> resultMapTransactions;
+
+                                // A variável paramsApp armazena uma lista parametros iniciais da aplicação
+                                paramsApp = TransactionUtilsMock.createParamsAppMock();
+
+
                                 customers = TransactionUtilsMock.createCustomerListMock();
-                                TransactionUtilsMock.getCustomersByStatus(customers, Status.ACTIVE);
 
+                                loginAuths = TransactionUtilsMock.createLoginAuthListMock(customers );
+                                encriptAccessKeyLoginAuthListMock(loginAuths);
+
+
+                                // Cria a lista de wallets a partir da lista de customers
                                 wallets = TransactionUtilsMock.createWalletListMock(customers);
-                                TransactionUtilsMock.getWalletsByStatus(wallets, Status.ACTIVE);
 
-                                Map<String, List<?>> resultMapTransactions = TransactionUtilsMock.createTransactionListMock(wallets);
+                                // Cria a lista de transactions, movements e depositSenders a partir da lista de
+                                // wallets
+                                resultMapTransactions = TransactionUtilsMock.createTransactionListMock(wallets);
+                                transactions = (List<Transaction>) resultMapTransactions.get("transactions");
+                                movements = (List<MovementTransaction>) resultMapTransactions.get("movements");
+                                depositSenders = (List<DepositSender>) resultMapTransactions.get("depositSenders");
 
                                 if (SAVE_JSON) {
 
                                         objectMapper = FileUtils.instanceObjectMapper();
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_CUSTOMER), 
-                                                objectMapper.writeValueAsString(customers));
+                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_PARAMS_APP),
+                                                        objectMapper.writeValueAsString(paramsApp));
+
+                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_CUSTOMER),
+                                                        objectMapper.writeValueAsString(customers));
+
+                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_LOGIN_AUTH),
+                                                        objectMapper.writeValueAsString(loginAuths));
 
                                         FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_WALLET),
-                                                objectMapper.writeValueAsString(wallets));
-
-                                        transactions = (List<Transaction>)resultMapTransactions.get("transactions");
-                                        movements = (List<MovementTransaction>)resultMapTransactions.get("movements");
-                                        depositSenders = (List<DepositSender>)resultMapTransactions.get("depositSenders");
+                                                        objectMapper.writeValueAsString(wallets));
 
                                         FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_TRANSACTION),
-                                                objectMapper.writeValueAsString(transactions));
+                                                        objectMapper.writeValueAsString(transactions));
 
                                         FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_MOVIMENT),
-                                                objectMapper.writeValueAsString(movements));
-                                        
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER), 
-                                                objectMapper.writeValueAsString(depositSenders));
+                                                        objectMapper.writeValueAsString(movements));
 
+                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER),
+                                                        objectMapper.writeValueAsString(depositSenders));
                                 }
                         }
-
                 } catch (JsonProcessingException ex) {
                         ex.printStackTrace();
                 }
 
         }
 
+        private void encriptAccessKeyLoginAuthListMock(List<LoginAuth> loginAuths2) {
+                for (LoginAuth loginAuth : loginAuths2) {
+                        String rawAccessKey = loginAuth.getAccessKey();
+                        String encodedAccessKey = passwordEncoder.encode(rawAccessKey);
+                        loginAuth.setAccessKey(encodedAccessKey);
+                }
+        }
+
         private String createFileJson(String jsonFile) {
-
-                return FileUtils.FOLDER_DEFAULT_FILE_JSON +
-                        jsonFile;
-
+                return FileUtils.FOLDER_DEFAULT_FILE_JSON + jsonFile;
         }
 
         @DisplayName("shouldReturn200_WhenRequestTransactionById >> Solicita uma transação a partir de um transactionId válido")
         @Test
         void shouldReturn200_WhenRequestTransactionById() throws Exception {
+
                 int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
                 Transaction transaction = transactions.get(idxTransaction);
                 Long transactionId = transaction.getTransactionId();
@@ -198,7 +253,8 @@ class TransactionControllerTests {
                                                 .println("Body: " + result.getResponse().getContentAsString()))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.transactionId", is(transaction.getTransactionId().intValue())))
-                                .andExpect(jsonPath("$.wallet.walletId", is(transaction.getWallet().getWalletId().intValue())));
+                                .andExpect(jsonPath("$.wallet.walletId",
+                                                is(transaction.getWallet().getWalletId().intValue())));
         }
 
         @Test
@@ -210,8 +266,8 @@ class TransactionControllerTests {
                 Long walletId = transaction.getWallet().getWalletId();
 
                 List<Transaction> resultFilter = transactions.stream()
-                                .filter(trn -> trn.getWallet().getWalletId().compareTo(walletId) == 
-                                CompareBigDecimal.EQUAL.getValue())
+                                .filter(trn -> trn.getWallet().getWalletId()
+                                                .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue())
                                 .toList();
 
                 Page<Transaction> pageForWallet = new PageImpl<>(resultFilter,
@@ -225,7 +281,7 @@ class TransactionControllerTests {
                 mockMvc.perform(get(URI_API.concat("/search-wallet"))
                                 .param("walletId", String.valueOf(walletId))
                                 .contentType(MediaType.APPLICATION_JSON))
-                            .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
                                 .andDo(result -> System.out
                                                 .println("Body: " + result.getResponse().getContentAsString()))
                                 .andExpect(status().isOk())
@@ -245,13 +301,13 @@ class TransactionControllerTests {
                 StatusTransaction typeTransaction = transaction.getStatusTransaction();
 
                 List<Transaction> resultFilter = transactions.stream()
-                                .filter(trn -> trn.getWallet().getWalletId().compareTo(walletId) == CompareBigDecimal.EQUAL
-                                                .getValue()
+                                .filter(trn -> trn.getWallet().getWalletId()
+                                                .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue()
                                                 && trn.getStatusTransaction().equals(typeTransaction))
                                 .toList();
 
                 Page<Transaction> pageForWallet = new PageImpl<>(resultFilter,
-                                TransactionUtilsMock.getDefaultPageable(), 
+                                TransactionUtilsMock.getDefaultPageable(),
                                 resultFilter.size());
 
                 when(transactionService.filterTransactionByWalletIdAndProcessType(any(Long.class),
@@ -342,7 +398,8 @@ class TransactionControllerTests {
                                 .andExpect(status().isCreated())
                                 .andExpect(header().exists("Location"))
                                 .andExpect(jsonPath("$.transactionId").value(withdrawMoney.getTransactionId()))
-                                .andExpect(jsonPath("$.wallet.walletId").value(withdrawMoney.getWallet().getWalletId()));
+                                .andExpect(jsonPath("$.wallet.walletId")
+                                                .value(withdrawMoney.getWallet().getWalletId()));
 
         }
 
@@ -396,19 +453,27 @@ class TransactionControllerTests {
         @DisplayName("shouldReturn200_WhenUploadFileCsvAndWriteByJSONInDatabase >> Simula upload do transaction.csv")
         void shouldReturn200_WhenUploadFileCsvAndWriteByJSONInDatabase() throws Exception {
 
-                String VALID_TRANSACTION_CSV = 
-                        "\"transactionId\",\"createdAt\",\"walletId\",\"operationType\",\"previousBalance\",\"amount\",\"currentBalance\",\"statusTransaction\",\"senderId\"\r\n" + //
-                        "11001,\"2025-11-16 02:57:18.381653500\",2119,\"DEPOSIT\",0,246.16,246.16,\"CUSTOMER_INVALID\",12901\r\n" + //
-                        "11002,\"2025-11-16 02:57:18.386653300\",2049,\"WITHDRAW\",0,365.5,-365.5,\"CUSTOMER_INVALID\",\\N\r\n" + //
-                        "11003,\"2025-11-16 02:57:18.386653300\",2058,\"WITHDRAW\",0,596.52,-596.52,\"CUSTOMER_INVALID\",\\N\r\n" + //
-                        "11004,\"2025-11-16 02:57:18.386653300\",2055,\"DEPOSIT\",0,549.23,549.23,\"CUSTOMER_INVALID\",12904\r\n" + //
-                        "11005,\"2025-11-16 02:57:18.390655100\",2062,\"DEPOSIT\",0,287.77,287.77,\"CUSTOMER_INVALID\",12905\r\n" + //
-                        "11006,\"2025-11-16 02:57:18.396656500\",2062,\"DEPOSIT\",0,488.68,488.68,\"CUSTOMER_INVALID\",\\N\r\n" + //
-                        "11007,\"2025-11-16 02:57:18.396656500\",2038,\"TRANSFER_SEND\",0,599.42,-599.42,\"CUSTOMER_INVALID\",\\N\r\n" + //
-                        "11008,\"2025-11-16 02:57:18.396656500\",2106,\"DEPOSIT\",0,545.88,545.88,\"CUSTOMER_INVALID\",12908\r\n" + //
-                        "11009,\"2025-11-16 02:57:18.399658200\",2051,\"DEPOSIT\",0,607.9,607.9,\"CUSTOMER_INVALID\",12909\r\n";
-                        
-               // 1. Definições do Arquivo
+                String VALID_TRANSACTION_CSV = "\"transactionId\",\"createdAt\",\"walletId\",\"operationType\",\"previousBalance\",\"amount\",\"currentBalance\",\"statusTransaction\",\"senderId\"\r\n"
+                                + //
+                                "11001,\"2025-11-16 02:57:18.381653500\",2119,\"DEPOSIT\",0,246.16,246.16,\"CUSTOMER_INVALID\",12901\r\n"
+                                + //
+                                "11002,\"2025-11-16 02:57:18.386653300\",2049,\"WITHDRAW\",0,365.5,-365.5,\"CUSTOMER_INVALID\",\\N\r\n"
+                                + //
+                                "11003,\"2025-11-16 02:57:18.386653300\",2058,\"WITHDRAW\",0,596.52,-596.52,\"CUSTOMER_INVALID\",\\N\r\n"
+                                + //
+                                "11004,\"2025-11-16 02:57:18.386653300\",2055,\"DEPOSIT\",0,549.23,549.23,\"CUSTOMER_INVALID\",12904\r\n"
+                                + //
+                                "11005,\"2025-11-16 02:57:18.390655100\",2062,\"DEPOSIT\",0,287.77,287.77,\"CUSTOMER_INVALID\",12905\r\n"
+                                + //
+                                "11006,\"2025-11-16 02:57:18.396656500\",2062,\"DEPOSIT\",0,488.68,488.68,\"CUSTOMER_INVALID\",\\N\r\n"
+                                + //
+                                "11007,\"2025-11-16 02:57:18.396656500\",2038,\"TRANSFER_SEND\",0,599.42,-599.42,\"CUSTOMER_INVALID\",\\N\r\n"
+                                + //
+                                "11008,\"2025-11-16 02:57:18.396656500\",2106,\"DEPOSIT\",0,545.88,545.88,\"CUSTOMER_INVALID\",12908\r\n"
+                                + //
+                                "11009,\"2025-11-16 02:57:18.399658200\",2051,\"DEPOSIT\",0,607.9,607.9,\"CUSTOMER_INVALID\",12909\r\n";
+
+                // 1. Definições do Arquivo
                 String name = "file"; // Nome do parâmetro que sua API espera (ex: @RequestParam("file"))
                 String filename = "transactions.csv";
                 String contentType = "text/csv";
@@ -416,18 +481,13 @@ class TransactionControllerTests {
 
                 // 2. Criação do MockMultipartFile
                 MultipartFile multipartFile = new MockMultipartFile(
-                        name,
-                        filename,
-                        contentType,
-                        content
-                        );
+                                name,
+                                filename,
+                                contentType,
+                                content);
 
                 transactionService.loadCsvAndSave(multipartFile);
 
         }
-
-
-                
-
 
 }

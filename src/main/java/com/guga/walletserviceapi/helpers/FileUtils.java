@@ -23,11 +23,13 @@ public class FileUtils {
 
     public static final String FOLDER_DEFAULT_FILE_JSON = "./data/seed/";
 
+    public static final String JSON_FILE_PARAMS_APP = "params_app.json";
     public static final String JSON_FILE_CUSTOMER = "customers.json";
     public static final String JSON_FILE_WALLET = "wallets.json";
     public static final String JSON_FILE_TRANSACTION = "transactions.json";
     public static final String JSON_FILE_MOVIMENT = "movements.json";
     public static final String JSON_FILE_DEPOSIT_SENDER = "deposit_senders.json";
+    public static final String JSON_FILE_LOGIN_AUTH = "login_auth.json";
 
     // Define o fuso horário do Brasil (ex: America/Sao_Paulo)
     static ZoneId zoneIdBrazil = ZoneId.of("America/Sao_Paulo");
@@ -114,7 +116,7 @@ public class FileUtils {
 
     public static <T> List<T> loadJSONToListObject(String filePathString, Class<T> clazz) {
 
-        Path filePath = Paths.get(filePathString).normalize();
+         Path filePath = Paths.get(filePathString).normalize();
         
         if (!Files.exists(filePath)) {
             throw new RuntimeException("Arquivo não encontrado no Sistema de Arquivos: " + filePathString);
@@ -131,127 +133,8 @@ public class FileUtils {
         } catch (Exception e) {
             throw new RuntimeException("Erro carregando JSON: " + filePathString, e);
         }
-        /*try {
-            
-            ClassPathResource resource = new ClassPathResource(path);
-            
-            if (!resource.exists()) {
-                throw new RuntimeException("Arquivo não encontrado no Classpath: " + path);
-            }
-            
-            InputStream stream = resource.getInputStream();
-            
-            return objectMapper.readValue(
-                    stream,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)
-            );
-        } catch (Exception e) {
-            System.err.println("DEBUG INFO: Erro real ao carregar JSON:");
-            e.printStackTrace(); // Imprime o erro original no console
-            throw new RuntimeException("Erro carregando JSON: " + path, e);
-        }*/
     }
 
-    // Assumindo que você tem uma classe Transaction
-/*    public static <T> List<T> loadListFromFile(String fileName,
-            TypeReference<List<T>> typeRef) {
-        ObjectMapper mapper = GlobalHelper.instanceObjectMapper();
-
-        try {
-            Path directoryPath = Paths.get(FileUtils.FOLDER_DEFAULT_FILE_JSON);
-            if (!Files.exists(directoryPath)) {
-                Files.createDirectories(directoryPath);
-            }
-
-            // Define o caminho completo do arquivo
-            Path filePath = directoryPath.resolve(fileName);
-
-            return mapper.readValue(filePath.toFile(), typeRef);
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar o arquivo: " + fileName);
-            e.printStackTrace();
-            return null;
-        }
-    }
-*/
-    /*
-    public static void loadJSONToStrinClass(MultipartFile file) {
-        //InputStream file = InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
-        
-        ObjectMapper mapper = new ObjectMapper();
-
-        // Garante que o ObjectMapper lide com LocalDate e LocalDateTime antes de
-        // carregar os JSONs
-        if (!mapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310")) {
-            mapper.registerModule(new JavaTimeModule());
-        }
-
-
-        
-        try {
- 
-
-            return mapper.readValue(file, typeRef);
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar o arquivo: " + fileName);
-            e.printStackTrace();
-            return null;
-        }
-    }
-    */            
-
-
-    /*
-    public static String convertCsvToJson(Reader reader) throws IOException, CsvValidationException {
-        // 1. Constrói o CSVParser, que define as regras do seu CSV (vírgula, aspas, etc.)
-        // O construtor CSVParserBuilder() deve funcionar
-        var parser = new CSVParserBuilder()
-            .withSeparator(',') 
-            .withIgnoreLeadingWhiteSpace(true)
-            .build();
-
-        // 2. Constrói o CSVReader, que aceita o Reader e o Parser
-        // O construtor CSVReaderBuilder(Reader) e .withCSVParser(parser).build() deve funcionar
-        try (CSVReader csvReader = new CSVReaderBuilder(reader)
-            .withCSVParser(parser)
-            .build()) {
-
-            // 3. Lê a primeira linha para obter o CABEÇALHO
-            String[] header = csvReader.readNext();
-
-            if (header == null || header.length == 0) {
-                return "[]"; // Retorna JSON vazio se o arquivo estiver vazio
-            }
-
-            // 4. Inicializa a lista de registros
-            List<Map<String, String>> records = new ArrayList<>();
-            String[] line;
-            
-            // 5. Itera sobre as linhas de dados restantes
-            while ((line = csvReader.readNext()) != null) {
-                
-                // Usamos LinkedHashMap para manter a ordem das chaves (opcional, mas bom para debug)
-                Map<String, String> recordMap = new LinkedHashMap<>();
-                
-                // 6. Itera sobre o cabeçalho e os dados, mapeando coluna a coluna
-                for (int i = 0; i < header.length; i++) {
-                    String key = header[i];
-                    // Evita ArrayIndexOutOfBounds se a linha tiver menos colunas que o cabeçalho
-                    String value = (i < line.length) ? line[i] : ""; 
-                    
-                    recordMap.put(key, value);
-                }
-                
-                records.add(recordMap);
-            }
-            
-            // 7. Usa o Jackson para serializar a lista de Mapas para JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(records);
-        }
-    }
-     */
-    
     public static Path getResourcePath() {
         // Obtém o diretório raiz do projeto (ex: C:\Users\...\wallet-service-api)
         String projectRoot = System.getProperty("user.dir");

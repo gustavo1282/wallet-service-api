@@ -3,6 +3,7 @@ package com.guga.walletserviceapi.controller;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,9 @@ public class WalletController {
     @Autowired
     private WalletService walletService;
 
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int defaultPageSize;
+
     @Operation(summary = "Create a new Wallet", description = "Creates a new Wallet with the data provided in the request body.")
     @PostMapping("/wallet")
     public ResponseEntity<Wallet> createWallet(@RequestBody Wallet wallet) {
@@ -49,6 +53,7 @@ public class WalletController {
         return ResponseEntity.created(location).body(createdWallet);
     }
 
+
     @Operation(summary = "Get Wallet by ID", description = "Retrieves a Wallet by their ID provided in the request body.")
     @GetMapping("/{id}")
     public ResponseEntity<Wallet> getWalletById(@PathVariable Long id) {
@@ -56,6 +61,7 @@ public class WalletController {
         return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
     
+
     @Operation(summary = "Update user by ID", description = "Updates a user by their ID provided in the request body.")
     @PutMapping("/{id}")
     public ResponseEntity<Wallet> updateWallet(
@@ -66,33 +72,39 @@ public class WalletController {
         return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
 
+
     @Operation(summary = "Get all Wallets", description = "Retrieves all Wallets.")
     @GetMapping("/list")
-    public ResponseEntity<Page<Wallet>> getAllWallets() {
-
-        Pageable pageable = PageRequest.of(0, 20,
+    public ResponseEntity<Page<Wallet>> getAllWallets(
+        @RequestParam(defaultValue = "0") int page
+        )   
+    {
+        Pageable pageable = PageRequest.of(page, defaultPageSize,
                 Sort.by(
-                    Sort.Order.asc("walletId"),
-                    Sort.Order.asc("createdAt")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                    Sort.Order.asc("createdAt"),
+                    Sort.Order.asc("status")
                 )
             );
 
         Page<Wallet> pageWallet = walletService.getAllWallets(pageable);
 
         return new ResponseEntity<>(pageWallet, HttpStatus.OK);
-
     }
+
 
     @Operation(summary = "Get Wallets by Customer ID",
             description = "Retrieves a list Wallets by Customer ID provided in the request body.")
     @GetMapping(value = "/search-by-customer")
     public ResponseEntity<Page<Wallet>> getWalletByCustomerId(
-            @RequestParam(required = true) Long customerId) {
+            @RequestParam(required = true) Long customerId,
+            @RequestParam(defaultValue = "0") int page
+        ) {
 
-        Pageable pageable = PageRequest.of(0, 20,
+        Pageable pageable = PageRequest.of(page, defaultPageSize,
                 Sort.by(
                     Sort.Order.asc("customerId"),
-                    Sort.Order.asc("walletId")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                    Sort.Order.asc("status"),
+                    Sort.Order.asc("createdAt")
                 )
             );
         

@@ -78,7 +78,7 @@ class WalletControllerTests {
     void before() {
         Mockito.reset(walletService);
         faker = new Faker(new Locale("pt-BR"));
-        customers = TransactionUtilsMock.createCustomerListMock();
+        customers = (List<Customer>)TransactionUtilsMock.createCustomerListMock();
         wallets = TransactionUtilsMock.createWalletListMock( customers );
         URI_API = BASE_PATH.concat(API_NAME);
     }

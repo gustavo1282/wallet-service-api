@@ -18,9 +18,17 @@ public class OperationTypeConverter implements AttributeConverter<OperationType,
 
     @Override
     public OperationType convertToEntityAttribute(Integer value) {
-        if (value == 0) {
-            return null;
+        if (value == null) {
+            return null; 
         }
-        return OperationType.fromCode(value);
+
+        // Agora é seguro chamar intValue() ou buscar a enumeração
+        for (OperationType type : OperationType.values()) {
+            if (value.equals(type.getValue())) { // Supondo que você tem um método getId() na sua enum
+                return type;
+            }
+        }
+        
+        throw new IllegalArgumentException("OperationType ID inválido: " + value);
     }
 }

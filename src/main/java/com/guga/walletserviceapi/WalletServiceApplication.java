@@ -9,6 +9,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
 @EnableCaching
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
+//@ComponentScan(basePackages = "com.guga.walletserviceapi")
 public class WalletServiceApplication {
 
 	public static void main(String[] args) {

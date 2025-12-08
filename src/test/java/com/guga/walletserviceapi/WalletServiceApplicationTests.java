@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
+//@ComponentScan(basePackages = "com.guga.walletserviceapi")
 class WalletServiceApplicationTests {
 
     private String BASE_PATH;

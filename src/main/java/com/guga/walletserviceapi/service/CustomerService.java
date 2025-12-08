@@ -18,6 +18,7 @@ import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.CustomerRepository;
 
@@ -25,10 +26,13 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class CustomerService {
+public class CustomerService implements IWalletApiService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    private final ParamAppService paramAppService;
+
 
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
@@ -49,10 +53,12 @@ public class CustomerService {
 
     @Transactional
     public Customer saveCustomer(Customer customer) {
+        customer.setCustomerId(nextIdGenerate());
+
         Customer newCustomer = customerRepository.save(customer);
 
         if (newCustomer.getCustomerId() == null) {
-            throw new ResourceNotFoundException("Error saving customer");
+            throw new ResourceNotFoundException("Error saving customer: " + customer.toString());
         }
 
         return newCustomer;
@@ -116,6 +122,13 @@ public class CustomerService {
         } catch (Exception e) {
             throw new ResourceBadRequestException(e.getMessage());
         }
+    }
+
+    @Override
+    public Long nextIdGenerate() {
+        return paramAppService
+            .getNextSequenceId(ParamApp.SEQ_CUSTOMER_ID)
+            .getValueLong();
     }
     
 }

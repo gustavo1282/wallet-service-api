@@ -4,12 +4,11 @@ package com.guga.walletserviceapi.controller;
 import java.math.BigDecimal;
 import java.net.URI;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,16 +37,19 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int defaultPageSize;    
+
     @Operation(summary = "Create a new transaction of type DEPOSIT",
             description = "Creates a new transaction with the data provided in the request body.")
     @PostMapping(value = "/transaction", params = "type=DEPOSIT")
     public ResponseEntity<DepositMoney> createNewDepositMoneyTransaction(@RequestParam Long walletId,
-            @RequestParam BigDecimal amount,
-            @RequestParam String cpfSender,
-            @RequestParam String terminalId,
-            @RequestParam String senderName)
-//        @RequestBody @Valid DepositMoney depositMoney
-        {
+        @RequestParam BigDecimal amount,
+        @RequestParam String cpfSender,
+        @RequestParam String terminalId,
+        @RequestParam String senderName
+        )
+    {
         DepositMoney depositCreated = transactionService.saveDepositMoney(walletId, amount,
                 cpfSender, terminalId, senderName);
 
@@ -114,14 +116,17 @@ public class TransactionController {
             description = "Retrieves a list transaction by Wallet ID provided in the request body.")
     @GetMapping(value = "/search-wallet", params = { "walletId", "!typeTransaction" })
     public ResponseEntity<Page<Transaction>> getTransactionByWalletId(
-            @RequestParam(required = true) Long walletId) {
+            @RequestParam(required = true) Long walletId,
+            @RequestParam(defaultValue = "25") int page
+            ) 
+        {
 
-        Pageable pageable = PageRequest.of(0, 20,
-                Sort.by(
-                    Sort.Order.asc("wallet.walletId"),
-                    Sort.Order.asc("createdAt")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-                )
-            );
+        Pageable pageable = PageRequest.of(page, defaultPageSize,
+            Sort.by(
+                Sort.Order.asc("walletId"),
+                Sort.Order.asc("transactionId")
+            )
+        );
         
         Page<Transaction> pageTransaction = transactionService.getTransactionByWalletId(walletId, pageable);
 
@@ -133,12 +138,17 @@ public class TransactionController {
     @GetMapping(value = "/list", params = { "walletId", "typeTransaction" })
     public ResponseEntity<Page<Transaction>> getTransactionByWalletIdAndProcessType(
             @RequestParam(required = true) Long walletId,
-            @RequestParam(required = true) StatusTransaction typeTransaction,
+            @RequestParam(required = false) StatusTransaction typeTransaction,
+            @RequestParam(defaultValue = "0") int page
+            ) 
+    {
 
-            @PageableDefault(page = 0, size = 200)
-            @SortDefault(sort = "walletId", direction = Sort.Direction.ASC)
-            @SortDefault(sort = "transactionId", direction = Sort.Direction.ASC)
-            Pageable pageable) {
+        Pageable pageable = PageRequest.of(page, defaultPageSize,
+            Sort.by(
+                Sort.Order.asc("walletId"),
+                Sort.Order.asc("transactionId")
+            )
+        );
 
         Page<Transaction> pageTransaction = transactionService
                 .filterTransactionByWalletIdAndProcessType(walletId, typeTransaction, pageable);

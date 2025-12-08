@@ -1,5 +1,8 @@
 package com.guga.walletserviceapi.helpers;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,19 +17,6 @@ public class GlobalHelper {
 
     @Value("${spring.jpa.properties.jdbc.batch_size}")
     public static int BATCH_SIZE;
-/*
-    @Value("${server.protocol-type}")
-    protected static String serverPrococolType;
-
-    @Value("${server.hostname}")
-    protected static String serverHostname;
-
-    @Value("${server.port}")
-    protected static String serverPort;
-
-    @Value("${server.servlet.context-path}")
-    protected static String serverContextPath;
-*/
 
     public static Pageable getDefaultPageable() {
         return PageRequest.of(0, 50,
@@ -36,15 +26,19 @@ public class GlobalHelper {
             );
     }
 
-    /*
-    public static String getURI() {       
-        Environment env = SpringContext.getBean(Environment.class);
-
-        return env.getProperty("server.protocol-type")
-                    .concat("://" + env.getProperty("server.hostname"))
-                    .concat(":" + env.getProperty("server.port"))
-                    .concat("/" + env.getProperty("server.servlet.context-path"));
-
+    public static List<String> matchers() {
+        List<String> matchers = Arrays.asList(
+            "/actuator/**",
+            "/wallet-services-api/api/auth/login",
+            "/api/auth/login",
+            "/api/auth/register",
+            "/api/auth/refresh",
+            "/h2-console/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+            );
+        return matchers;
     }
-    */
+
 }

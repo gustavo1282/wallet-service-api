@@ -18,14 +18,18 @@ import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.repository.WalletRepository;
 
 @Service
-public class WalletService {
+public class WalletService implements IWalletApiService {
 
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private ParamAppService paramAppService;
 
     @Autowired
     private CustomerService customerService;
@@ -39,21 +43,19 @@ public class WalletService {
 
         Customer customer = customerService.getCustomerById(wallet.getCustomer().getCustomerId());
 
-        Page<Wallet> findAllCustomer = walletRepository.findByCustomer_CustomerId(wallet.getCustomer().getCustomerId(), GlobalHelper.getDefaultPageable());
+        Page<Wallet> findAllCustomer = walletRepository.findByCustomerId(wallet.getCustomerId(), GlobalHelper.getDefaultPageable());
 
         if (findAllCustomer.isEmpty() || !findAllCustomer.hasContent()) {
             throw new ResourceBadRequestException("Customer already has a wallet");
         }
 
+        wallet.setWalletId(nextIdGenerate());
         wallet.setCustomer(customer);
-
         Wallet newWallet = walletRepository.save(wallet);
 
         if (newWallet.getWalletId() == null) {
-            throw new ResourceNotFoundException("Error saving wallet");
+            throw new ResourceNotFoundException("Error saving wallet: " + wallet.toString());
         }
-
-        // newWallet.setCustomer(customer);
 
         return newWallet;
     }
@@ -129,6 +131,13 @@ public class WalletService {
         }
 
         return findResult;
+    }
+
+    @Override
+    public Long nextIdGenerate() {
+        return paramAppService
+            .getNextSequenceId(ParamApp.SEQ_WALLET_ID)
+            .getValueLong();
     }
 
 }

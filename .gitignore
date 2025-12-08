@@ -1,0 +1,52 @@
+### Diretório de Build/Output ###
+# Ignora todo o diretório de build
+target/
+
+### Arquivos de empacotamento
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+### Diretórios de IDE e Configurações ###
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+### Logs, Cache e Temp ###
+# Arquivos de log e cache
+*.log
+log/
+tmp/
+temp/
+
+# Arquivos de banco de dados H2 (Causadores de conflito)
+*.mv.db
+*.trace.db
+
+### Maven/Gradle Wrappers e Cache ###
+# Cache do Maven/Gradle
+.gradle/
+/build/
+.m2/repository
+
+# Arquivos wrapper do Maven (manter o .mvn/wrapper/maven-wrapper.jar)
+.mvn/wrapper/
+
+### Outros Arquivos de Sistema ###
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

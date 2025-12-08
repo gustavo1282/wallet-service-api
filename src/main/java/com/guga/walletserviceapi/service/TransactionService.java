@@ -25,6 +25,7 @@ import com.guga.walletserviceapi.helpers.TransactionUtils;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.MovementTransaction;
+import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.TransferMoneyReceived;
 import com.guga.walletserviceapi.model.TransferMoneySend;
@@ -42,7 +43,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class TransactionService {
+public class TransactionService implements IWalletApiService {
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -55,6 +56,9 @@ public class TransactionService {
 
     @Autowired
     private WalletService walletService;
+
+    @Autowired
+    private ParamAppService paramAppService;
 
     public static final BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
     public static final BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
@@ -327,6 +331,13 @@ public class TransactionService {
         } catch (Exception e) {
             throw new ResourceBadRequestException(e.getMessage());
         }
+    }
+
+    @Override
+    public Long nextIdGenerate() {
+        return paramAppService
+            .getNextSequenceId(ParamApp.SEQ_TRANSACTION_ID)
+            .getValueLong();
     }
 
 }
