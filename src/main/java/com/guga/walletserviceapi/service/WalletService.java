@@ -124,7 +124,7 @@ public class WalletService implements IWalletApiService {
 
     public Page<Wallet> getWalletByCustomerId(Long customerId, Pageable pageable) {
 
-        Page<Wallet> findResult = walletRepository.findByCustomer_CustomerId(customerId, pageable);
+        Page<Wallet> findResult = walletRepository.findByCustomerId(customerId, pageable);
 
         if (findResult.isEmpty() || !findResult.hasContent()) {
             throw new ResourceNotFoundException("Wallets not found by Customer Id");

@@ -24,7 +24,6 @@ import lombok.Setter;
 @JsonPropertyOrder({
     "id", "name", "description", "valueString", "valueNumber", "valueDate", "valueDateTime", "valueBoolean"
 })
-
 @Builder(toBuilder = true)
 @Getter
 @Setter

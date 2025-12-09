@@ -18,26 +18,6 @@ import com.guga.walletserviceapi.model.enums.StatusTransaction;
 
 public class TransactionUtils {
 
-//    private static final boolean APPLY_FILTER_CUSTOMER_BY_STATUS = false;
-//    private static final int RANGE_CUSTOMER_ID = 1000;
-//    private static final int TOTAL_CUSTOMER_ID = 1050;
-//    private static final int LIMIT_LIST_CUSTOMER = 30;
-//
-//    public static final boolean APPLY_FILTER_WALLET_BY_STATUS = false;
-//    public static final int RANGE_WALLET_ID = 2000;
-//    public static final int TOTAL_WALLET_ID = 2150;
-//    public static final int LIMIT_LIST_WALLET = 80;
-//
-//    public static final int INI_TRANSACTION_ID = 1;
-//    public static final int MAX_TRANSACTION_ID = 2000;
-//
-//    public static final int RANGE_TRANSACTION = 11000;
-//    public static final int RANGE_TRANSFER_MONEY = 12000;
-//    public static final int RANGE_DEPOSIT_SENDER = 12900;
-//
-//    public static final Double MONEY_MIN = 10D;
-//    public static final Double MONEY_MAX = 800D;
-//
     public static BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
     public static BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
 
@@ -215,6 +195,5 @@ public class TransactionUtils {
 
         return sttType;
     }
-
 
 }

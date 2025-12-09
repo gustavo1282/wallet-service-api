@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.converter.LocalDateTimeCsvConverter;
 import com.guga.walletserviceapi.model.converter.OperationTypeConverter;
@@ -25,6 +26,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+
+@JsonPropertyOrder({
+    "movementId", "createdAt", "operationType", "amount", "statusTransaction", "transactionId", "walletId", "transactionReferenceId", "walletReferenceId"
+})
 @Entity()
 @Table(name = "tb_movement_transfer")
 @NoArgsConstructor

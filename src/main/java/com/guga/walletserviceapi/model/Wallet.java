@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.converter.OperationTypeConverter;
 import com.guga.walletserviceapi.model.converter.StatusConverter;
@@ -30,8 +31,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//@Data
-
+@JsonPropertyOrder({
+    "walletId", "status", "customerId", "lastOperationType", "previousBalance", "currentBalance", "loginUser", "createdAt", "updatedAt"
+})
 @Builder(toBuilder = true)
 @Getter
 @Setter
