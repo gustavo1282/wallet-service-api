@@ -18,11 +18,7 @@ class WalletServiceApplicationTests {
 	void contextLoads() {
         System.out.println("============================================");
         System.out.println("WalletServiceApplicationTests > contextLoads()");
-//
-//        System.out.println("spring.profiles.active = ".concat(activeProfile) );
-//        System.out.println("BASE_PATH = ".concat(BASE_PATH) );
-//
-//        System.out.println("============================================");
+        System.out.println("============================================");
     }
 
 }

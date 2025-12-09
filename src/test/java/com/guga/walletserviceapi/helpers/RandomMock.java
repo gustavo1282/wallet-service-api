@@ -3,6 +3,8 @@ package com.guga.walletserviceapi.helpers;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -145,6 +147,30 @@ public class RandomMock {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static int generateNumberByIntervalAndException(int min, int max, List<Integer> exceptions) {
+        // 1. Criar a lista de números válidos
+        List<Integer> validNumbers = new ArrayList<>();
+        for (int i = min; i <= max; i++) {
+            if (!exceptions.contains(i)) {
+                validNumbers.add(i);
+            }
+        }
+
+        // Verificar se restou algum número válido após as exclusões
+        if (validNumbers.isEmpty()) {
+            return -1;
+        }
+
+        // 2. Gerar um índice aleatório
+        Random random = new Random();
+        // O índice deve ser entre 0 (inclusivo) e o tamanho da lista (exclusivo)
+        int randomIndex = random.nextInt(validNumbers.size()); 
+
+        // 3. Retornar o número na posição aleatória
+        return validNumbers.get(randomIndex);
+
     }
 
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
@@ -47,8 +48,9 @@ import lombok.experimental.SuperBuilder;
         @JsonSubTypes.Type(value = TransferMoneySend.class, name = "TRANSFER_SEND"),
         @JsonSubTypes.Type(value = TransferMoneyReceived.class, name = "TRANSFER_RECEIVED")
 })
-//@JsonTypeIdResolver(OperationTypeIdResolver.class)
-//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonPropertyOrder({
+    "transactionId", "operationType", "walletId", "login", "previousBalance", "amount", "currentBalance", "statusTransaction", "movementId", "createdAt"
+})
 @Entity
 @Table(name = "tb_transaction")
 @SuperBuilder
