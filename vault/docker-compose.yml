@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: vault-server
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./config/config.docker.hcl:/vault/config/config.hcl
+      - ./data:/vault/data
+    environment:
+      VAULT_LOCAL_CONFIG: |
+        {
+          "ui": true
+        }

@@ -153,6 +153,7 @@ public class TransactionUtilsMock {
                     .customerId(customer.getCustomerId())
                     .login(loginAccess)
                     .accessKey(accessKey)
+                    .accessKeyOpen(accessKey)
                     .loginAuthType(loginAuthType)
                     .createdAt(customer.getCreatedAt())
                     .updatedAt(customer.getCreatedAt())

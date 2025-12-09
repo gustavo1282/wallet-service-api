@@ -43,11 +43,11 @@ public class LoginAuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 1. Busque o usuário no seu banco de dados
+        // Busque o usuário no seu banco de dados
         LoginAuth loginAuth = loginAuthRepository.findByLogin(username)
             .orElseThrow(() -> new UsernameNotFoundException("Login não encontrado: " + username));
 
-        // 2. Retorne um objeto UserDetails que o Spring Security entende
+        // Retorne um objeto UserDetails que o Spring Security entende
         return User.builder()
             .username(loginAuth.getLogin())
             .password(loginAuth.getAccessKey()) // Deve ser a senha JÁ criptografada do banco

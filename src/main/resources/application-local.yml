@@ -4,6 +4,7 @@ server:
   port: '8080'
   servlet:
     context-path: /wallet-services-api
+
 controller:
   path:
     base: "/api"
@@ -12,10 +13,9 @@ wallet-services-api:
   seed-path: classpath:./data/seed/
 
 springdoc:
-  packagesToScan: com.guga.walletserviceapi   # ou seu pacote base exato
-  pathsToMatch: /api/** 
+  packagesToScan: com.guga.walletserviceapi
+  pathsToMatch: /api/**
   api-docs:
-    #server-url: http://localhost:8080/wallet-services-api/api
     path: /v3/api-docs
     version: OPENAPI_3_0
     enabled: true
@@ -24,71 +24,62 @@ springdoc:
     description: API REST manages the entire lifecycle of a wallet service
   swagger-ui:
     path: /swagger-ui.html
-    disable-swagger-default-url: false  
+    disable-swagger-default-url: false
     try-it-out-enabled: 'false'
     groups-order: ASC
+
 spring:
-  ##spring.main.allow-circular-references: true
   application:
     name: wallet-service-api
-  cloud:
-    compatibility-verifier.enabled: false
-    vault:
-      kv:
-        enabled: true
-        backend: secret
-        version: 2
+
   data:
     web:
       pageable:
         default-page-size: 25
-        max-page-size: 25
+        max-page-size: 10
         page-parameter: page
         size-parameter: size
 
   datasource:
-    ### Propriedades específicas do H2
-    #url: jdbc:h2:file:./data/db_wallet;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    #driver-class-name: org.h2.Driver
-    #username: wallet_user
-    #password: wallet_pass
-
-    # Propriedades específicas do PostgreSQL
-    url: jdbc:postgresql://host.docker.internal:5432/wallet_db
+    url: jdbc:h2:file:./data/db_wallet;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
     username: wallet_user
     password: wallet_pass
 
-  # Configurações do console H2
   h2:
     console:
       enabled: true
       path: /h2-console
       settings:
         web-allow-others: true
+
   jpa:
     hibernate:
-      ddl-auto: create-drop   #none | validate | update | create | create-drop
+      ddl-auto: create-drop
       use_sql_comments: true
-      #enable_lazy_load_no_trans: true
     generate-ddl: true
     properties:
       jdbc.batch_size: 1000
     show-sql: 'true'
     format_sql: true
+
   jackson:
     default-property-inclusion: non_null
-    #property-naming-strategy: SNAKE_CASE
     property-naming-strategy: LOWER_CAMEL_CASE
     deserialization:
       fail-on-unknown-properties: false
-    #serialization:
-    #  fail-on-empty-beans: false
-  #sql:
-    #init:
-      #mode: always
-      #defer-datasource-initialization: true      
-      #data-locations:
-      #- classpath:data.sql
+
+  cloud:
+    vault:
+      enabled: true
+      uri: ${spring.cloud.vault.uri}
+      token: ${spring.cloud.vault.token}
+      scheme: http
+      kv:
+        enabled: true
+        backend: secret
+        default-context: wallet-service-api
+
 management:
   endpoints:
     web:
@@ -104,14 +95,9 @@ management:
 
 logging:
   level:
-    # Nível mais alto (TRACE/DEBUG) para detalhar a causa raiz do erro de persistência
-    # (Este é o foco para debugar o erro de JPA/Hibernate)
-    org.hibernate.engine.jdbc.spi: warn 
-    org.hibernate.orm.jdbc.batch: warn # Detalhes sobre a execução do batch JDBC
-    org.hibernate.SQL: warn          # Mostra as queries SQL geradas
-
-    # Nível DEBUG para a camada de transação do Spring e JPA
+    org.hibernate.engine.jdbc.spi: warn
+    org.hibernate.orm.jdbc.batch: warn
+    org.hibernate.SQL: warn
     org.springframework.orm.jpa: warn
     org.springframework.transaction: warn
-    org.springframework.security: warn # Mantém a segurança em INFO (nível padrão para evitar flood)
-    org.springframework.cloud: DEBUG 
+    org.springframework.security: warn
