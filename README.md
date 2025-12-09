@@ -1,6 +1,14 @@
+
+## 👨‍💻 Autor
+
+**Gustavo1282**  
+[GitHub](https://github.com/gustavo1282) | [LinkedIn](https://www.linkedin.com/in/gustavo-souza-68b34335/)
+
+
 # Wallet Service API
 
-Uma API REST robusta construída com **Spring Boot 3.4.10** para gerenciar o ciclo de vida completo de um serviço de carteira digital. Inclui autenticação JWT, operações de transações, gerenciamento de clientes e carteiras, com suporte a múltiplos bancos de dados e integração com Prometheus para observabilidade.
+A **Wallet Service** API é um serviço pensado para facilitar a criação e operação de uma carteira digital.
+Com autenticação segura, controle de clientes e processamento de transações, a API fornece uma base sólida para produtos financeiros modernos.
 
 ## 🎯 Visão Geral
 
@@ -266,11 +274,6 @@ Versão atual: **0.2.4-SNAPSHOT**
 ## 📄 Licença
 
 Este projeto está sob licença [MIT](LICENSE). Veja o arquivo LICENSE para detalhes.
-
-## 👨‍💻 Autor
-
-**Gustavo1282**  
-[GitHub](https://github.com/gustavo1282) | [LinkedIn](https://www.linkedin.com/in/gustavo-souza-68b34335/)
 
 ## 📞 Suporte
 

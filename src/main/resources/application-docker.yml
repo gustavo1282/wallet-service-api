@@ -90,3 +90,13 @@ logging:
     org.springframework.orm.jpa: warn
     org.springframework.transaction: warn
     org.springframework.security: warn
+
+# ===========================================================
+# VAULT CONFIGURATION (desativado por padrão)
+# Ative com: VAULT_ENABLED=true
+# ===========================================================
+vault:
+  enabled: ${VAULT_ENABLED:false}
+  uri: http://localhost:8200
+  token: ${VAULT_TOKEN:local-dev-token}
+  path: secret/wallet-service

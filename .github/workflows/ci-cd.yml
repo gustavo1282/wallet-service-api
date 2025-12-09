@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+# Gatilhos: Quando o workflow deve rodar
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/*
+  pull_request:
+    branches:
+      - main
+      - develop
+      - feature/*
+
+# Trabalhos (Jobs) a serem executados
+jobs:
+  build_and_test:
+    # O ambiente onde este job será executado (ex: Ubuntu)
+    runs-on: ubuntu-latest
+    
+    steps:    
+    # 1. Checkout do código
+    # Baixa o código do repositório
+    - uses: actions/checkout@v4
+    
+    # 2. Configuração do ambiente (Node.js, Java, etc.)
+    # Exemplo para um projeto Node.js:
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Ajuste para a versão do seu projeto
+        
+    # 3. Instalação de dependências
+    - name: Instalar Dependências
+      run: mvn install # Ou 'mvn install', 'pip install', etc.
+      
+    # 4. Execução de testes (CI)
+    - name: Rodar Testes Unitários
+      run: mvn test # O comando para rodar seus testes automatizados
+      
+    # 5. Build/Compilação (Opcional, mas recomendado)
+    - name: Compilar o Projeto
+      run: mvn run build # O comando para gerar o executável/artefato
+      
+    # (Opcional) 6. Implantação/Deploy (CD - Etapa futura)
+    # Aqui você adicionaria passos para fazer o deploy para a AWS, Azure, ou um servidor.
