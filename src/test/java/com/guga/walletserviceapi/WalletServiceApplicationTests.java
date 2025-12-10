@@ -12,8 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 //@ComponentScan(basePackages = "com.guga.walletserviceapi")
 class WalletServiceApplicationTests {
 
-    private String BASE_PATH;
-
     @Test
 	void contextLoads() {
         System.out.println("============================================");

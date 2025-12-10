@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -105,8 +105,9 @@ public class TransactionControllerTests {
         @MockitoBean
         private TransactionRepository transactionRepository;
 
-        @Value("${controller.path.base}")
-        private String BASE_PATH;
+
+        @Autowired
+        private Environment env;
 
         private static final String API_NAME = "/transactions";
 
@@ -127,7 +128,7 @@ public class TransactionControllerTests {
         private List<LoginAuth> loginAuths;
 
         private static boolean SAVE_JSON = true;
-        private static boolean LOAD_JSON = true;
+        private static boolean LOAD_JSON = false;
 
         @Autowired 
         private PasswordEncoder passwordEncoder;
@@ -136,7 +137,8 @@ public class TransactionControllerTests {
         void setUp() throws JsonProcessingException {
                 Mockito.reset(transactionService);
                 MockitoAnnotations.openMocks(this);
-                URI_API = BASE_PATH.concat(API_NAME);
+
+                URI_API = env.getProperty("controller.path.base") + API_NAME;
 
                 objectMapper = FileUtils.instanceObjectMapper();
 
@@ -249,8 +251,7 @@ public class TransactionControllerTests {
                                 .param("id", transactionId.toString())
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out
-                                                .println("Body: " + result.getResponse().getContentAsString()))
+                                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.transactionId", is(transaction.getTransactionId().intValue())))
                                 .andExpect(jsonPath("$.wallet.walletId",

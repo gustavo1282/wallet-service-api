@@ -21,9 +21,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +41,8 @@ import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.service.LoginAuthService;
 import com.guga.walletserviceapi.service.WalletService;
 
 import net.datafaker.Faker;
@@ -61,8 +63,14 @@ class WalletControllerTests {
     @MockitoBean
     private WalletService walletService;
 
-    @Value("${controller.path.base}")
-    private String BASE_PATH;
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private LoginAuthService loginAuthService;
+
+    @Autowired
+    private Environment env;
 
     private static final String API_NAME = "/wallets";
 
@@ -79,8 +87,10 @@ class WalletControllerTests {
         Mockito.reset(walletService);
         faker = new Faker(new Locale("pt-BR"));
         customers = (List<Customer>)TransactionUtilsMock.createCustomerListMock();
+
         wallets = TransactionUtilsMock.createWalletListMock( customers );
-        URI_API = BASE_PATH.concat(API_NAME);
+
+        URI_API = env.getProperty("controller.path.base") + API_NAME;
     }
 
     @Test
@@ -117,7 +127,11 @@ class WalletControllerTests {
 
         Pageable pageable = PageRequest.of(0, 50, Sort.by("walletId").ascending() );
 
-        List<Wallet> mockWallets = new ArrayList<>( wallets.stream().toList() );
+        List<Wallet> mockWallets = new ArrayList<>(wallets.stream().toList());
+        if (mockWallets.size() > 10) {
+            mockWallets = mockWallets.subList(0, 10);
+        }
+
         Page<Wallet> mockPage = new PageImpl<>(mockWallets, pageable, mockWallets.size());
 
         when(walletService.getAllWallets(any(Pageable.class))).thenReturn(mockPage);
@@ -125,10 +139,16 @@ class WalletControllerTests {
         // Act & Assert
         mockMvc.perform(get(URI_API.concat("/list"))
                 .contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
+
                 .andExpect(status().isOk())
 
-                .andExpect(jsonPath("$[2].walletId",
-                        is( mockPage.getContent().get(2).getWalletId().intValue() )))
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(mockWallets.size()))
+                .andExpect(jsonPath("$.page.totalElements").value(mockWallets.size()));
         ;
 
     }
@@ -144,7 +164,7 @@ class WalletControllerTests {
         when(walletService.getWalletById(walletIdMock)).thenReturn(walletMock);
 
         // Act & Assert
-        mockMvc.perform(get(URI_API.concat("/{id}"), walletIdMock)
+        mockMvc.perform(get(URI_API + "/{id}", walletIdMock)
                 .contentType(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
@@ -162,7 +182,7 @@ class WalletControllerTests {
                 .thenThrow(new ResourceNotFoundException("Wallet not found. ID: " + walletIdMock));
 
 
-        mockMvc.perform(get(URI_API.concat("/{id}"), walletIdMock))
+        mockMvc.perform(get(URI_API + "/{id}", walletIdMock))
                 .andExpect(status().isNotFound());
 
     }

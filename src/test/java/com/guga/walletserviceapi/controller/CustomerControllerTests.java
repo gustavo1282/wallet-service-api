@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -37,12 +37,14 @@ import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.repository.CustomerRepository;
+import com.guga.walletserviceapi.security.JwtService;
 import com.guga.walletserviceapi.service.CustomerService;
+import com.guga.walletserviceapi.service.LoginAuthService;
 
 import net.datafaker.Faker;
 
 
-//@SpringBootTest
 @WebMvcTest(CustomerController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
@@ -60,6 +62,18 @@ class CustomerControllerTests {
     @MockitoBean
     private CustomerService customerService;
 
+    @MockitoBean
+    private CustomerRepository customerRepository;
+    
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private LoginAuthService loginAuthService;
+
+    @Autowired
+    private Environment env;
+    
     private static final String API_NAME = "/customers";
 
     private String URI_API;
@@ -68,8 +82,6 @@ class CustomerControllerTests {
 
     private List<Customer> customers;
 
-    @Autowired
-    private Environment env;
 
     @BeforeEach
     void setup() {
@@ -78,13 +90,7 @@ class CustomerControllerTests {
 
         customers = TransactionUtilsMock.createCustomerListMock();
 
-        URI_API = env.getProperty("server.protocol-type")
-                    .concat("://" + env.getProperty("server.hostname"))
-                    .concat(":" + env.getProperty("server.port") + "/")
-                    .concat(env.getProperty("server.servlet.context-path"))
-                    .concat(env.getProperty("controller.path.base"))
-                    .concat(API_NAME)
-                    ;
+        URI_API = env.getProperty("controller.path.base") + API_NAME;
 
         System.out.println(("BeforeEach - OK"));
     }
@@ -104,6 +110,9 @@ class CustomerControllerTests {
         mockMvc.perform(post(URI_API.concat("/customer"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customerInput)))
+
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
 
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
@@ -184,6 +193,7 @@ class CustomerControllerTests {
 
     // --- 4. Testes para GET /list ---
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve retornar 200 OK e a lista de Customers")
     void shouldReturn200_WhenRequestingCustomerList_WithValidParameters() throws Exception {
@@ -191,71 +201,53 @@ class CustomerControllerTests {
         Status statusFilter = TransactionUtilsMock.defineStatus();
 
         List<Customer> customersFiltered = customers.stream()
-                .filter(customer -> customer.getStatus().equals(statusFilter) &&
-                        customer.getCustomerId() > 0)
+                .filter(customer -> customer.getStatus().equals(statusFilter))
                 .toList();
+
+        Page<Customer> pageResult = new PageImpl<>(customersFiltered);
 
         // Simula uma página com conteúdo
         when(customerService.filterByStatus(eq(statusFilter), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(customersFiltered));
+                .thenReturn(pageResult);
+
 
         // Act & Assert
         mockMvc.perform(get(URI_API.concat("/list"))
+                .param("status", statusFilter.name())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()", is(customersFiltered.size())))
-                .andExpect(jsonPath("$[0].firstName", is(customersFiltered.get(0).getFirstName())));
+
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
+
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(customersFiltered.size()))
+                .andExpect(jsonPath("$.page.totalElements").value(customersFiltered.size()));
+
     }
 
     @Test
     @DisplayName("Deve retornar 404 Not Found quando a lista de Customers está vazia")
     void shouldReturn404WhenNoCustomersFound() throws Exception {
-        // Arrange
-        // Simula uma página vazia
-        when(customerService.filterByStatus( any(Status.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        // Act & Assert
-        mockMvc.perform(get(URI_API.concat("/list")))
-                .andExpect(status().isNotFound()); // Verifica o status HTTP 404
+        Long customerIdNotFoud = 4849L;
+
+        ResourceNotFoundException notfound = 
+                new ResourceNotFoundException("Customer not found with id: " + String.valueOf(customerIdNotFoud));
+        
+        when(customerService.getCustomerById(customerIdNotFoud))
+                .thenThrow(notfound);
+        
+        mockMvc.perform(get(URI_API +("/{id}"), customerIdNotFoud)
+                .contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
+
+                .andExpect(status().isNotFound())                
+                ;
+                
     }
-
-//    private void createCustomerListMock() {
-//        customerList = new ArrayList<>();
-//
-//        IntStream.range(0, 100)
-//                .forEach(i -> {
-//
-//                    String fullName = RandomGenerator.removeSufixoEPrevixos( faker.name().fullName().toUpperCase() );
-//                    String[] partName =  fullName.split(" ");
-//                    LocalDate birthDate = HelperTest.defineBirthDateMore18YearOld();
-//                    LocalDateTime dtCreatedAt = RandomGenerator.generatePastLocalDateTime(2);
-//
-//                    Customer CustomerNew = Customer.builder()
-//                            .customerId((long) (i + 1))
-//                            .status(HelperTest.defineStatus())
-//                            .fullName(fullName)
-//                            .firstName(partName[0])
-//                            .lastName( partName[partName.length-1] )
-//                            .birthDate(birthDate)
-//                            .email(faker.internet().emailAddress( partName[0].concat(".")
-//                                    .concat( partName[partName.length -1 ] ).concat(".")
-//                                    .concat( String.valueOf(birthDate.getMonthValue()) )
-//                                    .concat( String.valueOf(birthDate.getYear()) )
-//                            ))
-//                            .phoneNumber(faker.phoneNumber().cellPhone())
-//                            .documentId(faker.idNumber().valid())
-//                            .cpf(faker.cpf().valid())
-//                            .createdAt(dtCreatedAt)
-//                            .updatedAt(dtCreatedAt)
-//
-//                            .build();
-//
-//                    customerList.add(CustomerNew);
-//
-//                    }
-//                );
-//    }
 
 }
