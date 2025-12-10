@@ -26,7 +26,7 @@ public class SeedExecutor {
             
             JpaRepository<T, ?> repository = (JpaRepository<T, ?>)context.getBean(repositoryBeanName);
             
-             if (repository.count() == 0) {                
+            if (repository.count() == 0) {                
                 repository.saveAll(items);
             }
 

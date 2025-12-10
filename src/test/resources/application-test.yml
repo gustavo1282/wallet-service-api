@@ -9,6 +9,12 @@ controller:
   path:
     base: "/api"
 
+# Configurações globais do JWT (sobrepostas por profiles)
+jwt:
+  secret: 'JWT_KEY_VAULT_WALLET_SERVICE_API_TRUE_VERSION_2_0_FRASE_LONGA'
+  issuer: wallet-service-api
+  expiration-minutes: 20
+
 wallet-services-api:
   seed-path: classpath:./data/seed/
 
