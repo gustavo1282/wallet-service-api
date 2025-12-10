@@ -24,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -78,417 +79,418 @@ import com.guga.walletserviceapi.service.TransactionService;
 })
 public class TransactionControllerTests {
 
-        @MockitoBean
-        private JwtService jwtService;
+    @MockitoBean
+    private JwtService jwtService;
 
-        @MockitoBean
-        private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-        @MockitoBean 
-        private LoginAuthService loginAuthService;
+    @MockitoBean 
+    private LoginAuthService loginAuthService;
 
-        @Autowired
-        private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-        @Autowired
-        private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        @MockitoBean
-        private TransactionService transactionService;
+    @MockitoBean
+    private TransactionService transactionService;
 
-        @MockitoBean
-        private CustomerRepository customerRepository;
+    @MockitoBean
+    private CustomerRepository customerRepository;
 
-        @MockitoBean
-        private WalletRepository walletRepository;
+    @MockitoBean
+    private WalletRepository walletRepository;
 
-        @MockitoBean
-        private TransactionRepository transactionRepository;
-
-
-        @Autowired
-        private Environment env;
-
-        private static final String API_NAME = "/transactions";
-
-        private String URI_API;
-
-        private List<Customer> customers;
-
-        private List<Wallet> wallets;
-
-        private List<Transaction> transactions;
-
-        private List<MovementTransaction> movements;
-
-        private List<DepositSender> depositSenders;
-
-        private List<ParamApp> paramsApp;
-
-        private List<LoginAuth> loginAuths;
-
-        private static boolean SAVE_JSON = true;
-        private static boolean LOAD_JSON = false;
-
-        @Autowired 
-        private PasswordEncoder passwordEncoder;
-
-        @BeforeEach
-        void setUp() throws JsonProcessingException {
-                Mockito.reset(transactionService);
-                MockitoAnnotations.openMocks(this);
-
-                URI_API = env.getProperty("controller.path.base") + API_NAME;
-
-                objectMapper = FileUtils.instanceObjectMapper();
-
-                simularTransacoes();
-        }
-
-        private void simularTransacoes() {
-
-                boolean isOlderThanFiveMinutes = FileUtils.isOlderThanFiveMinutes(
-                                createFileJson(FileUtils.JSON_FILE_CUSTOMER));
-
-                try {
-                        if (SAVE_JSON && LOAD_JSON && !isOlderThanFiveMinutes) {
-
-                                customers = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_CUSTOMER),
-                                                Customer.class);
-
-                                wallets = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_WALLET),
-                                                Wallet.class);
-
-                                depositSenders = FileUtils.loadJSONToListObject(
-                                                createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER),
-                                                DepositSender.class);
-
-                                transactions = FileUtils.loadJSONToListObject(
-                                                createFileJson(FileUtils.JSON_FILE_TRANSACTION), Transaction.class);
-
-                                movements = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_MOVIMENT),
-                                                MovementTransaction.class);
-
-                        } else {
-                                Map<String, List<?>> resultMapTransactions;
-
-                                // A variável paramsApp armazena uma lista parametros iniciais da aplicação
-                                paramsApp = TransactionUtilsMock.createParamsAppMock();
+    @MockitoBean
+    private TransactionRepository transactionRepository;
 
 
-                                customers = TransactionUtilsMock.createCustomerListMock();
+    @Autowired
+    private Environment env;
 
-                                loginAuths = TransactionUtilsMock.createLoginAuthListMock(customers );
-                                encriptAccessKeyLoginAuthListMock(loginAuths);
+    private static final String API_NAME = "/transactions";
+
+    private String URI_API;
+
+    private List<Customer> customers;
+
+    private List<Wallet> wallets;
+
+    private List<Transaction> transactions;
+
+    private List<MovementTransaction> movements;
+
+    private List<DepositSender> depositSenders;
+
+    private List<ParamApp> paramsApp;
+
+    private List<LoginAuth> loginAuths;
+
+    private static boolean SAVE_JSON = true;
+    private static boolean LOAD_JSON = true;
+
+    @Autowired 
+    private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void setUp() throws JsonProcessingException {
+        Mockito.reset(transactionService);
+        MockitoAnnotations.openMocks(this);
+
+        URI_API = env.getProperty("controller.path.base") + API_NAME;
+
+        objectMapper = FileUtils.instanceObjectMapper();
+
+        simularTransacoes();
+    }
+
+    @Cacheable("simular-transacoes-cache")
+    private void simularTransacoes() {
+
+        boolean isOlderThanFiveMinutes = FileUtils.isOlderThanFiveMinutes(
+                createFileJson(FileUtils.JSON_FILE_CUSTOMER));
+
+        try {
+            if (SAVE_JSON && LOAD_JSON && !isOlderThanFiveMinutes) {
+
+                customers = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_CUSTOMER),
+                        Customer.class);
+
+                wallets = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_WALLET),
+                        Wallet.class);
+
+                depositSenders = FileUtils.loadJSONToListObject(
+                        createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER),
+                        DepositSender.class);
+
+                transactions = FileUtils.loadJSONToListObject(
+                        createFileJson(FileUtils.JSON_FILE_TRANSACTION), Transaction.class);
+
+                movements = FileUtils.loadJSONToListObject(createFileJson(FileUtils.JSON_FILE_MOVIMENT),
+                        MovementTransaction.class);
+
+            } else {
+                Map<String, List<?>> resultMapTransactions;
+
+                // A variável paramsApp armazena uma lista parametros iniciais da aplicação
+                paramsApp = TransactionUtilsMock.createParamsAppMock();
 
 
-                                // Cria a lista de wallets a partir da lista de customers
-                                wallets = TransactionUtilsMock.createWalletListMock(customers);
+                customers = TransactionUtilsMock.createCustomerListMock();
 
-                                // Cria a lista de transactions, movements e depositSenders a partir da lista de
-                                // wallets
-                                resultMapTransactions = TransactionUtilsMock.createTransactionListMock(wallets);
-                                transactions = (List<Transaction>) resultMapTransactions.get("transactions");
-                                movements = (List<MovementTransaction>) resultMapTransactions.get("movements");
-                                depositSenders = (List<DepositSender>) resultMapTransactions.get("depositSenders");
+                loginAuths = TransactionUtilsMock.createLoginAuthListMock(customers );
+                encriptAccessKeyLoginAuthListMock(loginAuths);
 
-                                if (SAVE_JSON) {
 
-                                        objectMapper = FileUtils.instanceObjectMapper();
+                // Cria a lista de wallets a partir da lista de customers
+                wallets = TransactionUtilsMock.createWalletListMock(customers);
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_PARAMS_APP),
-                                                        objectMapper.writeValueAsString(paramsApp));
+                // Cria a lista de transactions, movements e depositSenders a partir da lista de
+                // wallets
+                resultMapTransactions = TransactionUtilsMock.createTransactionListMock(wallets);
+                transactions = (List<Transaction>) resultMapTransactions.get("transactions");
+                movements = (List<MovementTransaction>) resultMapTransactions.get("movements");
+                depositSenders = (List<DepositSender>) resultMapTransactions.get("depositSenders");
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_CUSTOMER),
-                                                        objectMapper.writeValueAsString(customers));
+                if (SAVE_JSON) {
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_LOGIN_AUTH),
-                                                        objectMapper.writeValueAsString(loginAuths));
+                    objectMapper = FileUtils.instanceObjectMapper();
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_WALLET),
-                                                        objectMapper.writeValueAsString(wallets));
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_PARAMS_APP),
+                            objectMapper.writeValueAsString(paramsApp));
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_TRANSACTION),
-                                                        objectMapper.writeValueAsString(transactions));
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_CUSTOMER),
+                            objectMapper.writeValueAsString(customers));
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_MOVIMENT),
-                                                        objectMapper.writeValueAsString(movements));
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_LOGIN_AUTH),
+                            objectMapper.writeValueAsString(loginAuths));
 
-                                        FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER),
-                                                        objectMapper.writeValueAsString(depositSenders));
-                                }
-                        }
-                } catch (JsonProcessingException ex) {
-                        ex.printStackTrace();
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_WALLET),
+                            objectMapper.writeValueAsString(wallets));
+
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_TRANSACTION),
+                            objectMapper.writeValueAsString(transactions));
+
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_MOVIMENT),
+                            objectMapper.writeValueAsString(movements));
+
+                    FileUtils.writeStringToFile(createFileJson(FileUtils.JSON_FILE_DEPOSIT_SENDER),
+                            objectMapper.writeValueAsString(depositSenders));
                 }
-
+            }
+        } catch (JsonProcessingException ex) {
+            ex.printStackTrace();
         }
 
-        private void encriptAccessKeyLoginAuthListMock(List<LoginAuth> loginAuths2) {
-                for (LoginAuth loginAuth : loginAuths2) {
-                        String rawAccessKey = loginAuth.getAccessKey();
-                        String encodedAccessKey = passwordEncoder.encode(rawAccessKey);
-                        loginAuth.setAccessKey(encodedAccessKey);
-                }
+    }
+
+    private void encriptAccessKeyLoginAuthListMock(List<LoginAuth> loginAuths2) {
+        for (LoginAuth loginAuth : loginAuths2) {
+            String rawAccessKey = loginAuth.getAccessKey();
+            String encodedAccessKey = passwordEncoder.encode(rawAccessKey);
+            loginAuth.setAccessKey(encodedAccessKey);
         }
+    }
 
-        private String createFileJson(String jsonFile) {
-                return FileUtils.FOLDER_DEFAULT_FILE_JSON + jsonFile;
-        }
+    private String createFileJson(String jsonFile) {
+        return FileUtils.FOLDER_DEFAULT_FILE_JSON + jsonFile;
+    }
 
-        @DisplayName("shouldReturn200_WhenRequestTransactionById >> Solicita uma transação a partir de um transactionId válido")
-        @Test
-        void shouldReturn200_WhenRequestTransactionById() throws Exception {
+    @DisplayName("shouldReturn200_WhenRequestTransactionById >> Solicita uma transação a partir de um transactionId válido")
+    @Test
+    void shouldReturn200_WhenRequestTransactionById() throws Exception {
 
-                int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
-                Transaction transaction = transactions.get(idxTransaction);
-                Long transactionId = transaction.getTransactionId();
+        int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
+        Transaction transaction = transactions.get(idxTransaction);
+        Long transactionId = transaction.getTransactionId();
 
-                when(transactionService.getTransactionById(any(Long.class))).thenReturn(transaction);
+        when(transactionService.getTransactionById(any(Long.class))).thenReturn(transaction);
 
-                // Act & Assert
-                mockMvc.perform(get(URI_API.concat("/{id}"), transactionId)
-                                .param("id", transactionId.toString())
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.transactionId", is(transaction.getTransactionId().intValue())))
-                                .andExpect(jsonPath("$.wallet.walletId",
-                                                is(transaction.getWallet().getWalletId().intValue())));
-        }
+        // Act & Assert
+        mockMvc.perform(get(URI_API.concat("/{id}"), transactionId)
+                .param("id", transactionId.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionId", is(transaction.getTransactionId().intValue())))
+                .andExpect(jsonPath("$.wallet.walletId",
+                        is(transaction.getWallet().getWalletId().intValue())));
+    }
 
-        @Test
-        @DisplayName("shouldReturn200_WhenRequestTListTransactionByWalletId >> Solicita uma transação a partir de um transactionId válido")
-        void shouldReturn200_WhenRequestTListTransactionByWalletId() throws Exception {
+    @Test
+    @DisplayName("shouldReturn200_WhenRequestTListTransactionByWalletId >> Solicita uma transação a partir de um transactionId válido")
+    void shouldReturn200_WhenRequestTListTransactionByWalletId() throws Exception {
 
-                int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
-                Transaction transaction = transactions.get(idxTransaction);
-                Long walletId = transaction.getWallet().getWalletId();
+        int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
+        Transaction transaction = transactions.get(idxTransaction);
+        Long walletId = transaction.getWallet().getWalletId();
 
-                List<Transaction> resultFilter = transactions.stream()
-                                .filter(trn -> trn.getWallet().getWalletId()
-                                                .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue())
-                                .toList();
+        List<Transaction> resultFilter = transactions.stream()
+                .filter(trn -> trn.getWallet().getWalletId()
+                        .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue())
+                .toList();
 
-                Page<Transaction> pageForWallet = new PageImpl<>(resultFilter,
-                                TransactionUtilsMock.getDefaultPageable(),
-                                resultFilter.size());
+        Page<Transaction> pageForWallet = new PageImpl<>(resultFilter,
+                TransactionUtilsMock.getDefaultPageable(),
+                resultFilter.size());
 
-                when(transactionService.getTransactionByWalletId(any(Long.class), any(Pageable.class)))
-                                .thenReturn(pageForWallet);
+        when(transactionService.getTransactionByWalletId(any(Long.class), any(Pageable.class)))
+                .thenReturn(pageForWallet);
 
-                // Act & Assert
-                mockMvc.perform(get(URI_API.concat("/search-wallet"))
-                                .param("walletId", String.valueOf(walletId))
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out
-                                                .println("Body: " + result.getResponse().getContentAsString()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.content").exists())
-                                .andExpect(jsonPath("$.content").isArray())
-                                .andExpect(jsonPath("$.content", hasSize(resultFilter.size())))
-                                .andExpect(jsonPath("$.page.totalElements").value(resultFilter.size()));
-        }
+        // Act & Assert
+        mockMvc.perform(get(URI_API.concat("/search-wallet"))
+                .param("walletId", String.valueOf(walletId))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out
+                        .println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(resultFilter.size())))
+                .andExpect(jsonPath("$.page.totalElements").value(resultFilter.size()));
+    }
 
-        @Test
-        @DisplayName("shouldReturn200_WhenRequestTListTransactionByWalletIdAndProcessType >> Solicita as transações por wallet e status")
-        void shouldReturn200_WhenRequestTListTransactionByWalletIdAndProcessType() throws Exception {
+    @Test
+    @DisplayName("shouldReturn200_WhenRequestTListTransactionByWalletIdAndProcessType >> Solicita as transações por wallet e status")
+    void shouldReturn200_WhenRequestTListTransactionByWalletIdAndProcessType() throws Exception {
 
-                int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
-                Transaction transaction = transactions.get(idxTransaction);
-                Long walletId = transaction.getWallet().getWalletId();
-                StatusTransaction typeTransaction = transaction.getStatusTransaction();
+        int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
+        Transaction transaction = transactions.get(idxTransaction);
+        Long walletId = transaction.getWallet().getWalletId();
+        StatusTransaction typeTransaction = transaction.getStatusTransaction();
 
-                List<Transaction> resultFilter = transactions.stream()
-                                .filter(trn -> trn.getWallet().getWalletId()
-                                                .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue()
-                                                && trn.getStatusTransaction().equals(typeTransaction))
-                                .toList();
+        List<Transaction> resultFilter = transactions.stream()
+                .filter(trn -> trn.getWallet().getWalletId()
+                        .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue()
+                        && trn.getStatusTransaction().equals(typeTransaction))
+                .toList();
 
-                Page<Transaction> pageForWallet = new PageImpl<>(resultFilter,
-                                TransactionUtilsMock.getDefaultPageable(),
-                                resultFilter.size());
+        Page<Transaction> pageForWallet = new PageImpl<>(resultFilter,
+                TransactionUtilsMock.getDefaultPageable(),
+                resultFilter.size());
 
-                when(transactionService.filterTransactionByWalletIdAndProcessType(any(Long.class),
-                                any(StatusTransaction.class), any(Pageable.class))).thenReturn(pageForWallet);
+        when(transactionService.filterTransactionByWalletIdAndProcessType(any(Long.class),
+                any(StatusTransaction.class), any(Pageable.class))).thenReturn(pageForWallet);
 
-                // Act & Assert
-                mockMvc.perform(get(URI_API.concat("/list"))
-                                .param("walletId", String.valueOf(walletId))
-                                .param("typeTransaction", typeTransaction.name())
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out
-                                                .println("Body: " + result.getResponse().getContentAsString()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.content").exists())
-                                .andExpect(jsonPath("$.content").isArray())
-                                .andExpect(jsonPath("$.content", hasSize(resultFilter.size())))
-                                .andExpect(jsonPath("$.page.totalElements").value(resultFilter.size()));
-        }
+        // Act & Assert
+        mockMvc.perform(get(URI_API.concat("/list"))
+                .param("walletId", String.valueOf(walletId))
+                .param("typeTransaction", typeTransaction.name())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out
+                        .println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(resultFilter.size())))
+                .andExpect(jsonPath("$.page.totalElements").value(resultFilter.size()));
+    }
 
-        @Test
-        @DisplayName("shouldReturn201_WhenCreateNewDepositMoney >> Solicita as transações por wallet e status")
-        void shouldReturn201_WhenCreateNewDepositMoney() throws Exception {
-                int idxWalletSend = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
-                Wallet wallet = wallets.get(idxWalletSend);
+    @Test
+    @DisplayName("shouldReturn201_WhenCreateNewDepositMoney >> Solicita as transações por wallet e status")
+    void shouldReturn201_WhenCreateNewDepositMoney() throws Exception {
+        int idxWalletSend = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
+        Wallet wallet = wallets.get(idxWalletSend);
 
-                BigDecimal amount = TransactionUtilsMock.generateMoneyBetweenMinAndMaxValue();
+        BigDecimal amount = TransactionUtilsMock.generateMoneyBetweenMinAndMaxValue();
 
-                DepositMoney depositMoney = TransactionUtils.generateDepositMoney(wallet, amount);
+        DepositMoney depositMoney = TransactionUtils.generateDepositMoney(wallet, amount);
 
-                when(transactionService.saveDepositMoney(any(Long.class), any(BigDecimal.class),
-                                any(String.class), any(String.class), any(String.class)))
-                                .thenReturn(depositMoney);
+        when(transactionService.saveDepositMoney(any(Long.class), any(BigDecimal.class),
+                any(String.class), any(String.class), any(String.class)))
+                .thenReturn(depositMoney);
 
-                Long newTransactionId = lastTransactionId() + 1;
-                depositMoney.setTransactionId(newTransactionId);
+        Long newTransactionId = lastTransactionId() + 1;
+        depositMoney.setTransactionId(newTransactionId);
 
-                String cpfSender = RandomMock.cpfFake();
-                String senderName = RandomMock.loginFakeMock();
-                String terminalId = RandomMock.generateHexaBetween100And999()
-                                .concat(RandomMock.generateRandomNumbers(5));
+        String cpfSender = RandomMock.cpfFake();
+        String senderName = RandomMock.loginFakeMock();
+        String terminalId = RandomMock.generateHexaBetween100And999()
+                .concat(RandomMock.generateRandomNumbers(5));
 
-                // ACT & ASSERT: Execução do MockMvc
-                mockMvc.perform(post(URI_API.concat("/transaction"))
-                                .param("type", "DEPOSIT")
-                                .param("walletId", String.valueOf(depositMoney.getWallet().getWalletId()))
-                                .param("amount", String.valueOf(amount))
-                                .param("cpfSender", cpfSender)
-                                .param("terminalId", terminalId)
-                                .param("senderName", senderName)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(depositMoney)))
-                                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out
-                                                .println("Body: " + result.getResponse().getContentAsString()))
-                                .andExpect(status().isCreated())
-                                .andExpect(header().exists("Location"))
-                                .andExpect(jsonPath("$.transactionId").value(depositMoney.getTransactionId()))
-                                .andExpect(jsonPath("$.wallet.walletId").value(depositMoney.getWallet().getWalletId()));
+        // ACT & ASSERT: Execução do MockMvc
+        mockMvc.perform(post(URI_API.concat("/transaction"))
+                .param("type", "DEPOSIT")
+                .param("walletId", String.valueOf(depositMoney.getWallet().getWalletId()))
+                .param("amount", String.valueOf(amount))
+                .param("cpfSender", cpfSender)
+                .param("terminalId", terminalId)
+                .param("senderName", senderName)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(depositMoney)))
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out
+                        .println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.transactionId").value(depositMoney.getTransactionId()))
+                .andExpect(jsonPath("$.wallet.walletId").value(depositMoney.getWallet().getWalletId()));
 
-        }
+    }
 
-        @Test
-        @DisplayName("shouldReturn201_WhenCreateNewWithdrawMoney >> Solicita as transações por wallet e status")
-        void shouldReturn201_WhenCreateNewWithdrawMoney() throws Exception {
-                int idxWalletSend = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
-                Wallet wallet = wallets.get(idxWalletSend);
+    @Test
+    @DisplayName("shouldReturn201_WhenCreateNewWithdrawMoney >> Solicita as transações por wallet e status")
+    void shouldReturn201_WhenCreateNewWithdrawMoney() throws Exception {
+        int idxWalletSend = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
+        Wallet wallet = wallets.get(idxWalletSend);
 
-                BigDecimal amount = TransactionUtilsMock.generateMoneyBetweenMinAndMaxValue();
+        BigDecimal amount = TransactionUtilsMock.generateMoneyBetweenMinAndMaxValue();
 
-                WithdrawMoney withdrawMoney = TransactionUtils.generateWithdraw(wallet, amount);
-                when(transactionService.saveWithdrawMoney(any(Long.class), any(BigDecimal.class)))
-                                .thenReturn(withdrawMoney);
+        WithdrawMoney withdrawMoney = TransactionUtils.generateWithdraw(wallet, amount);
+        when(transactionService.saveWithdrawMoney(any(Long.class), any(BigDecimal.class)))
+                .thenReturn(withdrawMoney);
 
-                Long newTransactionId = lastTransactionId() + 1;
-                withdrawMoney.setTransactionId(newTransactionId);
+        Long newTransactionId = lastTransactionId() + 1;
+        withdrawMoney.setTransactionId(newTransactionId);
 
-                // ACT & ASSERT: Execução do MockMvc
-                mockMvc.perform(post(URI_API.concat("/transaction"))
-                                .param("type", "WITHDRAW")
-                                .param("walletId", String.valueOf(wallet.getWalletId()))
-                                .param("amount", String.valueOf(amount))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(withdrawMoney)))
-                                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out
-                                                .println("Body: " + result.getResponse().getContentAsString()))
-                                .andExpect(status().isCreated())
-                                .andExpect(header().exists("Location"))
-                                .andExpect(jsonPath("$.transactionId").value(withdrawMoney.getTransactionId()))
-                                .andExpect(jsonPath("$.wallet.walletId")
-                                                .value(withdrawMoney.getWallet().getWalletId()));
+        // ACT & ASSERT: Execução do MockMvc
+        mockMvc.perform(post(URI_API.concat("/transaction"))
+                .param("type", "WITHDRAW")
+                .param("walletId", String.valueOf(wallet.getWalletId()))
+                .param("amount", String.valueOf(amount))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(withdrawMoney)))
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out
+                        .println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.transactionId").value(withdrawMoney.getTransactionId()))
+                .andExpect(jsonPath("$.wallet.walletId")
+                        .value(withdrawMoney.getWallet().getWalletId()));
 
-        }
+    }
 
-        @Test
-        @DisplayName("shouldReturn201_WhenCreateNewTransferMoneySend >> Solicita as transações por wallet e status")
-        void shouldReturn201_WhenCreateNewTransferMoneySend() throws Exception {
-                int idxWalletSend = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
-                Wallet walletSend = wallets.get(idxWalletSend);
+    @Test
+    @DisplayName("shouldReturn201_WhenCreateNewTransferMoneySend >> Solicita as transações por wallet e status")
+    void shouldReturn201_WhenCreateNewTransferMoneySend() throws Exception {
+        int idxWalletSend = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
+        Wallet walletSend = wallets.get(idxWalletSend);
 
-                int idxWalletReceived = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
-                Wallet walletReceived = wallets.get(idxWalletReceived);
+        int idxWalletReceived = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);
+        Wallet walletReceived = wallets.get(idxWalletReceived);
 
-                BigDecimal amount = TransactionUtilsMock.generateMoneyBetweenMinAndMaxValue();
+        BigDecimal amount = TransactionUtilsMock.generateMoneyBetweenMinAndMaxValue();
 
-                TransferMoneySend moneySend = TransactionUtils.generateTransferMoneySend(
-                                walletSend, walletReceived, amount);
+        TransferMoneySend moneySend = TransactionUtils.generateTransferMoneySend(
+                walletSend, walletReceived, amount);
 
-                when(transactionService.saveTransferMoneySend(any(Long.class), any(Long.class), any(BigDecimal.class)))
-                                .thenReturn(moneySend);
+        when(transactionService.saveTransferMoneySend(any(Long.class), any(Long.class), any(BigDecimal.class)))
+                .thenReturn(moneySend);
 
-                Long newTransactionId = lastTransactionId() + 1;
-                moneySend.setTransactionId(newTransactionId);
+        Long newTransactionId = lastTransactionId() + 1;
+        moneySend.setTransactionId(newTransactionId);
 
-                // ACT & ASSERT: Execução do MockMvc
-                mockMvc.perform(post(URI_API.concat("/transaction"))
-                                .param("type", "TRANSFER_SEND")
-                                .param("walletIdSend", String.valueOf(walletSend.getWalletId()))
-                                .param("walletIdReceived", String.valueOf(walletReceived.getWalletId()))
-                                .param("amount", String.valueOf(amount))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(moneySend)))
-                                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out
-                                                .println("Body: " + result.getResponse().getContentAsString()))
-                                .andExpect(status().isCreated())
-                                .andExpect(header().exists("Location"))
-                                // .andExpect(jsonPath("$.transactionType").value("TRANSFER_SEND"))
-                                .andExpect(jsonPath("$.transactionId").value(moneySend.getTransactionId()))
-                                .andExpect(jsonPath("$.wallet.walletId").value(moneySend.getWallet().getWalletId()));
+        // ACT & ASSERT: Execução do MockMvc
+        mockMvc.perform(post(URI_API.concat("/transaction"))
+                .param("type", "TRANSFER_SEND")
+                .param("walletIdSend", String.valueOf(walletSend.getWalletId()))
+                .param("walletIdReceived", String.valueOf(walletReceived.getWalletId()))
+                .param("amount", String.valueOf(amount))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(moneySend)))
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out
+                        .println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                // .andExpect(jsonPath("$.transactionType").value("TRANSFER_SEND"))
+                .andExpect(jsonPath("$.transactionId").value(moneySend.getTransactionId()))
+                .andExpect(jsonPath("$.wallet.walletId").value(moneySend.getWallet().getWalletId()));
 
-        }
+    }
 
-        private Long lastTransactionId() {
-                return transactions.stream()
-                                .max(Comparator.comparing(Transaction::getTransactionId))
-                                .map(Transaction::getTransactionId)
-                                .orElse(0L);
-        }
+    private Long lastTransactionId() {
+        return transactions.stream()
+                .max(Comparator.comparing(Transaction::getTransactionId))
+                .map(Transaction::getTransactionId)
+                .orElse(0L);
+    }
 
-        @Test
-        @DisplayName("shouldReturn200_WhenUploadFileCsvAndWriteByJSONInDatabase >> Simula upload do transaction.csv")
-        void shouldReturn200_WhenUploadFileCsvAndWriteByJSONInDatabase() throws Exception {
+    @Test
+    @DisplayName("shouldReturn200_WhenUploadFileCsvAndWriteByJSONInDatabase >> Simula upload do transaction.csv")
+    void shouldReturn200_WhenUploadFileCsvAndWriteByJSONInDatabase() throws Exception {
 
-                String VALID_TRANSACTION_CSV = "\"transactionId\",\"createdAt\",\"walletId\",\"operationType\",\"previousBalance\",\"amount\",\"currentBalance\",\"statusTransaction\",\"senderId\"\r\n"
-                                + //
-                                "11001,\"2025-11-16 02:57:18.381653500\",2119,\"DEPOSIT\",0,246.16,246.16,\"CUSTOMER_INVALID\",12901\r\n"
-                                + //
-                                "11002,\"2025-11-16 02:57:18.386653300\",2049,\"WITHDRAW\",0,365.5,-365.5,\"CUSTOMER_INVALID\",\\N\r\n"
-                                + //
-                                "11003,\"2025-11-16 02:57:18.386653300\",2058,\"WITHDRAW\",0,596.52,-596.52,\"CUSTOMER_INVALID\",\\N\r\n"
-                                + //
-                                "11004,\"2025-11-16 02:57:18.386653300\",2055,\"DEPOSIT\",0,549.23,549.23,\"CUSTOMER_INVALID\",12904\r\n"
-                                + //
-                                "11005,\"2025-11-16 02:57:18.390655100\",2062,\"DEPOSIT\",0,287.77,287.77,\"CUSTOMER_INVALID\",12905\r\n"
-                                + //
-                                "11006,\"2025-11-16 02:57:18.396656500\",2062,\"DEPOSIT\",0,488.68,488.68,\"CUSTOMER_INVALID\",\\N\r\n"
-                                + //
-                                "11007,\"2025-11-16 02:57:18.396656500\",2038,\"TRANSFER_SEND\",0,599.42,-599.42,\"CUSTOMER_INVALID\",\\N\r\n"
-                                + //
-                                "11008,\"2025-11-16 02:57:18.396656500\",2106,\"DEPOSIT\",0,545.88,545.88,\"CUSTOMER_INVALID\",12908\r\n"
-                                + //
-                                "11009,\"2025-11-16 02:57:18.399658200\",2051,\"DEPOSIT\",0,607.9,607.9,\"CUSTOMER_INVALID\",12909\r\n";
+        String VALID_TRANSACTION_CSV = "\"transactionId\",\"createdAt\",\"walletId\",\"operationType\",\"previousBalance\",\"amount\",\"currentBalance\",\"statusTransaction\",\"senderId\"\r\n"
+                + //
+                "11001,\"2025-11-16 02:57:18.381653500\",2119,\"DEPOSIT\",0,246.16,246.16,\"CUSTOMER_INVALID\",12901\r\n"
+                + //
+                "11002,\"2025-11-16 02:57:18.386653300\",2049,\"WITHDRAW\",0,365.5,-365.5,\"CUSTOMER_INVALID\",\\N\r\n"
+                + //
+                "11003,\"2025-11-16 02:57:18.386653300\",2058,\"WITHDRAW\",0,596.52,-596.52,\"CUSTOMER_INVALID\",\\N\r\n"
+                + //
+                "11004,\"2025-11-16 02:57:18.386653300\",2055,\"DEPOSIT\",0,549.23,549.23,\"CUSTOMER_INVALID\",12904\r\n"
+                + //
+                "11005,\"2025-11-16 02:57:18.390655100\",2062,\"DEPOSIT\",0,287.77,287.77,\"CUSTOMER_INVALID\",12905\r\n"
+                + //
+                "11006,\"2025-11-16 02:57:18.396656500\",2062,\"DEPOSIT\",0,488.68,488.68,\"CUSTOMER_INVALID\",\\N\r\n"
+                + //
+                "11007,\"2025-11-16 02:57:18.396656500\",2038,\"TRANSFER_SEND\",0,599.42,-599.42,\"CUSTOMER_INVALID\",\\N\r\n"
+                + //
+                "11008,\"2025-11-16 02:57:18.396656500\",2106,\"DEPOSIT\",0,545.88,545.88,\"CUSTOMER_INVALID\",12908\r\n"
+                + //
+                "11009,\"2025-11-16 02:57:18.399658200\",2051,\"DEPOSIT\",0,607.9,607.9,\"CUSTOMER_INVALID\",12909\r\n";
 
-                // 1. Definições do Arquivo
-                String name = "file"; // Nome do parâmetro que sua API espera (ex: @RequestParam("file"))
-                String filename = "transactions.csv";
-                String contentType = "text/csv";
-                byte[] content = VALID_TRANSACTION_CSV.getBytes(StandardCharsets.UTF_8);
+        // 1. Definições do Arquivo
+        String name = "file"; // Nome do parâmetro que sua API espera (ex: @RequestParam("file"))
+        String filename = "transactions.csv";
+        String contentType = "text/csv";
+        byte[] content = VALID_TRANSACTION_CSV.getBytes(StandardCharsets.UTF_8);
 
-                // 2. Criação do MockMultipartFile
-                MultipartFile multipartFile = new MockMultipartFile(
-                                name,
-                                filename,
-                                contentType,
-                                content);
+        // 2. Criação do MockMultipartFile
+        MultipartFile multipartFile = new MockMultipartFile(
+                name,
+                filename,
+                contentType,
+                content);
 
-                transactionService.loadCsvAndSave(multipartFile);
+        transactionService.loadCsvAndSave(multipartFile);
 
-        }
+    }
 
 }

@@ -38,6 +38,18 @@ spring:
   application:
     name: wallet-service-api
 
+  # Configurações do Caffeine para um cache chamado "wallet-details"
+# Corrigido
+  cache:
+    caffeine:
+      spec: expireAfterWrite=60s,maximumSize=500
+
+  cloud:
+      vault:
+        enabled: false
+        health:
+          enabled: false
+
   data:
     web:
       pageable:
