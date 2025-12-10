@@ -14,11 +14,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
@@ -71,10 +73,11 @@ public class TransactionUtilsMock {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
 
 
+    @Cacheable("create-customer-list-mock")
     public static List<Customer> createCustomerListMock() {
 
         Faker faker = new Faker(new Locale("pt-BR"));
@@ -135,6 +138,7 @@ public class TransactionUtilsMock {
 
     }
 
+    @Cacheable("create-login-auth-list-mock")
     public static List<LoginAuth> createLoginAuthListMock(List<Customer> customers) {
 
         List<LoginAuth> loginAuths = new ArrayList<>();
@@ -195,7 +199,7 @@ public class TransactionUtilsMock {
         return loginAuths;
     }
     
-
+    @Cacheable("create-wallet-list-mock")
     public static List<Wallet> createWalletListMock(List<Customer> customersInput) {
         
         List<Customer> customersMock = new ArrayList<>(customersInput);
@@ -257,6 +261,7 @@ public class TransactionUtilsMock {
         return wallets;
     }
 
+    @Cacheable("create-transaction-list-mock")
     public static Map<String, List<?>> createTransactionListMock(List<Wallet> walletInput) {
 
         Map<String, List<?>> resultsMap = new HashMap<>();
@@ -537,6 +542,7 @@ public class TransactionUtilsMock {
         );
     }
 
+    @Cacheable("create-params-app-mock")
     public static List<ParamApp> createParamsAppMock() {
 
         List<ParamApp> paramApps = List.of(
