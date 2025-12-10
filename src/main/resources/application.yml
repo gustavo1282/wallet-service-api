@@ -1,18 +1,48 @@
 spring:
-  profiles.active: local
+  application:
+    name: wallet-service-api
+
+  profiles:
+    active: local
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+# Configurações globais de upload (perfil local pode sobrescrever)
   servlet:
     multipart:
-      enabled: true # Deve estar 'true' (geralmente é o padrão)
-      max-file-size: 10MB # Certifique-se de que o arquivo não excede o limite
+      enabled: true
+      max-file-size: 10MB
       max-request-size: 10MB
-  jpa:
-    properties:
-      jdbc.batch_size: 1000
-      order_inserts: true               # Essencial para otimizar INSERTS
-      order_updates: true               # Essencial para otimizar UPDATES
-      jdbc.batch_versioned_data: true   # Mantenha a versão do dado no batch
 
-# Define o componente uma vez - referente a carga de arquivo csv e upload
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.guga.wallet: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+# Configurações globais do JWT (sobrepostas por profiles)
+jwt:
+  issuer: wallet-service-api
+  expiration-minutes: 20
+
+# DB genérico (perfil local/docker substituem)
+datasource:
+  driver-class-name: org.postgresql.Driver
+
+# Componentes compartilhados (swagger, upload CSV, etc)  
 components:
   requestBodies:
     FileUpload:
@@ -25,28 +55,31 @@ components:
             properties:
               file:
                 type: string
-                format: binary # A chave para o input de arquivo
+                format: binary
+
 paths:
   /api/customers/upload:
     post:
       summary: Importa dados de Clientes via CSV.
-      requestBody: # E aqui
+      requestBody:
         $ref: '#/components/requestBodies/FileUpload'
       responses:
         '200':
           description: Upload bem-sucedido.
+
   /api/wallets/upload:
     post:
       summary: Importa dados de Carteiras via CSV.
-      requestBody: # Referencia o componente aqui
+      requestBody:
         $ref: '#/components/requestBodies/FileUpload'
       responses:
         '200':
           description: Upload bem-sucedido.
+
   /api/transactions/upload:
     post:
-      summary: Importa dados de Carteiras via CSV.
-      requestBody: # Referencia o componente aqui
+      summary: Importa dados de Transações via CSV.
+      requestBody:
         $ref: '#/components/requestBodies/FileUpload'
       responses:
         '200':

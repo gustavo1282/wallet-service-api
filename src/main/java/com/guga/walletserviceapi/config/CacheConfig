@@ -1,0 +1,23 @@
+package com.guga.walletserviceapi.config;
+
+@Configuration
+public class CacheConfig {
+
+    @Bean
+    public CacheManager cacheManager() {
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+        
+        // Define uma regra específica para o cache "wallet-details"
+        cacheManager.setCaffeine(Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(5, TimeUnit.MINUTES)); // Exemplo: 5 minutos
+
+        // Define uma regra diferente para um cache "wallet-list"
+        cacheManager.registerCustomCache("wallet-list", Caffeine.newBuilder()
+            .maximumSize(50)
+            .expireAfterWrite(1, TimeUnit.MINUTES)
+            .build());
+            
+        return cacheManager;
+    }
+}

@@ -14,11 +14,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
@@ -42,7 +44,7 @@ public class TransactionUtilsMock {
 
     private static final boolean APPLY_FILTER_CUSTOMER_BY_STATUS = true;
     private static final int RANGE_CUSTOMER_ID = 1000;
-    private static final int TOTAL_CUSTOMER_ID = 1050;
+    private static final int TOTAL_CUSTOMER_ID = 1048;
     private static final int LIMIT_LIST_CUSTOMER = 30;
     private static final int RANGE_LOGIN_AUTH_ID = 0;
 
@@ -71,10 +73,11 @@ public class TransactionUtilsMock {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
 
 
+    @Cacheable("create-customer-list-mock")
     public static List<Customer> createCustomerListMock() {
 
         Faker faker = new Faker(new Locale("pt-BR"));
@@ -113,10 +116,29 @@ public class TransactionUtilsMock {
 
         });
 
+        customers.add(
+            Customer.builder()
+                .customerId(1L)
+                .status(Status.ACTIVE)
+                .fullName("WALLET USER")
+                .firstName("WALLET")
+                .lastName("USER")
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .email("wallet_user@gmail.com")
+                .phoneNumber(faker.phoneNumber().cellPhone())
+                .documentId(faker.idNumber().valid())
+                .cpf(faker.cpf().valid())
+                .createdAt(LocalDateTime.now().minusDays(10))
+                .updatedAt(LocalDateTime.now().minusDays(10))
+                .loginAuthId(null)
+                .build()
+        );
+
         return customers;
 
     }
 
+    @Cacheable("create-login-auth-list-mock")
     public static List<LoginAuth> createLoginAuthListMock(List<Customer> customers) {
 
         List<LoginAuth> loginAuths = new ArrayList<>();
@@ -146,24 +168,38 @@ public class TransactionUtilsMock {
             }
 
             SEQUENCE_LOGIN_AUTH_ID++;
-
             loginAuths.add(
                 LoginAuth.builder()
                     .id( (long)(RANGE_LOGIN_AUTH_ID + SEQUENCE_LOGIN_AUTH_ID) )
                     .customerId(customer.getCustomerId())
-                    .login(loginAccess)
-                    .accessKey(accessKey)
-                    .loginAuthType(loginAuthType)
-                    .createdAt(customer.getCreatedAt())
-                    .updatedAt(customer.getCreatedAt())
-                    .loginAuthType(loginAuthType)
+                    .login( loginAccess )
+                    .accessKey( accessKey )
+                    .accessKeyOpen( accessKey )
+                    .loginAuthType( loginAuthType )
+                    .createdAt( LocalDateTime.now() )
+                    .updatedAt( LocalDateTime.now() )
                     .build()
             );
+
         }
+
+        loginAuths.add(
+            LoginAuth.builder()
+                .id( (long)(RANGE_LOGIN_AUTH_ID + SEQUENCE_LOGIN_AUTH_ID) )
+                .customerId(1L)
+                .login("wallet_user")
+                .accessKey("wallet_pass")
+                .accessKeyOpen("wallet_pass")
+                .loginAuthType(LoginAuthType.USER_NAME)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build()
+        );
+
         return loginAuths;
     }
     
-
+    @Cacheable("create-wallet-list-mock")
     public static List<Wallet> createWalletListMock(List<Customer> customersInput) {
         
         List<Customer> customersMock = new ArrayList<>(customersInput);
@@ -202,21 +238,21 @@ public class TransactionUtilsMock {
                     System.out.println("Customer 1002 - " + status);
                 }
 
-                if (status.equals(Status.ACTIVE) && !walletCheck.isEmpty() && walletCheck.size() == 2){
+                if (status.equals(Status.ACTIVE) && !walletCheck.isEmpty() && walletCheck.size() == 1){
                     status = Status.INACTIVE;
                 }
 
                 Wallet wallet = Wallet.builder()
-                .walletId( walletId )
-                .customerId(customer.getCustomerId())
-                .customer(customer)
-                .status( status )
-                .currentBalance( BigDecimal.ZERO )
-                .previousBalance( BigDecimal.ZERO )
-                .createdAt(createAt)
-                .updatedAt(createAt)
-                .loginUser("system")
-                .build();
+                    .walletId( walletId )
+                    .customerId(customer.getCustomerId())
+                    .customer(customer)
+                    .status( status )
+                    .currentBalance( BigDecimal.ZERO )
+                    .previousBalance( BigDecimal.ZERO )
+                    .createdAt(createAt)
+                    .updatedAt(createAt)
+                    .loginUser("system")
+                    .build();
                 
                 wallets.add(wallet);
 
@@ -225,6 +261,7 @@ public class TransactionUtilsMock {
         return wallets;
     }
 
+    @Cacheable("create-transaction-list-mock")
     public static Map<String, List<?>> createTransactionListMock(List<Wallet> walletInput) {
 
         Map<String, List<?>> resultsMap = new HashMap<>();
@@ -505,6 +542,7 @@ public class TransactionUtilsMock {
         );
     }
 
+    @Cacheable("create-params-app-mock")
     public static List<ParamApp> createParamsAppMock() {
 
         List<ParamApp> paramApps = List.of(

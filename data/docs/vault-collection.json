@@ -1,0 +1,53 @@
+{
+  "info": {
+    "name": "Vault API Collection",
+    "_postman_id": "vault-collection-001",
+    "description": "Coleção para interação com o HashiCorp Vault",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Status do Vault",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "http://localhost:8200/v1/sys/health"
+      }
+    },
+    {
+      "name": "Consultar Token",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Vault-Token", "value": "root" }
+        ],
+        "url": "http://localhost:8200/v1/auth/token/lookup-self"
+      }
+    },
+    {
+      "name": "Criar/Atualizar JWT Secret",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-Vault-Token", "value": "root" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"data\":{\"secret_key\":\"MinhaChaveNova123\"}}"
+        },
+        "url": "http://localhost:8200/v1/wallet/jwt"
+      }
+    },
+    {
+      "name": "Ler JWT Secret",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Vault-Token", "value": "root" }
+        ],
+        "url": "http://localhost:8200/v1/wallet/jwt"
+      }
+    }
+  ]
+}

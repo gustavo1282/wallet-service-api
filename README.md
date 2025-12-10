@@ -1,6 +1,14 @@
+
+## 👨‍💻 Autor
+
+**Gustavo1282**  
+[GitHub](https://github.com/gustavo1282) | [LinkedIn](https://www.linkedin.com/in/gustavo-souza-68b34335/)
+
+
 # Wallet Service API
 
-Uma API REST robusta construída com **Spring Boot 3.4.10** para gerenciar o ciclo de vida completo de um serviço de carteira digital. Inclui autenticação JWT, operações de transações, gerenciamento de clientes e carteiras, com suporte a múltiplos bancos de dados e integração com Prometheus para observabilidade.
+A **Wallet Service** API é um serviço pensado para facilitar a criação e operação de uma carteira digital.
+Com autenticação segura, controle de clientes e processamento de transações, a API fornece uma base sólida para produtos financeiros modernos.
 
 ## 🎯 Visão Geral
 
@@ -45,12 +53,19 @@ mvnw.cmd clean package -DskipTests
 
 ### 3. Executar a Aplicação
 
-#### Opção A: Com Docker (Recomendado)
+#### Opção A: Com Docker e Vault (Recomendado)
+
+Inicia a aplicação e o servidor Hashicorp Vault para carregar as configurações.
+
 ```bash
-docker-compose up -d
+# Para garantir que o ambiente seja recriado com as configurações do Vault
+docker compose up -d --build --force-recreate
 ```
 
 #### Opção B: Localmente
+
+Roda com o perfil local (sem Vault), usando as configurações do application-local.yml.
+
 ```bash
 # Certifique-se de que PostgreSQL está rodando na porta 5432
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
@@ -65,6 +80,84 @@ mvnw.cmd spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=l
 - **Swagger UI**: [http://localhost:8080/wallet-services-api/swagger-ui.html](http://localhost:8080/wallet-services-api/swagger-ui.html)
 - **Health Check**: [http://localhost:8080/wallet-services-api/actuator/health](http://localhost:8080/wallet-services-api/actuator/health)
 - **Métricas Prometheus**: [http://localhost:8080/wallet-services-api/actuator/prometheus](http://localhost:8080/wallet-services-api/actuator/prometheus)
+
+
+## ⚙️ Configuração e Teste de CI/CD Local
+
+Para validar o pipeline de CI/CD (.github/workflows/ci-cd.yml) localmente, utilizamos a ferramenta act, que simula o runner do GitHub Actions usando Docker.
+
+### 1. Instalação do act (Windows)
+O act deve ser instalado usando o gerenciador de pacotes Scoop, pois ele garante a correta configuração do $PATH.
+
+### A. Instalar o Scoop (Se necessário)
+Execute os comandos a seguir em um PowerShell (Terminal) sem privilégios de Administrador:
+
+```bash
+#PowerShell >>
+
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser 
+irm get.scoop.sh | iex
+```
+
+### B. Instalar o act
+Após a instalação do Scoop, instale o act:
+
+```bash
+#PowerShell >>
+
+scoop install act
+```
+
+### 2. Integração com VS Code (Opcional, mas Recomendado)
+
+Para uma melhor experiência de depuração, instale a extensão no Visual Studio Code:
+
+- Plugin VSC: GitHub Actions Runner (Permite rodar jobs do act diretamente na interface do VS Code).
+
+### 3. Validação e Execução do Pipeline Local
+
+Para simular o pipeline build_and_test usando seu código local, execute o comando no terminal (no diretório raiz do projeto):
+
+```bash
+# Roda o job 'build_and_test' simulando um evento push na branch atual
+act push -j build_and_test
+```
+
+
+## 🐳 Docker e Orquestração
+
+Comandos de Gestão
+
+| Comando | Descrição |
+| :--- | :--- |
+| `docker compose up -d` | Inicia todos os serviços definidos no `docker-compose.yml` em segundo plano (detached mode). |
+| `docker compose up -d --build --force-recreate` | **Atualiza:** Para, remove, reconstrói (se houver alteração no Dockerfile) e recria todos os serviços com as configurações mais recentes do `docker-compose.yml`. |
+| `docker compose up -d [NOME_DO_SERVIÇO]` | Inicia apenas um serviço específico e suas dependências necessárias. |
+| `docker compose down` | Para e remove todos os containers, redes e volumes criados pelo Compose (limpeza total). |
+| `docker compose stop` | Apenas para os containers em execução, mantendo-os no disco. |
+| `docker compose stop [NOME_DO_SERVIÇO]` | Para um serviço específico. |
+| `docker compose ps` | Lista o status atual de todos os serviços definidos. |
+
+
+### Configurações de Ambiente
+
+As variáveis de ambiente podem ser definidas em docker-compose.yml ou em arquivos .env. O perfil de execução é definido pela variável SPRING_PROFILES_ACTIVE.
+
+## 📦 Dependências Principais
+
+| Tecnologia | Versão | Propósito |
+|------------|--------|----------|
+| Spring Boot | 3.4.10 | Framework principal |
+| Spring Security | Latest | Autenticação e autorização |
+| jjwt | 0.12.6 | Geração e validação de JWT |
+| Spring Data JPA | Latest | ORM e acesso a dados |
+| PostgreSQL | 15.3+ | Banco de dados produção |
+| Springdoc OpenAPI | 2.8.0 | Documentação API |
+| Micrometer/Prometheus | Latest | Métricas e observabilidade |
+| Lombok | 1.18.30 | Redução de boilerplate |
+| JaCoCo | 0.8.12 | Cobertura de testes |
+| SonarQube | 3.10.0 | Análise de código |
+
 
 ## 🏗️ Estrutura do Projeto
 
@@ -97,21 +190,6 @@ wallet-service-api/
 └── pom.xml                                        # Dependências Maven
 
 ```
-
-## 📦 Dependências Principais
-
-| Tecnologia | Versão | Propósito |
-|------------|--------|----------|
-| Spring Boot | 3.4.10 | Framework principal |
-| Spring Security | Latest | Autenticação e autorização |
-| jjwt | 0.12.6 | Geração e validação de JWT |
-| Spring Data JPA | Latest | ORM e acesso a dados |
-| PostgreSQL | 15.3+ | Banco de dados produção |
-| Springdoc OpenAPI | 2.8.0 | Documentação API |
-| Micrometer/Prometheus | Latest | Métricas e observabilidade |
-| Lombok | 1.18.30 | Redução de boilerplate |
-| JaCoCo | 0.8.12 | Cobertura de testes |
-| SonarQube | 3.10.0 | Análise de código |
 
 ## 🔐 Autenticação
 
@@ -266,11 +344,6 @@ Versão atual: **0.2.4-SNAPSHOT**
 ## 📄 Licença
 
 Este projeto está sob licença [MIT](LICENSE). Veja o arquivo LICENSE para detalhes.
-
-## 👨‍💻 Autor
-
-**Gustavo1282**  
-[GitHub](https://github.com/gustavo1282) | [LinkedIn](https://www.linkedin.com/in/gustavo-souza-68b34335/)
 
 ## 📞 Suporte
 

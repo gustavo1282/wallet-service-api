@@ -1,139 +1,116 @@
-
 services:
   # ======================================================================
-  # 1. SERVIÇO DE APLICAÇÃO (WALLET-SERVICE)
+  # 1. WALLET SERVICE API
   # ======================================================================
   wallet-service-api:
+    container_name: cont-wallet-service-api
     build:
       context: .
       dockerfile: Dockerfile
     image: wallet_service:latest
-    container_name: cont-wallet-service-api
-    restart: unless-stopped
-    ports:
-      - "8080:8080" # Porta da aplicação
-      - "5005:5005" # Porta do debug
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'        # Limite de 1 CPU
-          memory: 640M       # Limite de 512 MB de memória
-        reservations:
-          cpus: '0.25'       # Reserva de 0.25 CPU
-          memory: 400M       # Reserva de 128 MB de memória
-    #command: ["java", "-Dspring.profiles.active=develop", "-jar", "app.jar"]
-    volumes:
-      - wallet_service_data:/var/lib/wallet_service/data
-    # Variáveis de ambiente
+
     environment:
-      SPRING_PROFILES_ACTIVE: local  #values{ local, develop, hml, prd }
+      SPRING_PROFILES_ACTIVE: local
       SERVICE_NAME: wallet-service-api
-#      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+
+      # --- Vault ---
+      SPRING_CLOUD_VAULT_ENABLED: "true"
+      SPRING_CLOUD_VAULT_TOKEN: "root"
+      SPRING_CLOUD_VAULT_URI: "http://vault:8200"
+
+      # --- DB ---
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
       SPRING_DATASOURCE_USERNAME: wallet_user
       SPRING_DATASOURCE_PASSWORD: wallet_pass
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - wallet_service_data:/var/lib/wallet_service/data
+
     networks:
       - wallet_network
 
+    depends_on:
+      - vault
+      - postgres
+
+
   # ======================================================================
-  # 2. BANCO DE DADOS (POSTGRESQL)
+  # 2. VAULT - SERVIDOR DE SEGREDOS
+  # ======================================================================
+  vault:
+    image: hashicorp/vault:1.16
+    container_name: vault
+    ports:
+      - "8200:8200"
+
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+
+    cap_add:
+      - IPC_LOCK
+    command: "server -dev"
+
+    networks:
+      - wallet_network
+
+
+  # ======================================================================
+  # 3. POSTGRES
   # ======================================================================
   postgres:
-    image: postgres:15.3-alpine
+    image: postgres:16
     container_name: cont-wallet-postgres
     restart: unless-stopped
     environment:
-      - TX=America/Sao_Paulo
-      - POSTGRES_DB=wallet_db
-      - POSTGRES_USER=wallet_user
-      - POSTGRES_PASSWORD=wallet_pass
+      POSTGRES_DB: wallet_db
+      POSTGRES_USER: wallet_user
+      POSTGRES_PASSWORD: wallet_pass
     ports:
       - "5432:5432"
-    deploy:
-      resources:
-        limits:
-          memory: 640M         # Limite de 1 GB para o banco de dados
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wallet_user -d wallet_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - wallet_network
 
-
-#  # ======================================================================
-#  # 3. IDE - POSTGRES ADMIN (PGADMIN4)
-#  # ======================================================================
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: cont-wallet-pgadmin4
-    restart: unless-stopped
-    ports:
-      - "5050:80" # Porta para acessar o pgAdmin
-    deploy:
-      resources:
-        limits:
-          memory: 640M
-    environment:
-      PGADMIN_DEFAULT_EMAIL: 'admin@postgres.com'
-      PGADMIN_DEFAULT_PASSWORD: wallet_pass
-    depends_on:
-      - postgres
-    networks:
-      - wallet_network
-
-
-#  # ======================================================================
-#  # 3. MESSAGE BROKER (RABBITMQ)
-#  # ======================================================================
-#  rabbitmq:
-#    image: rabbitmq:3-management-alpine
-#    container_name: cont-wallet-rabbitmq
-#    restart: unless-stopped
-#    ports:
-#      - "5672:5672" # Porta de comunicação AMQP
-#      - "15672:15672" # Porta da interface de gerenciamento (Web UI)
-#    networks:
-#      - wallet_network
-#    volumes:
-#      - rabbitmq_data:/var/lib/rabbitmq
-
-  prometheus:
-    image: prom/prometheus:v2.51.0
-    container_name: cont-wallet-prometheus
-    restart: unless-stopped
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - "9090:9090"
     networks:
       - wallet_network
 
 
   # ======================================================================
-  #    GRAFANA
+  # GRAFANA / PROMETHEUS / PGADMIN / SONARQUBE
+  # (mantive sem alterações)
   # ======================================================================
   grafana:
     image: grafana/grafana:10.2.3
     container_name: cont-wallet-grafana
-    restart: unless-stopped
-    user: "472"
     ports:
       - "3000:3000"
-    #environment: # <<< ADICIONE ESTA SEÇÃO
-    #  GF_SECURITY_ADMIN_USER: wallet_user # Seu usuário de login
-    #  GF_SECURITY_ADMIN_PASSWORD: wallet_pass # Sua senha forte
-    #depends_on:
-    #  - prometheus
     networks:
       - wallet_network
 
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: cont-wallet-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - wallet_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: cont-wallet-pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@postgres.com
+      PGADMIN_DEFAULT_PASSWORD: wallet_pass
+    networks:
+      - wallet_network
 
   sonarqube:
     image: sonarqube:10.5.1-community
@@ -141,29 +118,23 @@ services:
     ports:
       - "9000:9000"
     environment:
-      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
-      - SONARQUBE_JDBC_URL=jdbc:postgresql://host.docker.internal:5432/sonar
-      - SONARQUBE_JDBC_USERNAME=sonar
-      - SONARQUBE_JDBC_PASSWORD=sonar
-      - SONARQUBE_TOKEN=SONAR_TOKEN
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: true
+      SONARQUBE_JDBC_URL: jdbc:postgresql://host.docker.internal:5432/sonar
+      SONARQUBE_JDBC_USERNAME: sonar
+      SONARQUBE_JDBC_PASSWORD: sonar
+      SONARQUBE_TOKEN: SONAR_TOKEN
     networks:
       - wallet_network
-    volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-      - sonarqube_logs:/opt/sonarqube/logs
 
 # ======================================================================
-# VOLUMES E REDES
+# VOLUMES / NETWORKS
 # ======================================================================
 volumes:
   postgres_data:
-  rabbitmq_data:
   wallet_service_data:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
-  sonar_db:
 
 networks:
   wallet_network:

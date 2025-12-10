@@ -55,6 +55,8 @@ public class LoginAuth {
     @Column(name = "access_key", nullable = false, length = 256)
     private String accessKey;
 
+    @Column(name = "access_key_open", nullable = false, length = 256)
+    private String accessKeyOpen;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = GlobalHelper.PATTERN_FORMAT_DATE_TIME)
     @Column(name = "created_at", nullable = false)
