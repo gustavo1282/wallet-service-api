@@ -32,6 +32,11 @@ springdoc:
 spring:
   application:
     name: wallet-service-api
+  cloud:
+    vault:
+      enabled: false
+    compatibility-verifier:
+      enabled: false
   data:
     web:
       pageable:
@@ -112,3 +117,7 @@ logging:
     org.springframework.orm.jpa: warn
     org.springframework.transaction: warn
     org.springframework.security: warn # Mantém a segurança em INFO (nível padrão para evitar flood)
+
+jwt:
+  secret: 'CHAVE_SECRETA_MOCK_PARA_TESTES_DE_INTEGRACAO'
+  # Você pode usar a mesma frase do seu .env aqui, se quiser consistência.

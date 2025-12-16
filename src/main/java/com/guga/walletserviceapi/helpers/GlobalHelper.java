@@ -1,7 +1,14 @@
 package com.guga.walletserviceapi.helpers;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +46,30 @@ public class GlobalHelper {
             "/v3/api-docs/**"
             );
         return matchers;
+    }
+
+    public static Map<String, String> jwtTokens(String token) {
+        String accessToken = "mock-access-token." + UUID.randomUUID().toString();
+        String refreshToken = "mock-refresh-token." + UUID.randomUUID().toString();
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("mock-access-token", accessToken);
+        tokens.put("mock-refresh-token", refreshToken);
+
+        return tokens;
+    }
+
+    public static long convertLocalDateTimeToMillis() {
+        
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
+
+        ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
+
+        Instant instant = zonedDateTime.toInstant();
+
+        return instant.toEpochMilli();
     }
 
 }

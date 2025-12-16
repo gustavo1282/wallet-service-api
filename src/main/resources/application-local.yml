@@ -31,13 +31,6 @@ spring:
   ##spring.main.allow-circular-references: true
   application:
     name: wallet-service-api
-  cloud:
-    compatibility-verifier.enabled: false
-    vault:
-      kv:
-        enabled: true
-        backend: secret
-        version: 2
   data:
     web:
       pageable:
@@ -45,7 +38,6 @@ spring:
         max-page-size: 25
         page-parameter: page
         size-parameter: size
-
   datasource:
     ### Propriedades específicas do H2
     #url: jdbc:h2:file:./data/db_wallet;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
@@ -102,16 +94,3 @@ management:
     health:
       show-details: always
 
-logging:
-  level:
-    # Nível mais alto (TRACE/DEBUG) para detalhar a causa raiz do erro de persistência
-    # (Este é o foco para debugar o erro de JPA/Hibernate)
-    org.hibernate.engine.jdbc.spi: warn 
-    org.hibernate.orm.jdbc.batch: warn # Detalhes sobre a execução do batch JDBC
-    org.hibernate.SQL: warn          # Mostra as queries SQL geradas
-
-    # Nível DEBUG para a camada de transação do Spring e JPA
-    org.springframework.orm.jpa: warn
-    org.springframework.transaction: warn
-    org.springframework.security: warn # Mantém a segurança em INFO (nível padrão para evitar flood)
-    org.springframework.cloud: DEBUG 

@@ -136,7 +136,7 @@ public class TransactionControllerTests {
         void setUp() throws JsonProcessingException {
                 Mockito.reset(transactionService);
                 MockitoAnnotations.openMocks(this);
-                URI_API = BASE_PATH.concat(API_NAME);
+                URI_API = BASE_PATH + API_NAME;
 
                 objectMapper = FileUtils.instanceObjectMapper();
 
@@ -393,8 +393,7 @@ public class TransactionControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(withdrawMoney)))
                                 .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                                .andDo(result -> System.out
-                                                .println("Body: " + result.getResponse().getContentAsString()))
+                                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
                                 .andExpect(status().isCreated())
                                 .andExpect(header().exists("Location"))
                                 .andExpect(jsonPath("$.transactionId").value(withdrawMoney.getTransactionId()))

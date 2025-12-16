@@ -2,6 +2,9 @@ package com.guga.walletserviceapi.controller;
 
 import java.net.URI;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,12 +24,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.guga.walletserviceapi.logging.LogMarkers;
+import com.guga.walletserviceapi.model.AuditContext;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.service.CustomerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +42,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerController {
 
+    private static final Logger logger =
+            LogManager.getLogger(CustomerController.class);
+            
     private final CustomerService customerService;
 
     @Value("${spring.data.web.pageable.default-page-size}")
@@ -45,10 +54,27 @@ public class CustomerController {
     @Operation(summary = "Create a new Customer", description = "Creates a new Customer with the data provided in the request body.")
     @PostMapping("/customer")
     public ResponseEntity<Customer> createCustomer(
-        @RequestBody Customer customer
+        @RequestBody Customer customer,
+        HttpServletRequest httpRequest
         ) 
     {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        AuditContext auditContext = AuditContext.builder()
+            .sessionId(httpRequest.getSession().getId())
+            .userAgent(httpRequest.getHeader("User-Agent"))
+            .ipAddress(httpRequest.getRemoteAddr())
+            .username(authentication.getName())
+            .build();
+
+        // 🧭 LOG + TRACE
+        logger.info(LogMarkers.LOG,
+                "Request received to create customer | user={}", auditContext.getUsername());
+
+        // 🛡️ AUDIT (entrada)
+        logger.info(LogMarkers.AUDIT,
+                "CREATE_CUSTOMER_START | auditContext={}", auditContext);
 
         Customer createdCustomer = customerService.saveCustomer(customer);
 
@@ -58,7 +84,13 @@ public class CustomerController {
                 .buildAndExpand(createdCustomer.getCustomerId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(createdCustomer);
+        // 🛡️ AUDIT (resultado)
+        logger.info(LogMarkers.AUDIT,
+                "CREATE_CUSTOMER_SUCCESS | customerId={}", createdCustomer.getCustomerId());
+
+        return ResponseEntity.created(location)
+            .header("X-Trace-Id", ThreadContext.get("traceId"))
+            .body(createdCustomer);
     }
 
 

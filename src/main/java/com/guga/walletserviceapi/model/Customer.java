@@ -27,6 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @JsonPropertyOrder({
@@ -40,6 +41,7 @@ import lombok.Setter;
 @EqualsAndHashCode(of = "customerId")
 @Entity
 @Table(name = "tb_customer")
+@ToString
 public class Customer {
 
     @Id
@@ -51,7 +53,6 @@ public class Customer {
     @Column(name = "documentId", nullable = false, length = 20)
     private String documentId;
     
-
     @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$", message = "CPF field is required")
     @Column(name = "cpf", unique = true, nullable = false, length = 20)
     private String cpf;
@@ -106,15 +107,9 @@ public class Customer {
     @Column(name = "status", nullable = false, length = 2)
     private Status status;
     
-    
+    @ToString.Exclude
     @Column(name = "login_auth_id_fk",  nullable = true, insertable = true, updatable = true)
     private Long loginAuthId;
-
-
-    //@Schema(description = "LoginAuth associated with the Customer", accessMode = Schema.AccessMode.READ_ONLY)
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "login_auth_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    //private LoginAuth loginAuth;
 
 
 }

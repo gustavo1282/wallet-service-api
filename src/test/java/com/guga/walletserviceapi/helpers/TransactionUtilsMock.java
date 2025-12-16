@@ -156,7 +156,6 @@ public class TransactionUtilsMock {
                     .loginAuthType(loginAuthType)
                     .createdAt(customer.getCreatedAt())
                     .updatedAt(customer.getCreatedAt())
-                    .loginAuthType(loginAuthType)
                     .build()
             );
         }

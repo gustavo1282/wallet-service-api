@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: wallet-service-api
+  cloud:
+    # A linha 'import' diz ao Spring para buscar propriedades no Vault
+    # Geralmente, em DEV, você define o import aqui.
+    config:
+      import: optional:vault://
+    
+    vault:
+      host: ${spring.cloud.vault.uri}    # Não está no seu arquivo, mas é necessário!
+      port: 8200
+      scheme: http
+      authentication: TOKEN # ou AppRole, etc.
+      token: ${spring.cloud.vault.token}
+      kv:
+        enabled: true
+        backend: secret
+        version: 2
+      config:
+        enabled: true
+        # Se você usar profiles, o Vault buscará em: secret/wallet-service-api/local
+        generic:
+          default-context: secret/wallet-service-api
+          profile-separator: '/'
+
+# --- Configuração da Chave JWT (fallback local) ---
+# Se o Vault falhar ou não for usado, esta propriedade é um fallback.
+# A aplicação tentará primeiro carregar do Vault, se falhar, usará o valor do .env.
+# Como o Spring Cloud Config (que carrega o Vault) é carregado antes, essa é uma forma segura de
+# injetar o valor para desenvolvimento sem expor no Git.
+jwt:
+  secret: ${jwt.secret}

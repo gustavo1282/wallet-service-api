@@ -7,26 +7,29 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import jakarta.servlet.ServletException;
 
-// Use @SpringBootTest para carregar o contexto completo (incluindo o filtro)
+@ActiveProfiles("test")
+@WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
 @SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
 public class JwtAuthenticationFilterIntegrationTest {
 
     // Injeta o filtro real que queremos testar
-    @Autowired
+    @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     // Substitui o JwtService real por um mock no contexto do teste
-    @MockBean
+    @MockitoBean
     private JwtService jwtService;
 
     @Test

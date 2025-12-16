@@ -1,8 +1,5 @@
 package com.guga.walletserviceapi.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.service.LoginAuthService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,7 +30,11 @@ public class AuthController {
     private JwtService jwtService;
 
     @Autowired
-    private AuthenticationManager authenticationManager; // Requer bean configurado no SecurityConfig
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private LoginAuthService loginAuthService;
+
 
     // DTO simples para login
     public static class LoginRequest {
@@ -61,16 +64,15 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtService.generateAccessToken(request.username);
-        String refreshToken = jwtService.generateRefreshToken(request.password);
+        String refreshToken = jwtService.generateRefreshToken(request.username);
 
         return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody LoginRequest request) {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "User registration logic pending implementation in a Service class.");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> register(@Valid @RequestBody LoginRequest request) {
+        LoginAuth loginAuth = loginAuthService.register(request.username, request.password);
+        return ResponseEntity.ok( loginAuth );
     }
 
     @PostMapping("/refresh")

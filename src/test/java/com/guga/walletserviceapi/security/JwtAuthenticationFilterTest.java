@@ -1,26 +1,43 @@
 package com.guga.walletserviceapi.security;
 
+import static org.mockito.ArgumentMatchers.anyString;
 // Importação estática para métodos 'when' e 'thenReturn'
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
+import com.guga.walletserviceapi.service.LoginAuthService;
+
+@ActiveProfiles("test")
+@WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
+@WebMvcTest(JwtAuthenticationFilter.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class JwtAuthenticationFilterTest {
 
-    // Simula o serviço JWT
-    @Mock
-    private JwtService jwtService;
+	@MockitoBean
+	private JwtService jwtService;
 
-    // Injeta o mock acima no filtro que estamos testando
-    @InjectMocks
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+	@MockitoBean
+	private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+	@MockitoBean
+	private LoginAuthService loginAuthService;
+
+	@Autowired
+	private MockMvc mockMvc;
+
 
     @BeforeEach
     public void setUp() {
@@ -37,10 +54,10 @@ public class JwtAuthenticationFilterTest {
 
         // >>> CONFIGURAÇÃO DA SIMULAÇÃO (MOCKING) <<<
         // Quando validateToken for chamado com "token_valido_mock", retorne TRUE
-        when(jwtService.validateToken("token_valido_mock")).thenReturn(true);
+        when(jwtService.validateToken(anyString())).thenReturn(true);
         
         // Quando extractUsername for chamado, retorne "testuser"
-        when(jwtService.extractUsername("token_valido_mock")).thenReturn("testuser");
+        when(jwtService.extractUsername(anyString())).thenReturn("testuser");
 
         // Execute o filtro
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);

@@ -12,7 +12,6 @@ import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.repository.LoginAuthRepository;
 import com.guga.walletserviceapi.security.JwtService;
 
-
 @Service
 public class LoginAuthService implements UserDetailsService {
 
@@ -26,17 +25,20 @@ public class LoginAuthService implements UserDetailsService {
     private JwtService jwtService;
 
 
-    public LoginAuth register(LoginAuth newUser) {
+    public LoginAuth register(String username, String password) {
+        // 1. Busque o usuário no seu banco de dados
+        LoginAuth loginAuth = loginAuthRepository.findByLogin(username)
+            .orElseThrow(() -> new UsernameNotFoundException("Login não encontrado: " + username));
+
         // Criptografa a senha (AccessKey) antes de salvar
-        String encodedPassword = passwordEncoder.encode(newUser.getAccessKey());
-        newUser.setAccessKey(encodedPassword);
+        String encodedPassword = passwordEncoder.encode(loginAuth.getAccessKey());
+        loginAuth.setAccessKey(encodedPassword);
 
         // Salva o usuário no banco de dados com a senha criptografada
-        return loginAuthRepository.save(newUser);
+        return loginAuthRepository.save(loginAuth);
     }
 
     public String login(LoginAuth loginAuth) {
-
         return jwtService.generateAccessToken(loginAuth.getLogin());
     }
 

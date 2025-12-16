@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +42,9 @@ import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.service.LoginAuthService;
 import com.guga.walletserviceapi.service.WalletService;
 
 import net.datafaker.Faker;
@@ -54,6 +58,15 @@ class WalletControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+	@MockitoBean
+	private JwtService jwtService;
+
+	@MockitoBean
+	private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+	@MockitoBean
+	private LoginAuthService loginAuthService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -78,10 +91,17 @@ class WalletControllerTests {
     void before() {
         Mockito.reset(walletService);
         faker = new Faker(new Locale("pt-BR"));
-        customers = (List<Customer>)TransactionUtilsMock.createCustomerListMock();
+        customers = generateCustomersMock();
         wallets = TransactionUtilsMock.createWalletListMock( customers );
-        URI_API = BASE_PATH.concat(API_NAME);
+        URI_API = BASE_PATH + API_NAME;
     }
+
+    @Cacheable(value = "customers", key = "#customersMock")
+        private List<Customer> generateCustomersMock() {
+                return (List<Customer>)TransactionUtilsMock.createCustomerListMock();
+        }
+
+
 
     @Test
     @DisplayName("Deve retornar 201 - Criar novo Wallet")
@@ -126,9 +146,8 @@ class WalletControllerTests {
         mockMvc.perform(get(URI_API.concat("/list"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-
-                .andExpect(jsonPath("$[2].walletId",
-                        is( mockPage.getContent().get(2).getWalletId().intValue() )))
+                .andExpect(jsonPath("$.content").exists())                
+                .andExpect(jsonPath("$.page.totalElements").value(mockPage.getContent().size()));
         ;
 
     }
