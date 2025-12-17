@@ -5,11 +5,10 @@ import org.apache.logging.log4j.MarkerManager;
 
 public final class LogMarkers {
 
-    private LogMarkers() {
-        // impede instanciação
-    }
+    private LogMarkers() { }
 
     public static final Marker LOG   = MarkerManager.getMarker("LOG");
     public static final Marker TRACE = MarkerManager.getMarker("TRACE");
     public static final Marker AUDIT = MarkerManager.getMarker("AUDIT");
+
 }

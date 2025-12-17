@@ -42,9 +42,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerController {
 
-    private static final Logger logger =
-            LogManager.getLogger(CustomerController.class);
-            
+    private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
+
     private final CustomerService customerService;
 
     @Value("${spring.data.web.pageable.default-page-size}")
@@ -58,6 +57,7 @@ public class CustomerController {
         HttpServletRequest httpRequest
         ) 
     {
+        String traceId = ThreadContext.get("traceId");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -66,15 +66,21 @@ public class CustomerController {
             .userAgent(httpRequest.getHeader("User-Agent"))
             .ipAddress(httpRequest.getRemoteAddr())
             .username(authentication.getName())
+            .traceId(traceId)
             .build();
 
-        // 🧭 LOG + TRACE
-        logger.info(LogMarkers.LOG,
-                "Request received to create customer | user={}", auditContext.getUsername());
+        // LOG FUNCIONAL (application.log)
+        LOGGER.info(LogMarkers.LOG, "Create customer request received | user={} traceId={}",
+            auditContext.getUsername(),
+            traceId
+        );
 
-        // 🛡️ AUDIT (entrada)
-        logger.info(LogMarkers.AUDIT,
-                "CREATE_CUSTOMER_START | auditContext={}", auditContext);
+
+        LOGGER.info(LogMarkers.AUDIT, "CREATE_CUSTOMER_START | user={} ip={} traceId={}",
+            auditContext.getUsername(),
+            auditContext.getIpAddress(),
+            traceId
+        );
 
         Customer createdCustomer = customerService.saveCustomer(customer);
 
@@ -84,9 +90,11 @@ public class CustomerController {
                 .buildAndExpand(createdCustomer.getCustomerId())
                 .toUri();
 
-        // 🛡️ AUDIT (resultado)
-        logger.info(LogMarkers.AUDIT,
-                "CREATE_CUSTOMER_SUCCESS | customerId={}", createdCustomer.getCustomerId());
+        LOGGER.info(LogMarkers.LOG, "CREATE_CUSTOMER_SUCCESS | customerId={} user={} traceId={}",
+            createdCustomer.getCustomerId(),
+            auditContext.getUsername(),
+            traceId
+        );
 
         return ResponseEntity.created(location)
             .header("X-Trace-Id", ThreadContext.get("traceId"))

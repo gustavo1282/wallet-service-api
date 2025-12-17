@@ -28,8 +28,10 @@ target/
 # Arquivos de log e cache
 *.log
 log/
+logs/
 tmp/
 temp/
+data/seed/
 
 # Arquivos de banco de dados H2 (Causadores de conflito)
 *.mv.db

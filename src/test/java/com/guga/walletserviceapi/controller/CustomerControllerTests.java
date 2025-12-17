@@ -15,6 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
+import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
@@ -54,7 +57,7 @@ class CustomerControllerTests {
 	// Objeto usado para simular chamadas HTTP
 	@Autowired
 	private MockMvc mockMvc;
-
+	
 	@MockitoBean
 	private JwtService jwtService;
 
@@ -67,14 +70,16 @@ class CustomerControllerTests {
 	// Converte objetos Java para JSON e vice-versa
 	@Autowired
 	private ObjectMapper objectMapper;
-
+	
 	@MockitoBean
 	private CustomerService customerService;
-
+	
 	private static final String API_NAME = "/customers";
-
+	
+	private static final Logger LOGGER = LogManager.getLogger(CustomerControllerTests.class);
+	
 	private String URI_API;
-
+	
 	private Faker faker;
 
 	private List<Customer> customers;
@@ -100,7 +105,11 @@ class CustomerControllerTests {
 	@Test
 	@DisplayName("Deve retornar 201 Created ao criar um Customer com sucesso")
 	void shouldReturn201_WhenCreateNewCustomer() throws Exception {
-		// Arrange
+
+		LOGGER.info(LogMarkers.AUDIT, "Sua mensagem | AUDIT | CustomerControllerTests | Test");
+
+		LOGGER.info(LogMarkers.LOG, "Sua mensagem | LOG | CustomerControllerTests | Test");
+
 		Customer customerRef = customers.get(RandomMock.generateIntNumberByInterval(0, customers.size() - 1));
 		Customer customerNew = customerRef.toBuilder().build();
 
