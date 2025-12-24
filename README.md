@@ -61,10 +61,22 @@ mvnw.cmd spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=l
 
 ### 4. Acessar a Aplicação
 
+Após subir os serviços com `docker-compose up -d`, acesse:
+
+#### Aplicação Principal
 - **API Principal**: [http://localhost:8080/wallet-service-api/api](http://localhost:8080/wallet-service-api/api)
 - **Swagger UI**: [http://localhost:8080/wallet-service-api/swagger-ui.html](http://localhost:8080/wallet-service-api/swagger-ui.html)
 - **Health Check**: [http://localhost:8080/wallet-service-api/actuator/health](http://localhost:8080/wallet-service-api/actuator/health)
-- **Métricas Prometheus**: [http://localhost:8080/wallet-service-api/actuator/prometheus](http://localhost:8080/wallet-service-api/actuator/prometheus)
+- **Métricas Prometheus (da app)**: [http://localhost:8080/wallet-service-api/actuator/prometheus](http://localhost:8080/wallet-service-api/actuator/prometheus)
+
+#### Observabilidade
+- **Prometheus**: [http://localhost:9090](http://localhost:9090) (Métricas coletadas)
+- **Grafana**: [http://localhost:3000](http://localhost:3000) (Dashboards visuais; login: admin/admin)
+- **Jaeger**: [http://localhost:16686](http://localhost:16686) (Visualização de traces)
+- **OpenTelemetry Collector**: [http://localhost:8889/metrics](http://localhost:8889/metrics) (Métricas do collector)
+
+#### Banco de Dados
+- **PgAdmin**: [http://localhost:5050](http://localhost:5050) (Interface web para PostgreSQL; login: admin@postgres.com / wallet_pass)
 
 ## 🏗️ Estrutura do Projeto
 
@@ -109,6 +121,10 @@ wallet-service-api/
 | PostgreSQL | 15.3+ | Banco de dados produção |
 | Springdoc OpenAPI | 2.8.0 | Documentação API |
 | Micrometer/Prometheus | Latest | Métricas e observabilidade |
+| Micrometer Tracing | Latest | Tracing automático via Spring Boot |
+| OpenTelemetry Collector | 0.99.0 | Coleta e processamento de traces/métricas |
+| Jaeger | 1.60 | Visualização de traces distribuídos |
+| Grafana | 10.2.3 | Dashboards de monitoramento |
 | Lombok | 1.18.30 | Redução de boilerplate |
 | JaCoCo | 0.8.12 | Cobertura de testes |
 | SonarQube | 3.10.0 | Análise de código |
