@@ -159,6 +159,27 @@ docker stats
 
 ---
 
+## 4️⃣ Serviços de Observabilidade
+
+A stack inclui serviços para monitoramento e tracing:
+
+- **Prometheus** (porta 9090): Métricas em http://localhost:9090
+- **Grafana** (porta 3000): Dashboards em http://localhost:3000 (login: admin/admin)
+- **Jaeger** (porta 16686): Traces em http://localhost:16686
+- **OpenTelemetry Collector** (portas 4317/4318/8889): Recebe traces e gera métricas
+
+### ▶️ Subir apenas observabilidade
+```bash
+docker-compose up -d prometheus grafana jaeger otel-collector
+```
+
+### 🧹 Limpar apenas observabilidade
+```bash
+docker-compose down prometheus grafana jaeger otel-collector
+```
+
+---
+
 ## 💡 Dica de Ouro (2025)
 
 Sempre que ocorrer:

@@ -14,7 +14,29 @@ Documentação sobre logs, métricas, health checks e monitoramento do Wallet Se
 └──────────────────────────────────────────┘
 ```
 
-## 📝 Logs
+## � Stack de Observabilidade Containerizada
+
+A partir da versão 0.2.4, a observabilidade é totalmente containerizada via Docker Compose, incluindo:
+
+- **Prometheus** (porta 9090): Coleta métricas da aplicação e OTel Collector.
+- **Grafana** (porta 3000): Dashboards visuais para métricas e traces.
+- **Jaeger** (porta 16686): Visualização de traces distribuídos.
+- **OpenTelemetry Collector** (portas 4317/4318/8889): Recebe traces via OTLP, gera métricas spanmetrics e exporta para Jaeger/Prometheus.
+
+**Arquivo:** `docker-compose.yml`
+
+**Subir a stack:**
+```bash
+docker-compose up -d prometheus grafana jaeger otel-collector
+```
+
+**Acessar:**
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000 (admin/admin)
+- Jaeger: http://localhost:16686
+- OTel Collector métricas: http://localhost:8889/metrics
+
+## �📝 Logs
 
 ### Configuração de Logging
 
@@ -217,6 +239,14 @@ jvm_gc_memory_allocated_bytes     # Total alocado
 jvm_gc_memory_promoted_bytes      # Promovido para old gen
 ```
 
+#### Métricas de Traces (Spanmetrics)
+
+```
+traces_span_metrics_calls_total              # Total de spans por serviço/span
+traces_span_metrics_duration_milliseconds_count  # Contagem de durações de spans
+traces_span_metrics_duration_milliseconds_sum    # Soma das durações de spans
+```
+
 #### Métricas de HTTP
 
 ```
@@ -416,69 +446,81 @@ public class WalletHealthIndicator extends AbstractHealthIndicator {
 
 Acesso: `/actuator/health/walletHealth`
 
-## 🔗 Tracing Distribuído (Jaeger)
+## 🔗 Tracing Distribuído (OpenTelemetry + Jaeger)
 
-### Configuração
+### Configuração com OTel Collector
 
-**Dependência:**
+**Dependências em `pom.xml`:**
 ```xml
 <dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-tracing</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-tracing-bridge-otel</artifactId>
+</dependency>
+<dependency>
     <groupId>io.opentelemetry</groupId>
-    <artifactId>opentelemetry-exporter-jaeger</artifactId>
+    <artifactId>opentelemetry-exporter-otlp</artifactId>
 </dependency>
 ```
 
-**Arquivo:** `application.yml`
-
+**Arquivo:** `src/main/resources/application-local.yml`
 ```yaml
-otel:
-  exporter:
-    jaeger:
-      endpoint: http://localhost:14250
-  traces:
-    exporter: jaeger
+management:
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 ```
 
-### Implementar Tracing
+**Arquivo:** `otel-collector-config.yml`
+```yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
 
-```java
-@Service
-@Slf4j
-public class CustomerService {
-    
-    @Autowired
-    private Tracer tracer;
-    
-    public Customer saveCustomer(Customer customer) {
-        
-        Span span = tracer.spanBuilder("saveCustomer")
-            .setAttribute("customer.email", customer.getEmail())
-            .setAttribute("customer.cpf", maskCpf(customer.getCpf()))
-            .startSpan();
-        
-        try (Scope scope = span.makeCurrent()) {
-            
-            // Span adicional para validação
-            Span validateSpan = tracer.spanBuilder("validateCustomer")
-                .startSpan();
-            
-            try (Scope validateScope = validateSpan.makeCurrent()) {
-                validateCustomer(customer);
-            } finally {
-                validateSpan.end();
-            }
-            
-            return customerRepository.save(customer);
-            
-        } catch (Exception e) {
-            span.recordException(e);
-            throw e;
-        } finally {
-            span.end();
-        }
-    }
-}
+connectors:
+  spanmetrics:
+    namespace: traces_span_metrics
+    metrics_flush_interval: 15s
+    dimensions:
+      - name: http.method
+      - name: http.route
+      - name: http.status_code
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [spanmetrics, otlp/jaeger]
+    metrics:
+      receivers: [spanmetrics]
+      processors: [batch]
+      exporters: [prometheus]
 ```
+
+**Métricas de Traces Geradas:**
+- `traces_span_metrics_calls_total`: Contagem de spans.
+- `traces_span_metrics_duration_milliseconds_count`: Duração de spans.
+- Labels: `service_name`, `span_name`, `span_kind`, `http_method`, etc.
 
 ### Jaeger UI
 
@@ -559,21 +601,26 @@ public class CorrelationIdFilter implements Filter {
 
 ## 📊 Dashboards
 
-### Grafana (Optional)
+### Grafana com Dashboards OpenTelemetry
 
 Visualizar métricas Prometheus em tempo real.
 
+Importe os dashboards oficiais via ID no Grafana (http://localhost:3000 > Dashboards > Import):
+
+- **18860 - HTTP Metrics OpenTelemetry**: Métricas HTTP (requisições, latência).
+- **19419 - OpenTelemetry APM**: APM completo (throughput, erro rate, traces).
+- **15983 - OpenTelemetry Collector**: Saúde do OTel Collector.
+
+**Configuração:**
+- Data Source: Prometheus (http://prometheus:9090).
+- Para dashboard 19419: Adicione variável template "span_kind" (Query: `label_values(traces_span_metrics_calls_total, span_kind)`) para filtrar dinamicamente por tipo de span (ex.: SPAN_KIND_INTERNAL).
+
+**Executar Grafana:**
 ```bash
-# Executar Grafana
-docker run -d \
-  -p 3000:3000 \
-  --name grafana \
-  grafana/grafana
+docker-compose up -d grafana
 ```
 
 **Acessar:** http://localhost:3000 (admin/admin)
-
-**Adicionar Data Source:** http://localhost:9090
 
 ## 📋 Checklist de Observabilidade
 
@@ -586,6 +633,9 @@ docker run -d \
 - [ ] Dashboards criados
 - [ ] Retenção de logs definida
 - [ ] Planos de disaster recovery
+- [ ] OTel Collector configurado e rodando
+- [ ] Dashboards OpenTelemetry importados (18860, 19419, 15983)
+- [ ] Métricas spanmetrics coletadas no Prometheus
 
 ## 🔗 Referências
 
