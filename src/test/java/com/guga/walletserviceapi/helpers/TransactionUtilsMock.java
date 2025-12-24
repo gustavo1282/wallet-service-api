@@ -88,6 +88,8 @@ public class TransactionUtilsMock {
                 LocalDate birthDate = defineBirthDateMore18YearOld();
                 LocalDateTime dtCreatedAt = RandomMock.generatePastLocalDateTime(2);
                 String cellPhone = faker.phoneNumber().cellPhone();
+                String documentId = faker.idNumber().valid();
+                String cpf = faker.cpf().valid();
 
                 Customer customer = Customer.builder()
                     .customerId((long) (i + 1))
@@ -101,9 +103,9 @@ public class TransactionUtilsMock {
                             .concat( String.valueOf(birthDate.getMonthValue()) )
                             .concat( String.valueOf(birthDate.getYear()) )
                     ))
-                    .phoneNumber(faker.phoneNumber().cellPhone())
-                    .documentId(faker.idNumber().valid())
-                    .cpf(faker.cpf().valid())
+                    .phoneNumber(cellPhone)
+                    .documentId(documentId)
+                    .cpf(cpf)
                     .createdAt(dtCreatedAt)
                     .updatedAt(dtCreatedAt)
                     .loginAuthId(null)

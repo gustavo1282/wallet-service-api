@@ -524,11 +524,11 @@ kubectl apply -f k8s-deployment.yaml
 sleep 30
 
 # Health check
-curl -f http://localhost:8080/wallet-services-api/actuator/health \
+curl -f http://localhost:8080/wallet-service-api/actuator/health \
   || exit 1
 
 # Smoke test
-curl -X GET http://localhost:8080/wallet-services-api/actuator/info
+curl -X GET http://localhost:8080/wallet-service-api/actuator/info
 ```
 
 ### Blue-Green Deployment

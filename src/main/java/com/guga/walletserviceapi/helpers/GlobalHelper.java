@@ -4,9 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,20 +31,25 @@ public class GlobalHelper {
             );
     }
 
-    public static List<String> matchers() {
-        List<String> matchers = Arrays.asList(
-            "/actuator/**",
-            "/wallet-services-api/api/auth/login",
-            "/api/auth/login",
-            "/api/auth/register",
-            "/api/auth/refresh",
-            "/h2-console/**",
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/v3/api-docs/**"
-            );
-        return matchers;
-    }
+    // public static List<String> matchers() {
+    //     List<String> matchers = Arrays.asList(
+    //         "/actuator/**",
+    //         "/api/auth/login",
+    //         "/api/auth/login",
+    //         "/api/auth/register",
+    //         "/api/auth/refresh",
+    //         "/swagger-ui/index.html",
+    //         "/h2-console/**"
+    //         /*
+    //         "/v3/api-docs/**",
+    //         "/v3/api-docs/v1/**",
+    //         "/swagger-ui/**",
+    //         "/swagger-ui.html",
+    //          */
+    //         );
+    //     return matchers;
+    //}
+    
 
     public static Map<String, String> jwtTokens(String token) {
         String accessToken = "mock-access-token." + UUID.randomUUID().toString();

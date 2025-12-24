@@ -1,8 +1,10 @@
 package com.guga.walletserviceapi.config;
 
 import java.util.Arrays;
-import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
+import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,20 +12,18 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
-import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
+
+    @Autowired
+    private SecurityMatchers matchers;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -48,18 +48,23 @@ public class SpringSecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(publicMatchers()).permitAll()
+                    // 1. Libera tudo que você definiu como público/doc no seu YAML
+                    .requestMatchers(matchers.getPublicPaths()).permitAll()
+                    .requestMatchers(matchers.getDocumentation()).permitAll()
+
+                    // 2. Restringe o Monitoramento (Ex: exige role MONITOR)
+                    //.requestMatchers(matchers.getMonitor()).hasRole("MONITOR")
+                    .requestMatchers(matchers.getMonitor()).hasAnyRole("MONITOR", "ADMIN")
+                    .requestMatchers(matchers.getAdmin()).hasRole("ADMIN")
+
+                    // 3. Todo o resto da API de Wallet exige JWT
                     .anyRequest().authenticated()
+
                 )
-                
+                //.httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 
                 .build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -67,11 +72,9 @@ public class SpringSecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    private RequestMatcher[] publicMatchers() {
-        List<String> matchers = GlobalHelper.matchers();
-
-        return matchers.stream()
-                .map(AntPathRequestMatcher::antMatcher)
-                .toArray(RequestMatcher[]::new);
+    @Bean
+    public HttpExchangeRepository httpExchangeRepository() {
+        return new InMemoryHttpExchangeRepository();
     }
+
 }

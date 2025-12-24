@@ -25,12 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.logging.LogMarkers;
-import com.guga.walletserviceapi.model.AuditContext;
 import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.dto.AuditLogContext;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.service.CustomerService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -39,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("${controller.path.base}/customers")
 @Tag(name = "Customer", description = "Endpoints for managing customers")
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class CustomerController {
 
@@ -57,11 +59,12 @@ public class CustomerController {
         HttpServletRequest httpRequest
         ) 
     {
+    
         String traceId = ThreadContext.get("traceId");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        AuditContext auditContext = AuditContext.builder()
+        AuditLogContext auditContext = AuditLogContext.builder()
             .sessionId(httpRequest.getSession().getId())
             .userAgent(httpRequest.getHeader("User-Agent"))
             .ipAddress(httpRequest.getRemoteAddr())

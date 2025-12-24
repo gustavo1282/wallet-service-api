@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
@@ -52,41 +51,31 @@ public class OpenApiConfig {
                     """
                 )
             )
-            //.servers(List.of(
-            //    new Server().url(serverUrl)
-            //    )
-            //)
 
-            // 2. Adiciona o esquema de segurança aos componentes
-            .components(new Components()
-                /*.addSecuritySchemes(securitySchemeName,
-                    new SecurityScheme()
-                        .type(SecurityScheme.Type.HTTP)
-                        .in(SecurityScheme.In.HEADER)
-
-                        .name(securitySchemeName)
-                        .scheme("basic")
-                ) */
-                .addSecuritySchemes("bearerAuth",
+            .components(
+                new Components()
+                    .addSecuritySchemes("bearerAuth",
                         new SecurityScheme()
-                                .name("bearerAuth")
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT"))
+                            .name("bearerAuth")
+                            .type(SecurityScheme.Type.HTTP)
+                            .scheme("bearer")
+                            .bearerFormat("JWT")
+                    )
             )
 
-            // 3. Aplica este esquema de segurança globalmente a TODOS os endpoints
-            // .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));
-            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+            // ADICIONE ESTA LINHA PARA ATIVAR O TOKEN NO SWAGGER
+            //.addSecurityItem(new SecurityRequirement().addList("bearerAuth"))            
 
+            ;        
     }
 
     @Bean
     public GroupedOpenApi apiV1() {
-    return GroupedOpenApi.builder()
-        .group("v1")
-        .pathsToMatch("/api/v1/**")
-        .build();
+        return GroupedOpenApi.builder()
+            .group("v1")
+            .pathsToMatch("/**")  // Alterar de "/api/v1/**" para "/**" para incluir todos os paths
+            .addOpenApiCustomizer(openApi -> openApi.info(new Info().title("Wallet API - V1")))
+            .build();
     }
 
 }

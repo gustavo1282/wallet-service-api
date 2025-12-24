@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.config.SecurityMatchers;
 import com.guga.walletserviceapi.service.LoginAuthService;
 
 import jakarta.servlet.FilterChain;
@@ -28,16 +29,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtService jwtService;
 
     @Autowired
+    @Lazy
     private LoginAuthService loginAuthService;
+
+    @Autowired
+    @Lazy
+    private SecurityMatchers matchers;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {  
-        List<String> patterns = GlobalHelper.matchers();
 
-        // 1. Obter a URI COMPLETA da requisição (ex: /wallet-services-api/api/auth/login)
+        // 1. Obter a URI COMPLETA da requisição (ex: /wallet-service-api/api/auth/login)
         String requestUri = request.getRequestURI(); 
         
-        // 2. Obter o Context Path (ex: /wallet-services-api)
+        // 2. Obter o Context Path (ex: /wallet-service-api)
         String contextPath = request.getContextPath(); 
         
         // 3. Remover o Context Path para obter a URI 'limpa' (ex: /api/auth/login)
@@ -65,8 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         };
 
-
         // Agora o AntPathRequestMatcher irá receber a requisição "limpa" e fazer o match corretamente
+        List<String> patterns = matchers.getAllMatchers();
+
         boolean isPublicUrl = patterns.stream()
             .anyMatch(pattern -> new AntPathRequestMatcher(pattern).matches(cleanedRequest));
 

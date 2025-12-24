@@ -279,7 +279,7 @@ public class TransactionService {
 
 ```bash
 # Endpoint de métricas
-curl http://localhost:8080/wallet-services-api/actuator/prometheus
+curl http://localhost:8080/wallet-service-api/actuator/prometheus
 
 # Exemplo de saída
 jvm_memory_used_bytes{area="heap"} 356147200
@@ -300,7 +300,7 @@ scrape_configs:
   - job_name: 'wallet-service-api'
     static_configs:
       - targets: ['localhost:8080']
-    metrics_path: '/wallet-services-api/actuator/prometheus'
+    metrics_path: '/wallet-service-api/actuator/prometheus'
 ```
 
 **Executar Prometheus:**

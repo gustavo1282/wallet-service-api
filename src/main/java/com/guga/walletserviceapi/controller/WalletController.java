@@ -24,12 +24,14 @@ import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.service.WalletService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("${controller.path.base}/wallets")
 @Tag(name = "Wallet", description = "Endpoints for managing wallets")
+@SecurityRequirement(name = "bearerAuth")
 public class WalletController {
 
     @Autowired

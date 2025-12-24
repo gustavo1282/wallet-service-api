@@ -27,11 +27,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("${controller.path.base}/wallet-operator")
-@Tag(name = "WalletOperator", description = "Endpoints for managing Wallet Operators")
+@Tag(name = "Wallet Operator", description = "Endpoints for wallet operations")
+@SecurityRequirement(name = "bearerAuth")
 public class WalletOperatorController {
 
     @Autowired

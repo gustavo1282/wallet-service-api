@@ -126,8 +126,8 @@ public class TransactionControllerTests {
 
         private List<LoginAuth> loginAuths;
 
-        private static boolean SAVE_JSON = true;
-        private static boolean LOAD_JSON = true;
+        private static boolean SAVE_JSON = false;
+        private static boolean LOAD_JSON = false;
 
         @Autowired 
         private PasswordEncoder passwordEncoder;

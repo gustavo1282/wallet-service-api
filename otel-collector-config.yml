@@ -1,0 +1,70 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+
+  # resource:  # Removido para usar o service.name definido pelo Spring Boot
+
+connectors:
+  spanmetrics:
+    namespace: traces_span_metrics
+    metrics_flush_interval: 15s
+
+    histogram:
+      explicit:
+        buckets:
+          - 5ms
+          - 10ms
+          - 25ms
+          - 50ms
+          - 100ms
+          - 250ms
+          - 500ms
+          - 1s
+          - 2s
+          - 5s
+
+    dimensions:
+      - name: http.method
+      - name: http.route
+      - name: http.status_code
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [spanmetrics, otlp/jaeger, debug]
+
+    metrics:
+      receivers: [spanmetrics, otlp]
+      processors: [batch]
+      exporters: [prometheus, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+
+  telemetry:
+    metrics:
+      address: 0.0.0.0:8888
+      level: detailed

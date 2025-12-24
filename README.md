@@ -61,10 +61,10 @@ mvnw.cmd spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=l
 
 ### 4. Acessar a Aplicação
 
-- **API Principal**: [http://localhost:8080/wallet-services-api/api](http://localhost:8080/wallet-services-api/api)
-- **Swagger UI**: [http://localhost:8080/wallet-services-api/swagger-ui.html](http://localhost:8080/wallet-services-api/swagger-ui.html)
-- **Health Check**: [http://localhost:8080/wallet-services-api/actuator/health](http://localhost:8080/wallet-services-api/actuator/health)
-- **Métricas Prometheus**: [http://localhost:8080/wallet-services-api/actuator/prometheus](http://localhost:8080/wallet-services-api/actuator/prometheus)
+- **API Principal**: [http://localhost:8080/wallet-service-api/api](http://localhost:8080/wallet-service-api/api)
+- **Swagger UI**: [http://localhost:8080/wallet-service-api/swagger-ui.html](http://localhost:8080/wallet-service-api/swagger-ui.html)
+- **Health Check**: [http://localhost:8080/wallet-service-api/actuator/health](http://localhost:8080/wallet-service-api/actuator/health)
+- **Métricas Prometheus**: [http://localhost:8080/wallet-service-api/actuator/prometheus](http://localhost:8080/wallet-service-api/actuator/prometheus)
 
 ## 🏗️ Estrutura do Projeto
 

@@ -3,21 +3,21 @@ server:
   hostname: localhost
   port: '8080'
   servlet:
-    context-path: /wallet-services-api
+    context-path: /wallet-service-api
 controller:
   path:
     base: "/api"
     #base-mapping: "/api"
-    #full: "/wallet-services-api/api"
+    #full: "/wallet-service-api/api"
 
-wallet-services-api:
+wallet-service-api:
   seed-path: classpath:./data/seed/
 
 springdoc:
   packagesToScan: com.guga.walletserviceapi   # ou seu pacote base exato
   pathsToMatch: /api/** 
   api-docs:
-    #server-url: http://localhost:8080/wallet-services-api/api
+    #server-url: http://localhost:8080/wallet-service-api/api
     path: /v3/api-docs
     version: OPENAPI_3_0
     enabled: true
@@ -29,6 +29,7 @@ springdoc:
     disable-swagger-default-url: false  
     try-it-out-enabled: 'false'
     groups-order: ASC
+
 spring:
   application:
     name: wallet-service-api
@@ -92,6 +93,12 @@ spring:
       #defer-datasource-initialization: true      
       #data-locations:
       #- classpath:data.sql
+  security:
+    user:
+      name: "wallet_user"
+      password: "wallet_pass"
+      roles: "MONITOR"
+
 management:
   endpoints:
     web:

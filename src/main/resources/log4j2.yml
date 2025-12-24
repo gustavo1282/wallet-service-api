@@ -1,29 +1,37 @@
+
 Configuration:
   status: WARN
+
   Appenders:
     Console:
       - name: CONSOLE
-        PatternLayout:
-          pattern: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
-          
+        JsonLayout:
+          compact: true
+          eventEol: true
+          properties: true
+
     File:
       - name: APP_FILE
         fileName: "logs/application.log"
-        PatternLayout:
-          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"
+        JsonLayout:
+          compact: true
+          eventEol: true
+          properties: true
         Filters:
-          # ADICIONE ISTO: Impede que o marcador AUDIT suje o application.log
+          # Impede que logs AUDIT entrem no application.log
           MarkerFilter:
             marker: "AUDIT"
             onMatch: DENY
             onMismatch: NEUTRAL
-          
+
       - name: AUDIT_FILE
         fileName: "logs/audit.log"
-        PatternLayout:
-          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} AUDIT %msg%n"
+        JsonLayout:
+          compact: true
+          eventEol: true
+          properties: true
         Filters:
-          # Mantém apenas o que for AUDIT
+          # Mantém apenas logs com marker AUDIT
           MarkerFilter:
             marker: "AUDIT"
             onMatch: ACCEPT

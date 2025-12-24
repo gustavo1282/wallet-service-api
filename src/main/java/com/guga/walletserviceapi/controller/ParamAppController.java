@@ -24,12 +24,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.service.ParamAppService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${controller.path.base}/params")
-@Tag(name = "ParamApp", description = "Endpoints for managing ParamApp")
+@Tag(name = "ParamApp", description = "Endpoints for managing application parameters")
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class ParamAppController {
 

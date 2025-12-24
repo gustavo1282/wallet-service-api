@@ -22,13 +22,6 @@ public class JacksonConfig {
                 .deserializers(new LocalDateTimeDeserializer(
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")));
     }
-
-    /*
-    @Bean
-    public Module hibernateModule() {
-        return new Hibernate6Module();
-    }
-    */
     
     @Bean
     public Hibernate6Module hibernateModule() {

@@ -1036,7 +1036,7 @@ X-RateLimit-Remaining: 999
 
 ### Login
 ```bash
-curl -X POST http://localhost:8080/wallet-services-api/api/auth/login \
+curl -X POST http://localhost:8080/wallet-service-api/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "usuario",
@@ -1046,7 +1046,7 @@ curl -X POST http://localhost:8080/wallet-services-api/api/auth/login \
 
 ### Criar Cliente
 ```bash
-curl -X POST http://localhost:8080/wallet-services-api/api/customers/customer \
+curl -X POST http://localhost:8080/wallet-service-api/api/customers/customer \
   -H "Authorization: Bearer {accessToken}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1058,12 +1058,12 @@ curl -X POST http://localhost:8080/wallet-services-api/api/customers/customer \
 
 ### Fazer Depósito
 ```bash
-curl -X POST "http://localhost:8080/wallet-services-api/api/transactions/transaction?type=DEPOSIT&walletId=1&amount=500.00&cpfSender=12345678901&terminalId=TERM001&senderName=João" \
+curl -X POST "http://localhost:8080/wallet-service-api/api/transactions/transaction?type=DEPOSIT&walletId=1&amount=500.00&cpfSender=12345678901&terminalId=TERM001&senderName=João" \
   -H "Authorization: Bearer {accessToken}"
 ```
 
 ### Listar Carteiras
 ```bash
-curl -X GET http://localhost:8080/wallet-services-api/api/wallets/list?page=0 \
+curl -X GET http://localhost:8080/wallet-service-api/api/wallets/list?page=0 \
   -H "Authorization: Bearer {accessToken}"
 ```

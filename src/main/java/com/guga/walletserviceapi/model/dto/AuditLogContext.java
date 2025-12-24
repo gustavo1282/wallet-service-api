@@ -1,4 +1,4 @@
-package com.guga.walletserviceapi.model;
+package com.guga.walletserviceapi.model.dto;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -9,30 +9,35 @@ import com.guga.walletserviceapi.helpers.GlobalHelper;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @JsonPropertyOrder({
     "sessionId", "sequenceId", "userAgent", "ipAddress", "username"
 })
+
+
 @Builder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Entity
-//@Table(name = "tb_audit_contexts")
-//@EqualsAndHashCode(of = "customerId")
-@ToString
-public class AuditContext {
+@Data
+public class AuditLogContext {
+
     private String sessionId;
     private String userAgent;
     private String ipAddress;
     private String username;
     private String traceId;
     private String info;
+    private String action;
+    private String resource;
+    private String result;
+    private Long timeMillis;
+
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = GlobalHelper.PATTERN_FORMAT_DATE_TIME)
     @Builder.Default

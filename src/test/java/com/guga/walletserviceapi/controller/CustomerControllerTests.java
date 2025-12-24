@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +39,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
-import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
@@ -67,7 +67,6 @@ class CustomerControllerTests {
 	@MockitoBean
 	private LoginAuthService loginAuthService;
 
-	// Converte objetos Java para JSON e vice-versa
 	@Autowired
 	private ObjectMapper objectMapper;
 	
@@ -98,17 +97,11 @@ class CustomerControllerTests {
 		customers = TransactionUtilsMock.createCustomerListMock();
 
 		URI_API = BASE_PATH + API_NAME;
-
-		System.out.println(("BeforeEach - OK"));
 	}
 
 	@Test
 	@DisplayName("Deve retornar 201 Created ao criar um Customer com sucesso")
 	void shouldReturn201_WhenCreateNewCustomer() throws Exception {
-
-		LOGGER.info(LogMarkers.AUDIT, "Sua mensagem | AUDIT | CustomerControllerTests | Test");
-
-		LOGGER.info(LogMarkers.LOG, "Sua mensagem | LOG | CustomerControllerTests | Test");
 
 		Customer customerRef = customers.get(RandomMock.generateIntNumberByInterval(0, customers.size() - 1));
 		Customer customerNew = customerRef.toBuilder().build();
@@ -118,14 +111,15 @@ class CustomerControllerTests {
 
 		// Act & Assert
 		mockMvc.perform(post(URI_API + "/customer")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(customerRef)))
-				.andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-				.andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
-				.andExpect(status().isCreated())
-				.andExpect(header().exists("Location"))
-				.andExpect(jsonPath("$.customerId", is(customerNew.getCustomerId().intValue())))
-				.andExpect(jsonPath("$.cpf", is(customerNew.getCpf())));
+		.header("X-Trace-Id", UUID.randomUUID().toString())
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(customerRef)))
+			.andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+			.andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
+			.andExpect(status().isCreated())
+			.andExpect(header().exists("Location"))
+			.andExpect(jsonPath("$.customerId", is(customerNew.getCustomerId().intValue())))
+			.andExpect(jsonPath("$.cpf", is(customerNew.getCpf())));
 	}
 
 	// --------------------------------------------------------------------------------

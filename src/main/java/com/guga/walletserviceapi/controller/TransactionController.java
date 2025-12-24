@@ -26,12 +26,14 @@ import com.guga.walletserviceapi.model.enums.StatusTransaction;
 import com.guga.walletserviceapi.service.TransactionService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${controller.path.base}/transactions")
 @Tag(name = "Transaction", description = "Endpoints for managing transactions")
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class TransactionController {
 
