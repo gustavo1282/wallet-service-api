@@ -10,6 +10,8 @@
             "args": "",
             "envFile": "${workspaceFolder}/.env",
             "vmArgs": [
+                "-Dspring.profiles.active=test",
+                
                 "-javaagent:${workspaceFolder}/lib/opentelemetry-javaagent.jar",
 
                 "-Dotel.service.name=wallet-service-api",

@@ -1,0 +1,140 @@
+server:
+  protocol-type: http
+  hostname: localhost
+  port: 0   # Porta aleatória para evitar conflito em testes
+  servlet:
+    context-path: /wallet-service-api
+
+controller:
+  path:
+    base: "/api"
+
+# Configurações globais do JWT (sobrepostas por profiles)
+jwt:
+  secret: 'JWT_KEY_VAULT_WALLET_SERVICE_API_TRUE_VERSION_2_0_FRASE_LONGA'
+  issuer: wallet-service-api
+  expiration-minutes: 20
+
+wallet-service-api:
+  # Mantido para testes de integração que usem carga inicial
+  seed-path: classpath:./data/seed/
+
+# =========================
+# SpringDoc (desligado em testes)
+# =========================
+springdoc:
+  #packagesToScan: com.guga.walletserviceapi
+  #pathsToMatch: /api/**
+  api-docs:
+    enabled: false
+    #path: /v3/api-docs
+    #version: OPENAPI_3_0
+  swagger-ui:
+    enabled: false
+  #show-actuator: true
+  #writer-with-default-pretty-printer: true
+
+spring:
+  application:
+    name: wallet-service-api-test
+
+  # =========================
+  # Import opcional (mantido comentado)
+  # =========================
+  config:
+    import: "optional:classpath:security-matchers.yml"
+
+  # =========================
+  # Pageable (OBRIGATÓRIO – usado pelos controllers)
+  # =========================
+  data:
+    web:
+      pageable:
+        default-page-size: 25
+        max-page-size: 25
+        page-parameter: page
+        size-parameter: size
+
+  # =========================
+  # Datasource (H2 em memória)
+  # =========================
+  datasource:
+    url: jdbc:h2:mem:wallet_test_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      #settings:
+      #  web-allow-others: true
+
+  # =========================
+  # Jackson (igual ao local)
+  # =========================
+  jackson:
+    default-property-inclusion: non_null
+    property-naming-strategy: LOWER_CAMEL_CASE
+    deserialization:
+      fail-on-unknown-properties: false
+
+  # =========================
+  # JPA / Hibernate
+  # =========================
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop   # Sempre recria o schema em testes
+      #use_sql_comments: true
+      #jdbc.batch_size: 1000
+    generate-ddl: true
+    show-sql: false
+    format_sql: false
+
+  # =========================
+  # Security (mínima para subir contexto)
+  # =========================
+  security:
+    user:
+      name: test_user
+      password: test_pass
+      roles:
+        - "MONITOR"
+
+  # =========================
+  # Threads
+  # =========================
+  threads:
+    virtual:
+      enabled: false   # Evita efeitos colaterais em testes
+
+# =========================
+# Management / Observability (desligado)
+# =========================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    prometheus:
+      enabled: false
+    metrics:
+      enabled: false
+  tracing:
+    enabled: false
+  #otlp:
+  #  tracing:
+  #    endpoint: http://localhost:4318/v1/traces
+
+# =========================
+# Logging (mais silencioso)
+# =========================
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.springdoc: OFF

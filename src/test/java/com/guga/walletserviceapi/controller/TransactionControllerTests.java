@@ -65,16 +65,13 @@ import com.guga.walletserviceapi.service.LoginAuthService;
 import com.guga.walletserviceapi.service.TransactionService;
 
 //@SpringBootTest(classes = TransactionController.class)
+@ActiveProfiles("test")
+@WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
 @WebMvcTest(TransactionController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
-@WithMockUser(username = "user", roles = { "USER" })
 @Import({
-    // Importe a configuração de segurança se necessário
-    //com.guga.walletserviceapi.service.LoginAuthService.class, 
-    //com.guga.walletserviceapi.security.JwtAuthenticationFilter.class,
-    //com.guga.walletserviceapi.security.JwtService.class,
-    com.guga.walletserviceapi.config.SpringSecurityConfig.class
+    com.guga.walletserviceapi.config.SpringSecurityConfig.class,
+    com.guga.walletserviceapi.config.ConfigProperties.class
 })
 public class TransactionControllerTests {
 
@@ -129,7 +126,8 @@ public class TransactionControllerTests {
         private static boolean SAVE_JSON = false;
         private static boolean LOAD_JSON = false;
 
-        @Autowired 
+        //@Autowired 
+        @MockitoBean
         private PasswordEncoder passwordEncoder;
 
         @BeforeEach
