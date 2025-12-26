@@ -40,7 +40,7 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;    
+    private int defaultPageSize;
 
     @Operation(summary = "Create a new transaction of type DEPOSIT",
             description = "Creates a new transaction with the data provided in the request body.")

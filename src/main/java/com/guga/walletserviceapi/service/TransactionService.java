@@ -61,15 +61,16 @@ public class TransactionService implements IWalletApiService {
     private ParamAppService paramAppService;
 
     public static final BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
+
     public static final BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
 
     public Transaction getTransactionById(Long id) {
         return transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + String.valueOf(id)));
+                .orElseThrow(() -> 
+                    new ResourceNotFoundException("Transaction not found with id: " + String.valueOf(id)));
     }
 
     public Page<Transaction> getTransactionByWalletId(Long id, Pageable pageable) {
-        
         Optional<Page<Transaction>> findResult = transactionRepository.findByWallet_WalletId(id, pageable);
 
         if (findResult.isEmpty() || !findResult.get().hasContent()) {
@@ -77,8 +78,28 @@ public class TransactionService implements IWalletApiService {
         }
 
         return findResult.get();
+    }
+
+    public Transaction getLastTransactionByWalletId(Long walletId) {
+        Optional<Transaction> findResult = transactionRepository
+            .findFirstByWalletWalletIdOrderByTransactionIdDesc(walletId);
+
+        if (findResult.isEmpty()) {
+            throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(walletId));
+        }
+        return findResult.get();
+    }
+
+    public Page<Transaction> findByWalletIdAndCreatedAtBetween(Long walletId, LocalDateTime startDate, 
+        LocalDateTime endDate, Pageable pageable) 
+    { 
+        return transactionRepository
+            .findByWalletWalletIdAndCreatedAtBetween(walletId, startDate, endDate, pageable)
+            .orElseThrow(() -> 
+                new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(walletId)));
 
     }
+
 
     public DepositMoney saveDepositMoney(Long walletId, BigDecimal amount, String cpfSender,
                                          String terminalId, String senderName)

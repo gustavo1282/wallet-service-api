@@ -49,8 +49,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;    
-
+    private int defaultPageSize;
 
     @Operation(summary = "Create a new Customer", description = "Creates a new Customer with the data provided in the request body.")
     @PostMapping("/customer")

@@ -30,5 +30,15 @@ public interface TransactionRepository extends
 
     Optional<Page<Transaction>> findByWallet_WalletId(Long walletId, Pageable pageable);
     
+// Usamos Wallet (o objeto) + WalletId (o campo dentro do objeto)
+    Optional<Page<Transaction>> findByWalletWalletIdAndCreatedAtBetween(
+        Long walletId, 
+        LocalDateTime start, 
+        LocalDateTime end, 
+        Pageable pageable
+    );
+
+    // 2. Para a última transação (corrigindo o filtro e a ordenação)
+    Optional<Transaction> findFirstByWalletWalletIdOrderByTransactionIdDesc(Long walletId);
 
 }
