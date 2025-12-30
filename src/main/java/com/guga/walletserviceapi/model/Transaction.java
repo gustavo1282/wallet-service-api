@@ -28,6 +28,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -68,11 +69,16 @@ public abstract class Transaction {
     @Column(name = "login", nullable = false, length = 25)
     private String login;
 
+    @NotNull(message = "Wallet ID cannot be null")
+    @Column(name = "wallet_id", nullable = false)
+    private Long walletId;
 
-    @Schema(description = "Wallet associated with the transaction", accessMode = Schema.AccessMode.READ_WRITE)
+
+    @Schema(description = "Wallet associated with the transaction", accessMode = Schema.AccessMode.READ_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id_fk", referencedColumnName = "wallet_Id", nullable = false, insertable = true, updatable = false)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "wallet_id", insertable = false, updatable = false)
     private Wallet wallet;
+
 
     @Convert(converter = OperationTypeConverter.class)
     @Column(name = "operation_type", nullable = false, length = 2)

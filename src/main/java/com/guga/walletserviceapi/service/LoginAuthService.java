@@ -31,7 +31,7 @@ public class LoginAuthService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("Login não encontrado: " + username));
 
         // Criptografa a senha (AccessKey) antes de salvar
-        String encodedPassword = passwordEncoder.encode(loginAuth.getAccessKey());
+        String encodedPassword = passwordEncoder.encode(password);
         loginAuth.setAccessKey(encodedPassword);
 
         // Salva o usuário no banco de dados com a senha criptografada

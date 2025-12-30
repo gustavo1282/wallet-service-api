@@ -1,7 +1,9 @@
 package com.guga.walletserviceapi.controller;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,11 +45,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${controller.path.base}/wallet-operator")
 @Tag(name = "Wallet Operator", description = "Endpoints for wallet operations")
 @SecurityRequirement(name = "bearerAuth")
+@RequiredArgsConstructor
 public class WalletOperatorController {
 
     @Autowired
@@ -67,50 +72,61 @@ public class WalletOperatorController {
     @Value("${spring.data.web.pageable.default-page-size}")
     private int defaultPageSize;
     
-    @GetMapping("/{walletId}")
+    @GetMapping("/wallets/{walletId}")
     public ResponseEntity<Wallet> getWalletById(@PathVariable Long walletId) {
         Wallet wallet = walletService.getWalletById(walletId);
         return ResponseEntity.ok(wallet);
     }
 
-    // @GetMapping("/balance/{walletId}")
-    // public ResponseEntity<Double> getWalletBalance(@PathVariable Long walletId) {
-    //     Double balance = walletService.getWalletBalance(walletId);
-    //     return ResponseEntity.ok(balance);
-    // }
-
-    @GetMapping("/last-movement/{walletId}")
-    public ResponseEntity<Transaction> getLastTransactionByWalletId(@PathVariable Long walletId) {
-        Transaction lastMovement = transactionService.getLastTransactionByWalletId(walletId);
-        return ResponseEntity.ok(lastMovement);
-    }
-
-    @GetMapping("/transactions/search/{walletId}/period")
-    public ResponseEntity<Page<Transaction>> searchTransactionsByPeriod(@PathVariable Long walletId, 
-        @RequestParam(required = true) LocalDateTime startDate,
-        @RequestParam(required = false) LocalDateTime endDate,
+    @GetMapping("/transaction/last-movement/{walletId}")
+    public ResponseEntity<Page<Transaction>> getLast10Transactions(
+        @PathVariable Long walletId,
         @RequestParam(defaultValue = "0") int page) 
     {
 
-        Pageable pageable = PageRequest.of(page, defaultPageSize,
+        Pageable pageable = PageRequest.of(page, 10,
+                Sort.by(
+                    Sort.Order.asc("createdAt")
+                )
+            );
+
+        Page<Transaction> last10Transactions = transactionService.getLast10Transactions(walletId, pageable);
+
+        return ResponseEntity.ok(last10Transactions);
+    }
+
+
+    @GetMapping("/transaction/search/period/{walletId}")
+    public ResponseEntity<Page<Transaction>> searchTransactionsByPeriod(
+        @PathVariable Long walletId, 
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+        @RequestParam(defaultValue = "0") int page) 
+    {
+
+                Pageable pageable = PageRequest.of(page, defaultPageSize,
                 Sort.by(
                     Sort.Order.asc("createdAt"),
                     Sort.Order.asc("walletId")
                 )
             );
 
-        LocalDateTime endDateSend = startDate.plusDays(1);
+
+        LocalDateTime startDateSend = startDate.atStartOfDay();
+
+        LocalDateTime endDateSend = LocalDate.now().atTime(LocalTime.MAX);
         if (endDate != null) {
-            endDateSend = endDateSend.plusDays(1);
+            endDateSend = endDate.atTime(LocalTime.MAX);
         }
 
         Page<Transaction> transactions = transactionService
-            .findByWalletIdAndCreatedAtBetween(walletId, startDate, endDateSend, pageable);
+            .findByWalletIdAndCreatedAtBetween(walletId, startDateSend, endDateSend, pageable);
+
         return new ResponseEntity<>(transactions, HttpStatus.OK);
 
     }
 
-    @PostMapping("/withdraw/")
+    @PostMapping("/transaction/withdraw/")
     public ResponseEntity<Transaction> createWithdraw(
         @RequestBody CreateWithdrawRequest request) 
     {
@@ -130,7 +146,7 @@ public class WalletOperatorController {
 
     }
 
-    @PostMapping("/deposit/{walletId}")
+    @PostMapping("/transaction/deposit/{walletId}")
     public ResponseEntity<Transaction> createDeposit(@PathVariable Long walletId, 
         @RequestBody CreateDepositRequest request) 
     {
@@ -150,7 +166,7 @@ public class WalletOperatorController {
             .body(newDepositMoney);
     }
 
-    @PostMapping("/transfer/{walletId}")
+    @PostMapping("/transaction/transfer/{walletId}")
     public ResponseEntity<Transaction> createTransfer(@PathVariable Long walletId, 
         @RequestBody CreateTransferRequest request) 
     {
@@ -172,7 +188,7 @@ public class WalletOperatorController {
     }
 
     @Operation(summary = "Upload the customer.json file.")
-    @PostMapping("/upload-customer")
+    @PostMapping("/upload/customer")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
         content = @Content(
             mediaType = "multipart/form-data",
@@ -198,7 +214,7 @@ public class WalletOperatorController {
     }
 
     @Operation(summary = "Upload the wallet.json file.")
-    @PostMapping("/upload-wallet")
+    @PostMapping("/upload/wallet")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
         content = @Content(
             mediaType = "multipart/form-data",
@@ -224,7 +240,7 @@ public class WalletOperatorController {
     }
 
     @Operation(summary = "Upload the transactions.json file.")
-    @PostMapping("/upload-transactions")
+    @PostMapping("/upload/transactions")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(
             mediaType = "multipart/form-data",
@@ -253,7 +269,7 @@ public class WalletOperatorController {
 
 
     @Operation(summary = "Upload the moviments.json file.")
-    @PostMapping("/upload-movements")
+    @PostMapping("/upload/movements")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(
             mediaType = "multipart/form-data",
@@ -281,7 +297,7 @@ public class WalletOperatorController {
     }
 
     @Operation(summary = "Upload the deposit_sender.json file.")
-    @PostMapping("/upload-deposit-senders")
+    @PostMapping("/upload/deposit-senders")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(
             mediaType = "multipart/form-data",

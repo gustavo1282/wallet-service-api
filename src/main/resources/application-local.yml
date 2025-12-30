@@ -45,8 +45,8 @@ spring:
   data:
     web:
       pageable:
-        default-page-size: 25
-        max-page-size: 25
+        default-page-size: 300    #é a quantidade de linhas que serão retornadas da query
+        max-page-size: 30
         page-parameter: page
         size-parameter: size
   datasource:
@@ -72,7 +72,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update   #none | validate | update | create | create-drop
+      ddl-auto: update        #none | validate | update | create | create-drop
       use_sql_comments: true
       jdbc.batch_size: 1000
     generate-ddl: true
@@ -133,9 +133,12 @@ logging.level.org.hibernate: INFO
 # Silencia o SpringDoc (Swagger) que está aparecendo muito no seu log
 logging.level.org.springdoc: WARN
 
+logging.level.org.springframework.data.mapping: DEBUG
+
 # Silencia especificamente a segurança e observabilidade que gera esse stacktrace
 logging.level.org.springframework.security: INFO
 logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: WARN
 
 # Limita o stacktrace para apenas as primeiras 5 linhas em caso de erro
 logging.exception-conversion-word: "%wEx{5}"
+

@@ -40,13 +40,13 @@ import net.datafaker.Faker;
 
 public class TransactionUtilsMock {
 
-    private static final boolean APPLY_FILTER_CUSTOMER_BY_STATUS = true;
+    private static final boolean APPLY_FILTER_CUSTOMER_BY_STATUS = false;
     private static final int RANGE_CUSTOMER_ID = 1000;
     private static final int TOTAL_CUSTOMER_ID = 1050;
-    private static final int LIMIT_LIST_CUSTOMER = 30;
+    private static final int LIMIT_LIST_CUSTOMER = 50;
     private static final int RANGE_LOGIN_AUTH_ID = 0;
 
-    public static final boolean APPLY_FILTER_WALLET_BY_STATUS = true;
+    public static final boolean APPLY_FILTER_WALLET_BY_STATUS = false;
     public static final int RANGE_WALLET_ID = 2000;
     public static final int TOTAL_WALLET_ID = 2150;
     public static final int LIMIT_LIST_WALLET = 80;
@@ -112,8 +112,7 @@ public class TransactionUtilsMock {
                     .build();
 
                 customers.add(customer);
-
-        });
+            });
 
         return customers;
 
@@ -145,6 +144,12 @@ public class TransactionUtilsMock {
                     break;                    
                 default:
                     break;
+            }
+
+            if (customer.getFirstName().toLowerCase().contains(GlobalHelper.APP_USER_NAME.toLowerCase())) {
+                loginAuthType = LoginAuthType.USER_NAME;
+                loginAccess = GlobalHelper.APP_USER_NAME;
+                accessKey = GlobalHelper.APP_PASSWORD;
             }
 
             SEQUENCE_LOGIN_AUTH_ID++;
@@ -198,10 +203,6 @@ public class TransactionUtilsMock {
                 Long walletId = (long)i;
                
                 Status status = defineStatus();
-
-                if (customer.getCustomerId().equals(1002L)) {
-                    System.out.println("Customer 1002 - " + status);
-                }
 
                 if (status.equals(Status.ACTIVE) && !walletCheck.isEmpty() && walletCheck.size() == 2){
                     status = Status.INACTIVE;
@@ -517,6 +518,40 @@ public class TransactionUtilsMock {
             ParamApp.newParam("seq-login-auth-id", "Id Sequencial de LoginAuth  .Id", Long.valueOf("0"))
         );
         return paramApps;
+    }
+
+    public static Customer addCustomerApplication(long nextCustomerId) {
+        Faker faker = new Faker(new Locale("pt-BR"));
+
+        String fullName = GlobalHelper.APP_USER_NAME.toUpperCase() + " APPLICATION";
+        String[] partName =  fullName.split(" ");
+        LocalDate birthDate = defineBirthDateMore18YearOld();
+        LocalDateTime dtCreatedAt = RandomMock.generatePastLocalDateTime(2);
+        String cellPhone = faker.phoneNumber().cellPhone();
+        String documentId = faker.idNumber().valid();
+        String cpf = faker.cpf().valid();
+
+        Customer customer = Customer.builder()
+            .customerId(nextCustomerId)
+            .status(Status.ACTIVE)
+            .fullName(fullName)
+            .firstName(partName[0])
+            .lastName( partName[partName.length-1] )
+            .birthDate(birthDate)
+            .email(faker.internet().emailAddress( partName[0].concat(".")
+                    .concat( partName[partName.length -1 ] ).concat(".")
+                    .concat( String.valueOf(birthDate.getMonthValue()) )
+                    .concat( String.valueOf(birthDate.getYear()) )
+            ))
+            .phoneNumber(cellPhone)
+            .documentId(documentId)
+            .cpf(cpf)
+            .createdAt(dtCreatedAt)
+            .updatedAt(dtCreatedAt)
+            .loginAuthId(null)
+            .build();
+
+        return customer;        
     }
 
 }

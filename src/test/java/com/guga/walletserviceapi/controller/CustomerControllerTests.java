@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,10 +39,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
+import com.guga.walletserviceapi.handler.GlobalExceptionHandler;
 import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.repository.CustomerRepository;
 import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
 import com.guga.walletserviceapi.security.JwtService;
 import com.guga.walletserviceapi.service.CustomerService;
@@ -48,6 +52,7 @@ import com.guga.walletserviceapi.service.LoginAuthService;
 
 import net.datafaker.Faker;
 
+@Import(GlobalExceptionHandler.class)
 @ActiveProfiles("test")
 @WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
 @WebMvcTest(CustomerController.class)
@@ -69,7 +74,10 @@ class CustomerControllerTests {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-	
+
+	@MockitoBean
+	private CustomerRepository customerRepository;
+
 	@MockitoBean
 	private CustomerService customerService;
 	
@@ -220,14 +228,14 @@ class CustomerControllerTests {
 	@Test
 	@DisplayName("Deve retornar 404 Not Found quando a lista de Customers está vazia")
 	void shouldReturn404WhenNoCustomersFound() throws Exception {
-		// Arrange
-		// Simula uma página vazia
-		when(customerService.filterByStatus(any(Status.class), any(Pageable.class)))
+
+		when(customerService.filterByStatus(isNull(), any(Pageable.class)))
 			.thenThrow(new ResourceNotFoundException("Customers not found"));
 
 		// Act & Assert
-		mockMvc.perform(get(URI_API = "/list"))
-			.andExpect(status().isNotFound()); // Verifica o status HTTP 404
+		mockMvc.perform(get(URI_API + "/list"))
+			.andExpect(status().isNotFound()) // Agora vai capturar o 404 do handleResourceNotFound
+            .andExpect(jsonPath("$.status").value(404));
 	}
 
 }

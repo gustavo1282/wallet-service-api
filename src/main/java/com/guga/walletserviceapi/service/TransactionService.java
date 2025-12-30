@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -71,33 +70,41 @@ public class TransactionService implements IWalletApiService {
     }
 
     public Page<Transaction> getTransactionByWalletId(Long id, Pageable pageable) {
-        Optional<Page<Transaction>> findResult = transactionRepository.findByWallet_WalletId(id, pageable);
+        Page<Transaction> findResult = transactionRepository.findByWalletId(id, pageable);
 
-        if (findResult.isEmpty() || !findResult.get().hasContent()) {
+        if (findResult.isEmpty() || !findResult.hasContent()) {
             throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(id));
         }
 
-        return findResult.get();
+        return findResult;
     }
 
-    public Transaction getLastTransactionByWalletId(Long walletId) {
-        Optional<Transaction> findResult = transactionRepository
-            .findFirstByWalletWalletIdOrderByTransactionIdDesc(walletId);
+    public Page<Transaction> getLast10Transactions(Long walletId, Pageable pageable) {
+
+        Page<Transaction> findResult = transactionRepository
+            .findByWalletId(walletId, pageable);
 
         if (findResult.isEmpty()) {
             throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(walletId));
         }
-        return findResult.get();
+
+        return findResult;
     }
 
-    public Page<Transaction> findByWalletIdAndCreatedAtBetween(Long walletId, LocalDateTime startDate, 
-        LocalDateTime endDate, Pageable pageable) 
+    public Page<Transaction> findByWalletIdAndCreatedAtBetween(
+        Long walletId, 
+        LocalDateTime startDate, 
+        LocalDateTime endDate, 
+        Pageable pageable) 
     { 
-        return transactionRepository
-            .findByWalletWalletIdAndCreatedAtBetween(walletId, startDate, endDate, pageable)
-            .orElseThrow(() -> 
-                new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(walletId)));
+        Page<Transaction> findResult = transactionRepository
+            .findByWalletIdAndCreatedAtBetween(walletId, startDate, endDate, pageable);
 
+        if (findResult.isEmpty() || !findResult.hasContent()) {
+            throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(walletId));
+        }
+
+        return findResult;
     }
 
 

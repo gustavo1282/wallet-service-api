@@ -17,10 +17,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 
 import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.handler.CustomAccessDeniedHandler;
+import com.guga.walletserviceapi.security.handler.CustomAuthenticationEntryPoint;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
+
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Autowired
     private SecurityMatchers matchers;
@@ -64,6 +72,11 @@ public class SpringSecurityConfig {
                 //.httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 
+                .exceptionHandling(exceptions -> exceptions
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .accessDeniedHandler(accessDeniedHandler)
+                )
+
                 .build();
     }
 

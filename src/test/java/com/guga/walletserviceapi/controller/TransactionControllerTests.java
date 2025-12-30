@@ -61,6 +61,8 @@ import com.guga.walletserviceapi.repository.TransactionRepository;
 import com.guga.walletserviceapi.repository.WalletRepository;
 import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
 import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.security.handler.CustomAccessDeniedHandler;
+import com.guga.walletserviceapi.security.handler.CustomAuthenticationEntryPoint;
 import com.guga.walletserviceapi.service.LoginAuthService;
 import com.guga.walletserviceapi.service.TransactionService;
 
@@ -71,7 +73,8 @@ import com.guga.walletserviceapi.service.TransactionService;
 @AutoConfigureMockMvc(addFilters = false)
 @Import({
     com.guga.walletserviceapi.config.SpringSecurityConfig.class,
-    com.guga.walletserviceapi.config.ConfigProperties.class
+    com.guga.walletserviceapi.config.ConfigProperties.class,
+    com.guga.walletserviceapi.config.PasswordConfig.class
 })
 public class TransactionControllerTests {
 
@@ -102,6 +105,12 @@ public class TransactionControllerTests {
         @MockitoBean
         private TransactionRepository transactionRepository;
 
+        @MockitoBean
+        private CustomAuthenticationEntryPoint authenticationEntryPoint;
+
+        @MockitoBean
+        private CustomAccessDeniedHandler accessDeniedHandler;
+
         @Value("${controller.path.base}")
         private String BASE_PATH;
 
@@ -122,13 +131,13 @@ public class TransactionControllerTests {
         private List<ParamApp> paramsApp;
 
         private List<LoginAuth> loginAuths;
-
-        private static boolean SAVE_JSON = false;
-        private static boolean LOAD_JSON = false;
-
-        //@Autowired 
-        @MockitoBean
+        
+        //@MockitoBean
+        @Autowired 
         private PasswordEncoder passwordEncoder;
+
+        private static boolean SAVE_JSON = true;
+        private static boolean LOAD_JSON = false;
 
         @BeforeEach
         void setUp() throws JsonProcessingException {
@@ -171,12 +180,13 @@ public class TransactionControllerTests {
                                 // A variável paramsApp armazena uma lista parametros iniciais da aplicação
                                 paramsApp = TransactionUtilsMock.createParamsAppMock();
 
-
-                                customers = TransactionUtilsMock.createCustomerListMock();
+                                customers = TransactionUtilsMock.createCustomerListMock();                                
+                                customers.add(TransactionUtilsMock.addCustomerApplication(
+                                        customers.getLast().getCustomerId() + 1
+                                ));
 
                                 loginAuths = TransactionUtilsMock.createLoginAuthListMock(customers );
                                 encriptAccessKeyLoginAuthListMock(loginAuths);
-
 
                                 // Cria a lista de wallets a partir da lista de customers
                                 wallets = TransactionUtilsMock.createWalletListMock(customers);
@@ -251,8 +261,7 @@ public class TransactionControllerTests {
                                                 .println("Body: " + result.getResponse().getContentAsString()))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.transactionId", is(transaction.getTransactionId().intValue())))
-                                .andExpect(jsonPath("$.wallet.walletId",
-                                                is(transaction.getWallet().getWalletId().intValue())));
+                                .andExpect(jsonPath("$.walletId",is(transaction.getWalletId().intValue())));
         }
 
         @Test
@@ -261,10 +270,10 @@ public class TransactionControllerTests {
 
                 int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
                 Transaction transaction = transactions.get(idxTransaction);
-                Long walletId = transaction.getWallet().getWalletId();
+                Long walletId = transaction.getWalletId();
 
                 List<Transaction> resultFilter = transactions.stream()
-                                .filter(trn -> trn.getWallet().getWalletId()
+                                .filter(trn -> trn.getWalletId()
                                                 .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue())
                                 .toList();
 
@@ -295,11 +304,11 @@ public class TransactionControllerTests {
 
                 int idxTransaction = RandomMock.generateIntNumberByInterval(0, transactions.size() - 1);
                 Transaction transaction = transactions.get(idxTransaction);
-                Long walletId = transaction.getWallet().getWalletId();
+                Long walletId = transaction.getWalletId();
                 StatusTransaction typeTransaction = transaction.getStatusTransaction();
 
                 List<Transaction> resultFilter = transactions.stream()
-                                .filter(trn -> trn.getWallet().getWalletId()
+                                .filter(trn -> trn.getWalletId()
                                                 .compareTo(walletId) == CompareBigDecimal.EQUAL.getValue()
                                                 && trn.getStatusTransaction().equals(typeTransaction))
                                 .toList();
@@ -351,7 +360,7 @@ public class TransactionControllerTests {
                 // ACT & ASSERT: Execução do MockMvc
                 mockMvc.perform(post(URI_API.concat("/transaction"))
                                 .param("type", "DEPOSIT")
-                                .param("walletId", String.valueOf(depositMoney.getWallet().getWalletId()))
+                                .param("walletId", String.valueOf(depositMoney.getWalletId()))
                                 .param("amount", String.valueOf(amount))
                                 .param("cpfSender", cpfSender)
                                 .param("terminalId", terminalId)
@@ -364,7 +373,7 @@ public class TransactionControllerTests {
                                 .andExpect(status().isCreated())
                                 .andExpect(header().exists("Location"))
                                 .andExpect(jsonPath("$.transactionId").value(depositMoney.getTransactionId()))
-                                .andExpect(jsonPath("$.wallet.walletId").value(depositMoney.getWallet().getWalletId()));
+                                .andExpect(jsonPath("$.walletId").value(depositMoney.getWalletId()));
 
         }
 
@@ -395,8 +404,8 @@ public class TransactionControllerTests {
                                 .andExpect(status().isCreated())
                                 .andExpect(header().exists("Location"))
                                 .andExpect(jsonPath("$.transactionId").value(withdrawMoney.getTransactionId()))
-                                .andExpect(jsonPath("$.wallet.walletId")
-                                                .value(withdrawMoney.getWallet().getWalletId()));
+                                .andExpect(jsonPath("$.walletId")
+                                                .value(withdrawMoney.getWalletId()));
 
         }
 
@@ -435,7 +444,7 @@ public class TransactionControllerTests {
                                 .andExpect(header().exists("Location"))
                                 // .andExpect(jsonPath("$.transactionType").value("TRANSFER_SEND"))
                                 .andExpect(jsonPath("$.transactionId").value(moneySend.getTransactionId()))
-                                .andExpect(jsonPath("$.wallet.walletId").value(moneySend.getWallet().getWalletId()));
+                                .andExpect(jsonPath("$.walletId").value(moneySend.getWalletId()));
 
         }
 

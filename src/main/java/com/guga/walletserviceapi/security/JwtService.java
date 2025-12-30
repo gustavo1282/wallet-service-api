@@ -44,12 +44,13 @@ public class JwtService {
     public String generateAccessToken(String username) {
         String roles = ""; 
         return Jwts.builder()
-                .subject(username)
-                .claim("roles", roles)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
-                .signWith(key, Jwts.SIG.HS256) 
-                .compact();
+            .subject(username)
+            .claim("roles", roles)
+            //.claim(username, roles)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
+            .signWith(key, Jwts.SIG.HS256) 
+            .compact();
 
     }
 
