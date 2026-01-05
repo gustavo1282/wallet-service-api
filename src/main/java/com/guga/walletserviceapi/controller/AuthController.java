@@ -1,11 +1,13 @@
 package com.guga.walletserviceapi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.guga.walletserviceapi.model.LoginAuth;
-import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +40,10 @@ public class AuthController {
 
 
     // DTO simples para login
-    public static class LoginRequest {
-        public String username;
-        public String password;
-    }
+    public record LoginRequest(
+        String username,
+        String password
+    ) {} 
 
     // DTO simples para resposta
     public static class TokenResponse {
@@ -54,7 +57,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<TokenResponse> login(
+        @Valid @RequestBody LoginRequest request
+        ) 
+    {
 
         // Usa o Spring Security AuthenticationManager para validar o usuário/senha
         Authentication authentication = authenticationManager.authenticate(
@@ -63,8 +69,10 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String accessToken = jwtService.generateAccessToken(request.username);
-        String refreshToken = jwtService.generateRefreshToken(request.username);
+        LoginAuth loginAuth = loginAuthService.findByLogin(request.username);
+
+        String accessToken = jwtService.generateAccessToken(loginAuth);
+        String refreshToken = jwtService.generateRefreshToken(loginAuth);
 
         return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
     }
@@ -76,21 +84,36 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(@RequestParam String refreshToken) {
-        if (jwtService.validateToken(refreshToken)) {
-            String username = jwtService.extractUsername(refreshToken);
-            String newAccessToken = jwtService.generateAccessToken(username);
-            return ResponseEntity.ok(new TokenResponse(newAccessToken, refreshToken));
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-/*
-    @GetMapping("/transaction/last-movement/{loginId}")
-     public ResponseEntity<TokenResponse> getDataLogin(
-        @RequestParam String refreshToken) 
+    public ResponseEntity<TokenResponse> refresh(
+        @RequestParam String refreshToken
+        ) 
     {
+        if (!jwtService.validateToken(refreshToken)) {
+            return ResponseEntity.badRequest().build();
+        }
 
+        String username = jwtService.extractLogin(refreshToken);
+
+        // 2. Busca o LoginAuth completo no banco
+        LoginAuth loginAuth = loginAuthService.findByLogin(username);
+
+        // 3. Gera novo access token com claims completas
+        String newAccessToken = jwtService.generateAccessToken(loginAuth);
+
+        // 4. Retorna o novo access token + refresh antigo
+        return ResponseEntity.ok(new TokenResponse(newAccessToken, refreshToken));
     }
- */
+
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/data/{loginId}")
+     public ResponseEntity<TokenResponse> getDataLogin() 
+    {
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        loginAuthService.loadUserByUsername(loginId);
+
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+ 
 }

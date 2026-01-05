@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
 import com.guga.walletserviceapi.security.handler.CustomAccessDeniedHandler;
 import com.guga.walletserviceapi.security.handler.CustomAuthenticationEntryPoint;
 

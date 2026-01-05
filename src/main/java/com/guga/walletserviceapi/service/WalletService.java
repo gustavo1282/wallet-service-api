@@ -20,6 +20,7 @@ import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.WalletRepository;
 
 @Service
@@ -81,12 +82,18 @@ public class WalletService implements IWalletApiService {
         return walletRepository.save(wallet);
     }
 
-    public Page<Wallet> getAllWallets(Pageable pageable) {
+    public Page<Wallet> getAllWallets(Status status, Pageable pageable) {
 
-        Page<Wallet> findResult = walletRepository.findAll(pageable);
+       Page<Wallet> findResult;
+        if (status == null) {
+            findResult = walletRepository.findAll(pageable);
+        }
+        else {
+            findResult = walletRepository.findByStatus(status, pageable);
+        }
 
         if (findResult.isEmpty() || !findResult.hasContent()) {
-            throw new ResourceNotFoundException("Transactions not found");
+            throw new ResourceNotFoundException("Wallets not found");
         }
 
         return findResult;

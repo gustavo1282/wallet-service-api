@@ -25,8 +25,8 @@ public class SeedOrderConfig {
 
             // 1) Tabelas de domínio
             new SeedDefinition(folder + FileUtils.JSON_FILE_CUSTOMER, Customer.class),
-            new SeedDefinition(folder + FileUtils.JSON_FILE_LOGIN_AUTH, LoginAuth.class),
             new SeedDefinition(folder + FileUtils.JSON_FILE_WALLET, Wallet.class),
+            new SeedDefinition(folder + FileUtils.JSON_FILE_LOGIN_AUTH, LoginAuth.class),
             new SeedDefinition(folder + FileUtils.JSON_FILE_DEPOSIT_SENDER, DepositSender.class),
 
             new SeedDefinition(folder + FileUtils.JSON_FILE_MOVIMENT, MovementTransaction.class),

@@ -22,7 +22,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @JsonPropertyOrder({
-    "walletId", "status", "customerId", "lastOperationType", "previousBalance", "currentBalance", "loginUser", "createdAt", "updatedAt"
+    "walletId", "status", "customerId", "lastOperationType", "previousBalance", "currentBalance", "createdAt", "updatedAt"
 })
 @Builder(toBuilder = true)
 @Getter
@@ -76,11 +75,6 @@ public class Wallet {
     @Digits(integer = 14, fraction = 2, message = "Current balance must have up to 14 integer digits and 2 decimal places")
     @Column(name = "current_balance", nullable = false)
     private BigDecimal currentBalance;
-
-
-    @NotBlank(message = "Login user cannot be null or empty")
-    @Column(name = "login_user", length = 20)
-    private String loginUser;
 
 
     @Convert(converter = StatusConverter.class)

@@ -6,12 +6,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -32,6 +33,7 @@ import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.WithdrawMoney;
 import com.guga.walletserviceapi.model.enums.LoginAuthType;
+import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.model.enums.StatusTransaction;
@@ -79,60 +81,64 @@ public class TransactionUtilsMock {
 
         Faker faker = new Faker(new Locale("pt-BR"));
         
+
         List<Customer> customers = new ArrayList<>();
 
-        IntStream.range(RANGE_CUSTOMER_ID, TOTAL_CUSTOMER_ID)
-            .forEach(i -> {
-                String fullName = RandomMock.removeSufixoEPrevixos( faker.name().fullName() ).toUpperCase();
-                String[] partName =  fullName.split(" ");
-                LocalDate birthDate = defineBirthDateMore18YearOld();
-                LocalDateTime dtCreatedAt = RandomMock.generatePastLocalDateTime(2);
-                String cellPhone = faker.phoneNumber().cellPhone();
-                String documentId = faker.idNumber().valid();
-                String cpf = faker.cpf().valid();
+        customers.add(TransactionUtilsMock.addCustomerApplication(RANGE_CUSTOMER_ID + 1));
 
-                Customer customer = Customer.builder()
-                    .customerId((long) (i + 1))
-                    .status(defineStatus())
-                    .fullName(fullName)
-                    .firstName(partName[0])
-                    .lastName( partName[partName.length-1] )
-                    .birthDate(birthDate)
-                    .email(faker.internet().emailAddress( partName[0].concat(".")
-                            .concat( partName[partName.length -1 ] ).concat(".")
-                            .concat( String.valueOf(birthDate.getMonthValue()) )
-                            .concat( String.valueOf(birthDate.getYear()) )
-                    ))
-                    .phoneNumber(cellPhone)
-                    .documentId(documentId)
-                    .cpf(cpf)
-                    .createdAt(dtCreatedAt)
-                    .updatedAt(dtCreatedAt)
-                    .loginAuthId(null)
-                    .build();
+        int rangeCustomerInit = RANGE_CUSTOMER_ID + 2;
+        for (int nextId = rangeCustomerInit; nextId < TOTAL_CUSTOMER_ID; nextId++) {
+            String fullName = RandomMock.removeSufixoEPrevixos( faker.name().fullName() ).toUpperCase();
+            String[] partName =  fullName.split(" ");
+            LocalDate birthDate = defineBirthDateMore18YearOld();
+            LocalDateTime dtCreatedAt = RandomMock.generatePastLocalDateTime(2);
+            String cellPhone = faker.phoneNumber().cellPhone();
+            String documentId = faker.idNumber().valid();
+            String cpf = faker.cpf().valid();
 
-                customers.add(customer);
-            });
+            Customer customer = Customer.builder()
+                .customerId((long) (nextId + 1))
+                .status(defineStatus())
+                .fullName(fullName)
+                .firstName(partName[0])
+                .lastName( partName[partName.length-1] )
+                .birthDate(birthDate)
+                .email(faker.internet().emailAddress( partName[0].concat(".")
+                        .concat( partName[partName.length -1 ] ).concat(".")
+                        .concat( String.valueOf(birthDate.getMonthValue()) )
+                        .concat( String.valueOf(birthDate.getYear()) )
+                ))
+                .phoneNumber(cellPhone)
+                .documentId(documentId)
+                .cpf(cpf)
+                .createdAt(dtCreatedAt)
+                .updatedAt(dtCreatedAt)
+                .loginAuthId(null)
+                .build();
+
+            customers.add(customer);
+        }
 
         return customers;
-
     }
 
-    public static List<LoginAuth> createLoginAuthListMock(List<Customer> customers) {
+    public static List<LoginAuth> createLoginAuthListMock(List<Wallet> wallets) {
 
         List<LoginAuth> loginAuths = new ArrayList<>();
 
-        for (Customer customer : customers) {
+        for (Wallet wallet : wallets) {
 
-            String lastFourNumbersPhone = customer.getPhoneNumber()
-                .substring( customer.getPhoneNumber().length() - 4 );
+            Customer customer = wallet.getCustomer();
+
+            Long walletId = wallet.getWalletId();
             
-            String loginAccess = "l"
-                .concat(customer.getFirstName())
-                .concat(lastFourNumbersPhone)
+            String loginAccess = customer.getFirstName()
+                .concat(wallet.getWalletId().toString())
                 .toLowerCase();
             
-            String accessKey = "k3Y_".concat(lastFourNumbersPhone);
+            String accessKey = "k3Y_".concat(walletId.toString());
+
+            LoginRole loginRole = LoginRole.fromValue(RandomMock.generateIntNumberByInterval(1, 4));
             
             LoginAuthType loginAuthType = LoginAuthType.fromValue(RandomMock.generateIntNumberByInterval(0, 3));
             switch (loginAuthType) {
@@ -146,10 +152,16 @@ public class TransactionUtilsMock {
                     break;
             }
 
+            // codigo exclusivo para o cliente da aplicação ( wallet_user )
             if (customer.getFirstName().toLowerCase().contains(GlobalHelper.APP_USER_NAME.toLowerCase())) {
                 loginAuthType = LoginAuthType.USER_NAME;
-                loginAccess = GlobalHelper.APP_USER_NAME;
-                accessKey = GlobalHelper.APP_PASSWORD;
+                loginAccess = GlobalHelper.APP_USER_NAME + "_" + walletId.toString();
+                accessKey = GlobalHelper.APP_PASSWORD + "_" + walletId.toString();
+                if (wallet.getStatus().equals(Status.ACTIVE)) {
+                    loginAccess = GlobalHelper.APP_USER_NAME;
+                    accessKey = GlobalHelper.APP_PASSWORD;
+                    loginRole = LoginRole.USER;
+                }
             }
 
             SEQUENCE_LOGIN_AUTH_ID++;
@@ -157,15 +169,20 @@ public class TransactionUtilsMock {
             loginAuths.add(
                 LoginAuth.builder()
                     .id( (long)(RANGE_LOGIN_AUTH_ID + SEQUENCE_LOGIN_AUTH_ID) )
+                    .status(wallet.getStatus())
                     .customerId(customer.getCustomerId())
+                    .walletId(wallet.getWalletId())
                     .login(loginAccess)
                     .accessKey(accessKey)
                     .loginAuthType(loginAuthType)
+                    .role(loginRole)
                     .createdAt(customer.getCreatedAt())
                     .updatedAt(customer.getCreatedAt())
                     .build()
             );
+
         }
+
         return loginAuths;
     }
     
@@ -188,43 +205,100 @@ public class TransactionUtilsMock {
 
         List<Wallet> wallets = new ArrayList<>();
 
-        IntStream.range(RANGE_WALLET_ID, TOTAL_WALLET_ID)
-           .forEach(i -> {
-                int indexCustomer = RandomMock.generateIntNumberByInterval(0, totalCustomerItems - 1);
-                Customer customer = customers.get(indexCustomer);
-                LocalDateTime createAt = TransactionUtilsMock.defineLocalDAteTimeBetweenYear();
+        Set<Long> processados = new HashSet<>();
 
-                List<Wallet> walletCheck = wallets.stream()
-                    .filter(w -> w.getCustomer().getCustomerId().equals(customer.getCustomerId()) 
-                                    && w.getStatus().equals(Status.ACTIVE) )
-                    .toList()
-                    ;
+        int nextExec = RANGE_WALLET_ID;
+        while (nextExec < TOTAL_WALLET_ID) {
 
-                Long walletId = (long)i;
-               
-                Status status = defineStatus();
+            LocalDateTime createAt = TransactionUtilsMock.defineLocalDAteTimeBetweenYear();            
 
-                if (status.equals(Status.ACTIVE) && !walletCheck.isEmpty() && walletCheck.size() == 2){
-                    status = Status.INACTIVE;
-                }
+            Long walletId = (long)nextExec;
 
-                Wallet wallet = Wallet.builder()
+            Wallet walletNew = validateProcessWallet(customers, wallets, processados);
+
+            if (walletNew == null) {
+                break;
+            }
+
+            Wallet wallet = Wallet.builder()
                 .walletId( walletId )
-                .customerId(customer.getCustomerId())
-                .customer(customer)
-                .status( status )
+                .customerId(walletNew.getCustomerId())
+                .customer(walletNew.getCustomer())
+                .status( walletNew.getStatus() )
                 .currentBalance( BigDecimal.ZERO )
                 .previousBalance( BigDecimal.ZERO )
                 .createdAt(createAt)
                 .updatedAt(createAt)
-                .loginUser("system")
                 .build();
-                
-                wallets.add(wallet);
+            
+            wallets.add(wallet);
 
-            }
-        );
+            nextExec = nextExec + 1;
+        }
+
         return wallets;
+    }
+
+    private static Wallet validateProcessWallet( List<Customer> customers, List<Wallet> wallets,
+        Set<Long> processados) {
+
+        List<Customer> customersProcess = new ArrayList<>();
+        for (Customer c: customers) {
+            if (!processados.contains(c.getCustomerId())) {
+                customersProcess.add(c);
+            }
+        }
+
+        Wallet walletOut = null;
+
+        while (customersProcess.size() > 1) {
+
+            int indexCustomer = RandomMock.generateIntNumberByInterval(0, customersProcess.size() - 1);
+            
+            Customer customer = customersProcess.get(indexCustomer);
+
+            Long customerId = customer.getCustomerId();
+
+            if (processados.contains(customerId)) {
+                continue;
+            }
+
+            List<Wallet> getWalletsByCustomer = wallets.stream()
+                .filter(w -> w.getCustomerId().equals(customerId))
+                .toList()
+                ;
+
+            boolean hasWalletActive = (!getWalletsByCustomer.isEmpty()) && 
+                (getWalletsByCustomer.stream()
+                    .anyMatch(w -> w.getStatus() == Status.ACTIVE));
+        
+            if (hasWalletActive) {
+                processados.add(customerId);
+                continue;
+            }
+
+            Status walletStatus = defineStatus();
+
+            if (!getWalletsByCustomer.isEmpty() && getWalletsByCustomer.size() == 2) {
+                walletStatus = Status.ACTIVE;
+            }
+
+            if (walletStatus.equals(Status.ACTIVE)) {
+                processados.add(customerId);
+            }
+
+            walletOut = Wallet.builder()
+                .customerId(customerId)
+                .customer(customer)
+                .status(walletStatus)
+                .build();
+
+            break;
+
+        }
+
+        return walletOut;
+
     }
 
     public static Map<String, List<?>> createTransactionListMock(List<Wallet> walletInput) {

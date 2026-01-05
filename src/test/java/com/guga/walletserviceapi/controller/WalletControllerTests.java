@@ -42,8 +42,9 @@ import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.Wallet;
-import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
-import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 import com.guga.walletserviceapi.service.WalletService;
 
@@ -140,7 +141,7 @@ class WalletControllerTests {
         List<Wallet> mockWallets = new ArrayList<>( wallets.stream().toList() );
         Page<Wallet> mockPage = new PageImpl<>(mockWallets, pageable, mockWallets.size());
 
-        when(walletService.getAllWallets(any(Pageable.class))).thenReturn(mockPage);
+        when(walletService.getAllWallets(any(Status.class), any(Pageable.class))).thenReturn(mockPage);
 
         // Act & Assert
         mockMvc.perform(get(URI_API.concat("/list"))

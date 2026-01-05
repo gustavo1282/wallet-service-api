@@ -59,10 +59,10 @@ import com.guga.walletserviceapi.model.enums.StatusTransaction;
 import com.guga.walletserviceapi.repository.CustomerRepository;
 import com.guga.walletserviceapi.repository.TransactionRepository;
 import com.guga.walletserviceapi.repository.WalletRepository;
-import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
-import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
 import com.guga.walletserviceapi.security.handler.CustomAccessDeniedHandler;
 import com.guga.walletserviceapi.security.handler.CustomAuthenticationEntryPoint;
+import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 import com.guga.walletserviceapi.service.TransactionService;
 
@@ -180,16 +180,13 @@ public class TransactionControllerTests {
                                 // A variável paramsApp armazena uma lista parametros iniciais da aplicação
                                 paramsApp = TransactionUtilsMock.createParamsAppMock();
 
-                                customers = TransactionUtilsMock.createCustomerListMock();                                
-                                customers.add(TransactionUtilsMock.addCustomerApplication(
-                                        customers.getLast().getCustomerId() + 1
-                                ));
-
-                                loginAuths = TransactionUtilsMock.createLoginAuthListMock(customers );
-                                encriptAccessKeyLoginAuthListMock(loginAuths);
+                                customers = TransactionUtilsMock.createCustomerListMock();
 
                                 // Cria a lista de wallets a partir da lista de customers
                                 wallets = TransactionUtilsMock.createWalletListMock(customers);
+
+                                loginAuths = TransactionUtilsMock.createLoginAuthListMock(wallets );
+                                encriptAccessKeyLoginAuthListMock(loginAuths);
 
                                 // Cria a lista de transactions, movements e depositSenders a partir da lista de
                                 // wallets

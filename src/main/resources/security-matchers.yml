@@ -2,9 +2,7 @@ security:
   access-levels:
     # ABERTOS: Essenciais para infraestrutura e onboarding
     public-paths:
-      - "/api/auth/login"
-      - "/api/auth/register"
-      - "/api/auth/refresh"
+      - "/api/auth/**"
       - "/actuator/health/**"
       - "/actuator/info"
 
@@ -16,19 +14,28 @@ security:
       - "/swagger-ui/index.html"
       - "/swagger-resources/**"
       - "/webjars/**"
-      - "/actuator/**"
 
     # MONITORAMENTO (Prometheus / Metrics): Foco em métricas numéricas
     monitor:
       - "/actuator/prometheus"
       - "/actuator/metrics/**"
-      - "/actuator/scheduledtasks" # Útil para ver tarefas agendadas
+      #- "/actuator/scheduledtasks" # Útil para ver tarefas agendadas
 
     # ADMINISTRAÇÃO E DIAGNÓSTICO: Foco em Tracing, Logs e Auditoria
     admin:
-      - "/actuator/loggers/**"
-      - "/actuator/env/**"
-      - "/actuator/httpexchanges" # Fundamental para auditoria de requests
-      - "/actuator/threaddump"    # Diagnóstico de travamentos
-      - "/actuator/heapdump"      # Diagnóstico de memória
-      - "/actuator/beans"         # Verificação de contexto
+      - "/actuator/**"
+      #- "/actuator/loggers/**"
+      #- "/actuator/env/**"
+      #- "/actuator/httpexchanges" # Fundamental para auditoria de requests
+      #- "/actuator/threaddump"    # Diagnóstico de travamentos
+      #- "/actuator/heapdump"      # Diagnóstico de memória
+      #- "/actuator/beans"         # Verificação de contexto
+
+    # SEGURANÇA: Foco em autenticação e autorização
+    SECURED:
+      - "/api/customers/**"
+      - "/api/wallets/**"
+      - "/api/transactions/**"
+      - "/api/wallet-operations/**"
+      
+      

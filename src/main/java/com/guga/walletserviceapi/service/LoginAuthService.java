@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.repository.LoginAuthRepository;
-import com.guga.walletserviceapi.security.JwtService;
 
 @Service
 public class LoginAuthService implements UserDetailsService {
@@ -21,8 +20,8 @@ public class LoginAuthService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtService jwtService;
+    //@Autowired
+    //private JwtService jwtService;
 
 
     public LoginAuth register(String username, String password) {
@@ -38,9 +37,9 @@ public class LoginAuthService implements UserDetailsService {
         return loginAuthRepository.save(loginAuth);
     }
 
-    public String login(LoginAuth loginAuth) {
-        return jwtService.generateAccessToken(loginAuth.getLogin());
-    }
+    //public String login(LoginAuth loginAuth) {
+    //    return jwtService.generateAccessToken(loginAuth.getLogin());
+    //}
 
 
     @Override
@@ -55,5 +54,11 @@ public class LoginAuthService implements UserDetailsService {
             .password(loginAuth.getAccessKey()) // Deve ser a senha JÁ criptografada do banco
             .roles("USER") // Adicione os papéis/autoridades aqui
             .build();
+    }
+
+    public LoginAuth findByLogin(String username) {
+         LoginAuth loginAuth = loginAuthRepository.findByLogin(username)
+            .orElseThrow(() -> new UsernameNotFoundException("Login não encontrado: " + username));
+        return loginAuth;
     }
 }

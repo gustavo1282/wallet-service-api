@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.enums.LoginAuthType;
 import com.guga.walletserviceapi.repository.LoginAuthRepository;
-import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 
 
@@ -72,8 +73,8 @@ class AuthControllerTests {
     private String jwtSecret;
 
     private static final String API_NAME = "/auth";
-    private static final String LOGIN_USER = "l_guga";
-    private static final String LOGIN_PASSWORD = "p_ruts"; // Senha em texto plano
+    private static final String LOGIN_USER = "wallet_user";
+    private static final String LOGIN_PASSWORD = "wallet_pass"; // Senha em texto plano
 
     private static final String TAG_MOCK_ACCESS_TOKEN = "mock-access-token";
     private static final String TAG_MOCK_REFRESH_TOKEN = "mock-refresh-token"; 
@@ -121,13 +122,23 @@ class AuthControllerTests {
             List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
 
+        LoginAuth loginAuth = LoginAuth.builder()
+            .login(LOGIN_USER)
+            .loginAuthType(LoginAuthType.USER_NAME)
+            .id(9878L)
+            .accessKey(UUID.randomUUID().toString())
+            .build();
+
+        when(loginAuthService.findByLogin(anyString()))
+            .thenReturn(loginAuth);
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
             .thenReturn(successfulAuthentication);
 
-        when(jwtService.generateAccessToken(eq(LOGIN_USER)))
+        when(jwtService.generateAccessToken(eq(loginAuth)))
             .thenReturn(tokens.get(TAG_MOCK_ACCESS_TOKEN));
             
-        when(jwtService.generateRefreshToken(eq(LOGIN_USER)))
+        when(jwtService.generateRefreshToken(eq(loginAuth)))
             .thenReturn(tokens.get(TAG_MOCK_REFRESH_TOKEN));
 
         mockMvc.perform(post(URI_API + "/login")
@@ -168,13 +179,23 @@ class AuthControllerTests {
     @Test
     void testRefreshGeneratesNewAccessToken() throws Exception {
         
+        LoginAuth loginAuth = LoginAuth.builder()
+            .login(LOGIN_USER)
+            .loginAuthType(LoginAuthType.USER_NAME)
+            .id(9878L)
+            .accessKey(UUID.randomUUID().toString())
+            .build();
+
+        when(loginAuthService.findByLogin(anyString()))
+            .thenReturn(loginAuth);
+
         Map<String, String> newTokenGenerate = GlobalHelper.jwtTokens(LOGIN_USER);
 
         when(jwtService.validateToken(anyString())).thenReturn(true);
-        when(jwtService.extractUsername(anyString())).thenReturn(LOGIN_USER);
+        when(jwtService.extractLogin(anyString())).thenReturn(LOGIN_USER);
 
-        when(jwtService.generateAccessToken(anyString())).thenReturn(newTokenGenerate.get(TAG_MOCK_ACCESS_TOKEN));
-        when(jwtService.generateRefreshToken(anyString())).thenReturn(newTokenGenerate.get(TAG_MOCK_REFRESH_TOKEN));
+        when(jwtService.generateAccessToken(eq(loginAuth))).thenReturn(newTokenGenerate.get(TAG_MOCK_ACCESS_TOKEN));
+        when(jwtService.generateRefreshToken(eq(loginAuth))).thenReturn(newTokenGenerate.get(TAG_MOCK_REFRESH_TOKEN));
 
         mockMvc.perform(post(URI_API + "/refresh")
             .param("refreshToken", tokens.get(TAG_MOCK_ACCESS_TOKEN)))

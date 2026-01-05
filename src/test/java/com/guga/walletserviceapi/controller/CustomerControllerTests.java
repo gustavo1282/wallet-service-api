@@ -45,8 +45,8 @@ import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.CustomerRepository;
-import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
-import com.guga.walletserviceapi.security.JwtService;
+import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.CustomerService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 
