@@ -12,11 +12,6 @@ public class SeedRunner implements CommandLineRunner {
     private final SeedExecutor executor;
     private final SeedOrderConfig config;
 
-//    public SeedRunner(SeedExecutor executor, SeedOrderConfig config) {
- //       this.executor = executor;
- //       this.config = config;
- //   }
-
     @Override
     public void run(String... args) throws Exception {
 

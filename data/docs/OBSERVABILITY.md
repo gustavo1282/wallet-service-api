@@ -191,6 +191,35 @@ grep "customerId=1" logs/wallet-service.log
 tail -50 logs/wallet-service.log
 ```
 
+### TraceId para Correlação (v0.2.7)
+
+Implementado TraceId único por requisição para correlação entre logs, auditoria e respostas da API.
+
+**Características:**
+- TraceId gerado automaticamente para cada requisição HTTP.
+- Propagação do TraceId através de todas as camadas da aplicação.
+- Inclusão do TraceId em logs, respostas de erro e eventos de auditoria.
+
+**Implementação:**
+
+```java
+// Em GlobalExceptionHandler
+public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+    String traceId = TraceIdContext.getTraceId();
+    return ResponseEntity.status(status)
+        .body(ErrorResponse.builder()
+            .error("Erro interno")
+            .message(ex.getMessage())
+            .traceId(traceId)
+            .build());
+}
+```
+
+**Benefícios:**
+- Correlação fácil entre requisições e logs.
+- Rastreamento de transações end-to-end.
+- Debugging facilitado em ambientes distribuídos.
+
 ## 📊 Métricas (Prometheus)
 
 ### Configuração

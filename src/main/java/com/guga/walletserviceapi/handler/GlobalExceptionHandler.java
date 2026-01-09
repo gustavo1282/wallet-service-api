@@ -2,10 +2,12 @@ package com.guga.walletserviceapi.handler;
 
 import java.time.Instant;
 
+import org.apache.hc.client5.http.auth.AuthenticationException;
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -73,14 +75,20 @@ public class GlobalExceptionHandler {
 
    // 🔥 Catch-all (ESSENCIAL)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) throws Exception {
+
+        // 🔹 Deixa Spring Security tratar autenticação/autorização
+        if (ex instanceof AccessDeniedException || ex instanceof AuthenticationException) {
+            throw ex;
+        }
+
+        // 🔹 Para os demais, retorna 500
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(buildError(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unexpected error occurred. " + ex.getMessage()
-                )
-            );
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Unexpected error occurred. " + ex.getMessage()
+            ));
     }
 
     /*

@@ -3,37 +3,33 @@ package com.guga.walletserviceapi.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
-import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.WalletRepository;
+import com.guga.walletserviceapi.service.common.DataImportService;
+import com.guga.walletserviceapi.service.common.ImportSummary;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class WalletService implements IWalletApiService {
 
-    @Autowired
-    private WalletRepository walletRepository;
-
-    @Autowired
-    private ParamAppService paramAppService;
-
-    @Autowired
-    private CustomerService customerService;
+    private final WalletRepository walletRepository;
+    private final ParamAppService paramAppService;
+    private final CustomerService customerService;
+    private final DataImportService importService;
 
     public Wallet getWalletById(Long id) {
         return walletRepository.findById(id)
@@ -100,33 +96,8 @@ public class WalletService implements IWalletApiService {
 
     }
 
-    /***
-     * Função responsável por realizar carga inicial de dados para a tabela correspondente a partir de um 
-     * arquivo no formato JSON
-     * @param file
-     * @throws Exception
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void loadCsvAndSave(MultipartFile file) throws Exception {
-        try {
-            ObjectMapper mapper = FileUtils.instanceObjectMapper();
-
-            TypeReference<List<Wallet>> walletTypeRef = new TypeReference<List<Wallet>>() { };
-
-            List<Wallet> wallets = mapper.readValue(file.getInputStream(), walletTypeRef);
-
-            for (int i = 0; i < wallets.size(); i += GlobalHelper.BATCH_SIZE) {
-
-                int end = Math.min(wallets.size(), i + GlobalHelper.BATCH_SIZE);
-                
-                List<Wallet> lote = wallets.subList(i, end);
-
-                walletRepository.saveAll(lote);
-
-            }
-        } catch (Exception e) {
-            throw new ResourceBadRequestException(e.getMessage());
-        }
+    public ImportSummary importWallets(MultipartFile file) {
+        return importService.importJson(file, new TypeReference<List<Wallet>>() {}, walletRepository);
     }
 
     public Page<Wallet> getWalletByCustomerId(Long customerId, Pageable pageable) {

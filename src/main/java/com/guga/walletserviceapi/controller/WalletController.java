@@ -4,13 +4,11 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,171 +33,207 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${controller.path.base}/wallets")
 @Tag(name = "Wallet", description = "Endpoints for managing wallets")
 @SecurityRequirement(name = "bearerAuth")
+@RequiredArgsConstructor
 public class WalletController {
-    
+
     private static final Logger LOGGER = LogManager.getLogger(WalletController.class);
 
-    @Autowired
-    private WalletService walletService;
+    private final WalletService walletService;
 
-    @Autowired
-    private JwtAuthenticatedUserProvider authUserProvider;
+    private final JwtAuthenticatedUserProvider authUserProvider;
 
     @Value("${spring.data.web.pageable.default-page-size}")
     private int defaultPageSize;
 
-    // ============================
-    // CREATE WALLET
-    // ============================
+    // =====================================================
+    // USER CONTEXT
+    // =====================================================
+
     @Operation(
-        summary = "Create a new Wallet",
-        description = "Creates a new Wallet with the data provided in the request body."
+        summary = "Get authenticated user's wallet",
+        description = "Returns the wallet associated with the authenticated user (JWT context)."
     )
-    @PostMapping("/wallet")
+    @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Wallet> getMyWallet() {
+
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+        Long walletId = auditCtx.getWalletId();
+
+        LOGGER.info(LogMarkers.LOG,
+            "GET_MY_WALLET | walletId={} user={}",
+            walletId, auditCtx.getUsername()
+        );
+
+        AuditLogger.log("WALLET_GET_ME", auditCtx);
+
+        return ResponseEntity.ok(
+            walletService.getWalletById(walletId)
+        );
+    }
+
+    // =====================================================
+    // CREATE WALLET (ADMIN)
+    // =====================================================
+
+    @Operation(
+        summary = "Create wallet",
+        description = "Creates a new wallet. Admin-only operation."
+    )
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Wallet> createWallet(
-            @RequestBody @Valid Wallet wallet
-        ) 
-    {
+        @RequestBody @Valid Wallet wallet
+    ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
-        LOGGER.info(LogMarkers.LOG, "Creating wallet | user={}", auditCtx.getUsername());
+        LOGGER.info(LogMarkers.LOG,
+            "CREATE_WALLET | admin={}",
+            auditCtx.getUsername()
+        );
+
         AuditLogger.log("WALLET_CREATE [START]", auditCtx);
 
         Wallet createdWallet = walletService.saveWallet(wallet);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(createdWallet.getWalletId())
-                .toUri();
+            .fromCurrentRequest()
+            .path("/{walletId}")
+            .buildAndExpand(createdWallet.getWalletId())
+            .toUri();
 
-        LOGGER.info("Wallet created successfully | walletId={}", createdWallet.getWalletId());
         AuditLogger.log("WALLET_CREATE [SUCCESS]", auditCtx);
 
         return ResponseEntity.created(location).body(createdWallet);
     }
 
-    // ============================
-    // GET WALLET BY ID
-    // ============================
+    // =====================================================
+    // ADMIN CONTEXT
+    // =====================================================
+
     @Operation(
-        summary = "Get Wallet by ID",
-        description = "Retrieves a Wallet by their ID."
+        summary = "Get wallet by ID",
+        description = "Retrieves a wallet by ID. Admin-only operation."
     )
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/{walletId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Wallet> getWalletById(
-            @PathVariable Long walletId
+        @PathVariable Long walletId
     ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
-        LOGGER.info(LogMarkers.LOG, "Fetching wallet | walletId={}", walletId);
+        LOGGER.info(LogMarkers.LOG,
+            "GET_WALLET_BY_ID | walletId={} admin={}",
+            walletId, auditCtx.getUsername()
+        );
+
         AuditLogger.log("WALLET_GET_BY_ID", auditCtx);
 
-        Wallet wallet = walletService.getWalletById(walletId);
-
-        return new ResponseEntity<>(wallet, HttpStatus.OK);
+        return ResponseEntity.ok(
+            walletService.getWalletById(walletId)
+        );
     }
 
-    // ============================
-    // UPDATE WALLET
-    // ============================
     @Operation(
-        summary = "Update Wallet by ID",
-        description = "Updates a Wallet by their ID."
+        summary = "Update wallet",
+        description = "Updates a wallet by ID. Admin-only operation."
     )
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/{walletId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Wallet> updateWallet(
-            @PathVariable Long walletId,
-            @RequestBody @Valid Wallet walletUpdate
+        @PathVariable Long walletId,
+        @RequestBody @Valid Wallet walletUpdate
     ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
-        LOGGER.info("Updating wallet | walletId={}", walletId);
+        LOGGER.info(LogMarkers.LOG,
+            "UPDATE_WALLET | walletId={} admin={}",
+            walletId, auditCtx.getUsername()
+        );
+
         AuditLogger.log("WALLET_UPDATE [START]", auditCtx);
 
         Wallet wallet = walletService.updateWallet(walletId, walletUpdate);
 
         AuditLogger.log("WALLET_UPDATE [SUCCESS]", auditCtx);
-        return new ResponseEntity<>(wallet, HttpStatus.OK);
+
+        return ResponseEntity.ok(wallet);
     }
 
-    // ============================
-    // LIST ALL WALLETS
-    // ============================
     @Operation(
-        summary = "Get all Wallets",
-        description = "Retrieves all Wallets."
+        summary = "List wallets",
+        description = "Retrieves all wallets with optional status filter. Admin-only operation."
     )
-    @GetMapping("/list")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Wallet>> getAllWallets(
+    public ResponseEntity<Page<Wallet>> listWallets(
         @RequestParam(required = false) Status status,
         @RequestParam(defaultValue = "0") int page
-        ) 
-    {
-
-        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-
-        LOGGER.info("Listing wallets | status={} page={}", status, page);
-        AuditLogger.log("WALLET_LIST_ALL", auditCtx);
-
-        Pageable pageable = PageRequest.of(
-                page,
-                defaultPageSize,
-                Sort.by(
-                    Sort.Order.asc("status"),
-                    Sort.Order.asc("createdAt")
-                )
-        );
-
-        Page<Wallet> pageWallet = walletService.getAllWallets(status, pageable);
-
-        return new ResponseEntity<>(pageWallet, HttpStatus.OK);
-    }
-
-    // ============================
-    // SEARCH BY CUSTOMER
-    // ============================
-    @Operation(
-        summary = "Get Wallets by Customer ID",
-        description = "Retrieves Wallets by Customer ID."
-    )
-    @GetMapping("/search-by-customer")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Wallet>> getWalletByCustomerId(
-            @RequestParam Long customerId,
-            @RequestParam(defaultValue = "0") int page
     ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
-        LOGGER.info("Searching wallets by customer | customerId={}", customerId);
-        AuditLogger.log("WALLET_SEARCH_BY_CUSTOMER [GET]", auditCtx);
-
-        Pageable pageable = PageRequest.of(
-                page,
-                defaultPageSize,
-                Sort.by(
-                        Sort.Order.asc("customerId"),
-                        Sort.Order.asc("status"),
-                        Sort.Order.asc("createdAt")
-                )
+        LOGGER.info(LogMarkers.LOG,
+            "LIST_WALLETS | status={} page={} admin={}",
+            status, page, auditCtx.getUsername()
         );
 
-        Page<Wallet> findResult =
-                walletService.getWalletByCustomerId(customerId, pageable);
+        AuditLogger.log("WALLET_LIST", auditCtx);
 
-        return new ResponseEntity<>(findResult, HttpStatus.OK);
+        Pageable pageable = PageRequest.of(
+            page,
+            defaultPageSize,
+            Sort.by(
+                Sort.Order.asc("status"),
+                Sort.Order.asc("createdAt")
+            )
+        );
+
+        return ResponseEntity.ok(
+            walletService.getAllWallets(status, pageable)
+        );
+    }
+
+    @Operation(
+        summary = "Get wallets by customer",
+        description = "Retrieves wallets by customer ID. Admin-only operation."
+    )
+    @GetMapping("/by-customer/{customerId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<Wallet>> getWalletsByCustomer(
+        @PathVariable Long customerId,
+        @RequestParam(defaultValue = "0") int page
+    ) {
+
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+
+        LOGGER.info(LogMarkers.LOG,
+            "GET_WALLETS_BY_CUSTOMER | customerId={} admin={}",
+            customerId, auditCtx.getUsername()
+        );
+
+        AuditLogger.log("WALLET_GET_BY_CUSTOMER", auditCtx);
+
+        Pageable pageable = PageRequest.of(
+            page,
+            defaultPageSize,
+            Sort.by(
+                Sort.Order.asc("status"),
+                Sort.Order.asc("createdAt")
+            )
+        );
+
+        return ResponseEntity.ok(
+            walletService.getWalletByCustomerId(customerId, pageable)
+        );
     }
 }

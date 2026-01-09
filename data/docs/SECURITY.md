@@ -130,6 +130,27 @@ public class JwtService {
 }
 ```
 
+### Novo Modelo de Autenticação JWT (v0.2.7)
+
+A partir da versão 0.2.7, foi implementado um modelo estrutural de autenticação JWT com as seguintes características:
+
+- **JwtAuthenticationDetails**: Fonte única do contexto autenticado, centralizando username, roles e metadados.
+- **Refatoração de Filtros e Providers**: Redesenho completo dos filtros de autenticação, providers e pacotes de segurança.
+- **Fluxo de Autorização Corrigido**: Garantia de que `@PreAuthorize` seja avaliado após a autenticação JWT.
+- **Padronização de Controllers**: Uso consistente de `JwtAuthenticatedUserProvider` para acesso ao usuário logado nos controllers.
+
+**Fluxo de Autenticação Atualizado:**
+
+```
+Requisição HTTP → JwtAuthenticationFilter → JwtAuthenticationProvider → JwtAuthenticationDetails → SecurityContext
+```
+
+**Principais Componentes:**
+
+- `JwtAuthenticationDetails`: Classe que encapsula o contexto do usuário autenticado.
+- `JwtAuthenticatedUserProvider`: Provider para acesso padronizado ao usuário logado nos controllers.
+- `AuditContextFactory`: Integração entre autenticação e auditoria.
+
 ### Configuração de Segurança
 
 **Arquivo:** `src/main/java/com/guga/walletserviceapi/config/SpringSecurityConfig.java`
@@ -540,6 +561,20 @@ public class Wallet {
 ```
 
 ## 📊 Audit & Logging
+
+### Módulo de Auditoria Dedicado (v0.2.7)
+
+Implementado módulo centralizado para auditoria e rastreamento:
+
+**Características:**
+- Centralização da criação do contexto de auditoria.
+- Desacoplamento entre logging e futuros publishers de eventos (Kafka, DB, Elastic, etc.).
+- Arquitetura preparada para evolução e escalabilidade.
+
+**Componentes do Módulo:**
+- `AuditContextFactory`: Criação e propagação do contexto.
+- `AuditEvent`: Representação de eventos auditáveis.
+- `AuditModule`: Centralização das regras de auditoria.
 
 ### Audit Trail
 

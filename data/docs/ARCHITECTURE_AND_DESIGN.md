@@ -611,7 +611,187 @@ Ou por header:
 Accept: application/vnd.wallet.v1+json
 ```
 
-## 📚 Referências de Arquitetura
+
+## 📝 Auditoria e Rastreamento
+
+### Conceito
+A aplicação passa a contar com um **módulo dedicado de auditoria**, responsável por registrar o contexto das operações realizadas.  
+Esse módulo garante transparência e rastreabilidade em transações críticas, como movimentações de carteira e operações financeiras.
+
+### Componentes
+| Componente            | Responsabilidade |
+|-----------------------|-----------------|
+| `AuditContextFactory` | Criação e propagação do contexto de auditoria |
+| `AuditEvent`          | Representação de eventos auditáveis |
+| `AuditModule`         | Centralização das regras de auditoria |
+
+### Fluxo de Auditoria
+```
+┌───────────────────────────────┐
+│ Controller recebe requisição  │
+└───────────────┬───────────────┘
+│
+┌───────────────▼───────────────┐
+│ AuditContextFactory cria      │
+│ contexto de auditoria         │
+└───────────────┬───────────────┘
+│
+┌───────────────▼───────────────┐
+│ Operação registrada com       │
+│ usuário, roles e traceId      │
+└───────────────┬───────────────┘
+│
+┌───────────────▼───────────────┐
+│ Evento auditável persistido   │
+│ ou publicado                  │
+└───────────────────────────────┘
+```
+
+---
+
+## 🔍 Observabilidade e TraceId
+
+### Conceito
+Cada requisição agora recebe um **TraceId** único, permitindo correlação entre logs, auditoria e respostas da API.  
+Esse identificador é fundamental para rastreabilidade ponta a ponta em ambientes distribuídos.
+
+### Componentes
+| Componente          | Responsabilidade |
+|---------------------|-----------------|
+| `TraceIdInjector`   | Injeção de identificador único em cada requisição |
+| `OpenTelemetryConfig` | Configuração para rastreabilidade distribuída |
+| `StructuredLogger`  | Logs estruturados com traceId |
+
+### Fluxo de Observabilidade
+```
+┌───────────────────────────────┐
+│ Requisição recebe TraceId     │
+└───────────────┬───────────────┘
+│
+┌───────────────▼───────────────┐
+│ TraceId propagado em          │
+│ controllers, services, repos  │
+└───────────────┬───────────────┘
+│
+┌───────────────▼───────────────┐
+│ Logs e auditoria incluem      │
+│ TraceId                       │
+└───────────────┬───────────────┘
+│
+┌───────────────▼───────────────┐
+│ OpenTelemetry correlaciona    │
+│ dados distribuídos            │
+└───────────────────────────────┘
+```
+
+---
+
+## 🔐 Atualização da Security Layer
+
+### Fluxo JWT
+O fluxo de autenticação JWT foi redesenhado para maior clareza e consistência:
+- `JwtAuthenticationDetails` como fonte única do contexto autenticado  
+- `JwtAuthenticatedUserProvider` padroniza acesso ao usuário  
+- `@PreAuthorize` avaliado após autenticação JWT  
+- Revisão dos filtros e providers, com configuração ajustada dos `SecurityMatchers`
+
+### Novo Fluxo
+
+1. POST /api/auth/login
+2. AuthenticationManager.authenticate(username, password)
+3. JwtService.generateAccessToken(username)
+4. JwtAuthenticationDetails armazena contexto autenticado
+5. JwtAuthenticatedUserProvider fornece usuário às camadas superiores
+6. @PreAuthorize avalia permissões
+
+
+---
+
+## 🔄 Fluxo 4: Operação de Carteira com Auditoria e TraceId
+
+```
+┌───────────────────────────────────────────┐
+│ POST /api/wallet/deposit                  │
+│ {walletId, amount}                        │
+└───────────────────┬───────────────────────┘
+│
+┌───────────────────▼───────────────────────┐
+│ WalletController                          │
+│ .deposit()                                │
+│ - Recebe requisição autenticada           │
+│ - Injeta TraceId                          │
+└───────────────────┬───────────────────────┘
+│
+┌───────────────────▼───────────────────────┐
+│ AuditContextFactory                       │
+│ - Cria contexto de auditoria              │
+│ - Associa usuário, roles e TraceId        │
+└───────────────────┬───────────────────────┘
+│
+┌───────────────────▼───────────────────────┐
+│ WalletService                             │
+│ - Valida wallet e saldo                   │
+│ - Executa operação de depósito            │
+│ - Propaga contexto de auditoria           │
+└───────────────────┬───────────────────────┘
+│
+┌───────────────────▼───────────────────────┐
+│ TransactionRepository                     │
+│ - Persiste transação                      │
+│ - Inclui TraceId e dados de auditoria     │
+└───────────────────┬───────────────────────┘
+│
+┌───────────────────▼───────────────────────┐
+│ Auditoria & Logs                          │
+│ - Evento auditável registrado             │
+│ - Log estruturado com TraceId             │
+│ - OpenTelemetry correlaciona operação     │
+└───────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 Fluxo 5: Transferência Entre Carteiras com Auditoria e TraceId
+```
+┌───────────────────────────────────────────┐
+│ POST /api/wallet/transfer                 │
+│ {sourceWalletId, targetWalletId, amount}  │
+└───────────────────┬───────────────────────┘
+│
+┌───────────────────▼───────────────────────┐
+│ WalletController                          │
+│ .transfer()                               │
+│ - Recebe requisição autenticada           │
+│ - Injeta TraceId                          │
+└───────────────────┬───────────────────────┘
+│
+┌───────────────────▼───────────────────────┐
+│ AuditContextFactory                       │
+│ - Cria contexto de auditoria              │
+│ - Associa usuário, roles e TraceId        │
+└───────────────────┬───────────────────────┘
+```
+
+## � Novo Fluxo de Segurança e Autenticação (v0.2.7)
+
+**Características:**
+- Refatoração completa do fluxo JWT com `JwtAuthenticationDetails`.
+- Integração nativa entre autenticação e auditoria.
+- Padronização do acesso ao contexto do usuário autenticado.
+
+**Fluxo Atualizado:**
+
+```
+HTTP Request → JwtAuthenticationFilter → JwtAuthenticationProvider → JwtAuthenticationDetails → SecurityContext
+    ↓
+AuditContextFactory (contexto de auditoria)
+    ↓
+Service Layer (regras de negócio)
+    ↓
+Repository Layer (persistência)
+```
+
+## �📚 Referências de Arquitetura
 
 - Clean Architecture (Robert C. Martin)
 - Domain-Driven Design (Eric Evans)

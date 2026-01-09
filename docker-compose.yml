@@ -142,6 +142,8 @@ services:
     user: "472"
     ports:
       - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
@@ -170,6 +172,8 @@ services:
     restart: unless-stopped
     ports:
       - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: 'admin@postgres.com'
       PGADMIN_DEFAULT_PASSWORD: wallet_pass
@@ -177,6 +181,18 @@ services:
       - postgres
     networks:
       - wallet_network
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: cont-wallet-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/etc/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - wallet_network
+
 
 # ======================================================================
 # VOLUMES E REDES
@@ -189,6 +205,9 @@ volumes:
   sonarqube_logs:
   jaeger_tracing_data:
   runner_act_data:
+  pgadmin_data:
+  grafana-data: 
+  loki-data:
 
 networks:
   wallet_network:

@@ -467,6 +467,122 @@ Authorization: Bearer {accessToken}
 
 ---
 
+## Wallet Operations
+
+Endpoints para operações financeiras diretas em carteiras.
+
+### Deposit to Wallet
+
+**POST** `/api/wallet/deposit`
+
+Realiza um depósito em uma carteira específica.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "walletId": 1,
+  "amount": 500.00,
+  "senderName": "João Silva",
+  "senderCpf": "12345678901",
+  "terminalId": "TERM001"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "transactionId": 1,
+  "walletId": 1,
+  "amount": 500.00,
+  "type": "DEPOSIT",
+  "status": "COMPLETED",
+  "createdAt": "2024-01-05T10:30:00Z"
+}
+```
+
+### Withdraw from Wallet
+
+**POST** `/api/wallet/withdraw`
+
+Realiza um saque de uma carteira específica.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "walletId": 1,
+  "amount": 200.00
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "transactionId": 2,
+  "walletId": 1,
+  "amount": 200.00,
+  "type": "WITHDRAW",
+  "status": "COMPLETED",
+  "createdAt": "2024-01-05T10:35:00Z"
+}
+```
+
+**Error Response (400 Bad Request - Insufficient Balance):**
+```json
+{
+  "error": "Saldo insuficiente",
+  "message": "A carteira não possui saldo suficiente para a operação",
+  "traceId": "abc123-def456"
+}
+```
+
+### Transfer between Wallets
+
+**POST** `/api/wallet/transfer`
+
+Realiza uma transferência entre carteiras.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "fromWalletId": 1,
+  "toWalletId": 2,
+  "amount": 100.00
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "transactionId": 3,
+  "fromWalletId": 1,
+  "toWalletId": 2,
+  "amount": 100.00,
+  "type": "TRANSFER",
+  "status": "COMPLETED",
+  "createdAt": "2024-01-05T10:40:00Z"
+}
+```
+
+---
+
 ## Transactions
 
 Endpoints para gerenciamento de transações financeiras.

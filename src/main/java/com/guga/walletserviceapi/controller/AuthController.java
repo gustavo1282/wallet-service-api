@@ -3,6 +3,7 @@ package com.guga.walletserviceapi.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.guga.walletserviceapi.model.LoginAuth;
+import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
+import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 
@@ -38,6 +41,8 @@ public class AuthController {
     @Autowired
     private LoginAuthService loginAuthService;
 
+    @Autowired
+    private JwtAuthenticatedUserProvider authUserProvider;    
 
     // DTO simples para login
     public record LoginRequest(
@@ -107,13 +112,11 @@ public class AuthController {
 
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/data/{loginId}")
-     public ResponseEntity<TokenResponse> getDataLogin() 
+    @PreAuthorize("hasRole('USER')")
+     public ResponseEntity<JwtAuthenticationDetails> getDataLogin() 
     {
-        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        loginAuthService.loadUserByUsername(loginId);
-
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        JwtAuthenticationDetails authDetails = authUserProvider.get();
+        return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
  
 }

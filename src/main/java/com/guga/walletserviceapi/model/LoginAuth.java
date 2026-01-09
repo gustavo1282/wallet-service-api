@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.converter.LoginAuthTypeConverter;
+import com.guga.walletserviceapi.model.converter.LoginRoleConverter;
 import com.guga.walletserviceapi.model.converter.StatusConverter;
 import com.guga.walletserviceapi.model.enums.LoginAuthType;
 import com.guga.walletserviceapi.model.enums.LoginRole;
@@ -15,8 +16,6 @@ import com.guga.walletserviceapi.model.enums.Status;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -86,8 +85,9 @@ public class LoginAuth {
     @Column(name = "last_login_at", nullable = true)
     private LocalDateTime lastLoginAt;
 
-
-    @Enumerated(EnumType.STRING)
+    
+    @Convert(converter = LoginRoleConverter.class)
+    @Column(name = "role", length = 180)
     private LoginRole role;
 
 }

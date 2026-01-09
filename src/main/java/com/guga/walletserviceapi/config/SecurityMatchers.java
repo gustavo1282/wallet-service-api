@@ -11,13 +11,12 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 
-//@Configuration
-//@ConfigurationProperties(prefix = "security.access-levels")
 @Getter @Setter
 public class SecurityMatchers {
     private String[] publicPaths;
     private String[] documentation;
     private String[] monitor;
+    private String[] secured;
     private String[] admin;
 
     public List<String> getAllMatchers() {
@@ -31,6 +30,9 @@ public class SecurityMatchers {
         }
         if (getMonitor() != null) {
             allPublicPatterns.addAll( List.of(getMonitor()) );
+        }
+        if (getSecured() != null) {
+            allPublicPatterns.addAll( List.of(getSecured()) );
         }
         if (getAdmin() != null) {
             allPublicPatterns.addAll( List.of(getAdmin() ) );
@@ -52,6 +54,7 @@ public class SecurityMatchers {
         System.out.println("publicPaths: " + Arrays.toString(publicPaths));
         System.out.println("documentation: " + Arrays.toString(documentation));
         System.out.println("monitor: " + Arrays.toString(monitor));
+        System.out.println("secured: " + Arrays.toString(secured));
         System.out.println("admin: " + Arrays.toString(admin));
     }
 }

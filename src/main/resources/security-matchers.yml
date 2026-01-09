@@ -1,12 +1,22 @@
 security:
   access-levels:
-    # ABERTOS: Essenciais para infraestrutura e onboarding
+
+    # =====================================================
+    # PÚBLICO: Essencial para infra e onboarding
+    # =====================================================
     public-paths:
+      # Autenticação / login / refresh tokens
       - "/api/auth/**"
+
+      # Actuator público (health, info, prometheus)
       - "/actuator/health/**"
       - "/actuator/info"
+      - "/actuator/prometheus"
+      - "/actuator/metrics/**"
 
-    # DOCUMENTAÇÃO: Necessário para o time de dev e testes
+    # =====================================================
+    # DOCUMENTAÇÃO: Swagger / OpenAPI
+    # =====================================================
     documentation:
       - "/v3/api-docs/**"
       - "/swagger-ui/**"
@@ -15,27 +25,33 @@ security:
       - "/swagger-resources/**"
       - "/webjars/**"
 
-    # MONITORAMENTO (Prometheus / Metrics): Foco em métricas numéricas
+    # =====================================================
+    # MONITORAMENTO (opcional: MONITOR / ADMIN)
+    # =====================================================
     monitor:
-      - "/actuator/prometheus"
-      - "/actuator/metrics/**"
-      #- "/actuator/scheduledtasks" # Útil para ver tarefas agendadas
+      # Exemplo de endpoints que exigem MONITOR ou ADMIN
+      # Caso queira liberar prometheus como público, não precisa incluir aqui
+      #- "/actuator/metrics/**"
+      #- "/actuator/scheduledtasks/**"
 
-    # ADMINISTRAÇÃO E DIAGNÓSTICO: Foco em Tracing, Logs e Auditoria
+    # =====================================================
+    # ADMIN: somente administradores
+    # =====================================================
     admin:
-      - "/actuator/**"
-      #- "/actuator/loggers/**"
-      #- "/actuator/env/**"
-      #- "/actuator/httpexchanges" # Fundamental para auditoria de requests
-      #- "/actuator/threaddump"    # Diagnóstico de travamentos
-      #- "/actuator/heapdump"      # Diagnóstico de memória
-      #- "/actuator/beans"         # Verificação de contexto
+      - "/actuator/loggers/**"
+      - "/actuator/env/**"
+      - "/actuator/httpexchanges/**"
+      - "/actuator/threaddump/**"
+      - "/actuator/heapdump/**"
+      - "/actuator/beans/**"
 
-    # SEGURANÇA: Foco em autenticação e autorização
-    SECURED:
+      - "/api/params/**"
+
+    # =====================================================
+    # API SECURED: endpoints de negócio autenticados
+    # =====================================================
+    secured:
       - "/api/customers/**"
       - "/api/wallets/**"
       - "/api/transactions/**"
-      - "/api/wallet-operations/**"
-      
-      
+      - "/api/wallets-operations/**"

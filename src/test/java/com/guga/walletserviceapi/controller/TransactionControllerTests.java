@@ -489,7 +489,7 @@ public class TransactionControllerTests {
                                 contentType,
                                 content);
 
-                transactionService.loadCsvAndSave(multipartFile);
+                transactionService.importTransactions(multipartFile);
 
         }
 

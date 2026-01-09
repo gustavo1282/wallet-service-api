@@ -1,11 +1,11 @@
 {
 	"info": {
-		"_postman_id": "ff27d182-4130-4736-b1d4-f406eeef2bc2",
+		"_postman_id": "3e57b2eb-4194-4e0c-9c21-c003de8838e7",
 		"name": "Wallet Service API",
 		"description": "Documentação da API de Carteira de Clientes.\n\n---\n\n### 🔑 Autenticação (A partir da v0.2.4)\n\nA autenticação agora utiliza **JSON Web Tokens (JWT)**. Para acessar os endpoints protegidos, siga os passos abaixo:\n\n1.  **Obter o Token:**\n    * Execute o endpoint de login: **`POST /api/auth/login`**.\n    * Use suas credenciais de usuário e senha no corpo da requisição (Request Body).\n\n2.  **Autorizar o Swagger (OpenAPI):**\n    * Copie o **token JWT** retornado no campo `access_token`.\n    * Clique no botão **\"Authorize\"** (Autorizar) no topo da página.\n    * Cole o token no campo de autenticação (Geralmente no formato **`Bearer SeuTokenAqui`**).\n\n3.  **Executar Métodos:**\n    * Com o token configurado no Swagger, você pode executar todos os métodos protegidos.\n\n---\n\n**Credenciais de Teste:**\n* **Usuário:** `user`\n* **Senha:** `password`\n\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "47458903",
-		"_collection_link": "https://gustavo1282-186150.postman.co/workspace/1dac3ff7-4e11-459b-885b-9c701e1aecd5/collection/47458903-ff27d182-4130-4736-b1d4-f406eeef2bc2?action=share&source=collection_link&creator=47458903"
+		"_collection_link": "https://gustavo1282-186150.postman.co/workspace/Gustavo-Souza's-Workspace~1dac3ff7-4e11-459b-885b-9c701e1aecd5/collection/47458903-3e57b2eb-4194-4e0c-9c21-c003de8838e7?action=share&source=collection_link&creator=47458903"
 	},
 	"item": [
 		{
@@ -49,12 +49,11 @@
 											],
 											"variable": [
 												{
-													"key": "id",
-													"value": "8228"
+													"key": "id"
 												}
 											]
 										},
-										"description": "Retrieves a Wallet by their ID provided in the request body."
+										"description": "Retrieves a Wallet by their ID."
 									},
 									"response": [
 										{
@@ -84,8 +83,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -100,7 +98,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"customerId\": 9761,\n  \"loginUser\": \"string\",\n  \"walletId\": 9432,\n  \"status\": \"BLOCKED\",\n  \"lastOperationType\": \"DEPOSIT\",\n  \"previousBalance\": 7877.669981655955,\n  \"currentBalance\": 8202.392042333973,\n  \"createdAt\": \"1991-01-31T20:40:09.792Z\",\n  \"updatedAt\": \"1961-12-16T21:24:47.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(78)   \\t\\t 1932-2983\",\n    \"customerId\": 1370,\n    \"status\": \"WAITING_VERIFICATION\",\n    \"cpf\": \"810.798.703-09\",\n    \"birthDate\": \"1996-11-11\",\n    \"email\": \"string\",\n    \"createdAt\": \"1968-12-25T00:53:57.807Z\",\n    \"updatedAt\": \"1989-07-12T10:01:25.614Z\",\n    \"loginAuthId\": 4567\n  }\n}"
+											"body": "{\n  \"customerId\": 554,\n  \"walletId\": 3422,\n  \"status\": \"REVIEW\",\n  \"lastOperationType\": \"WITHDRAW\",\n  \"previousBalance\": 6062.861101126508,\n  \"currentBalance\": 4730.63094208019,\n  \"createdAt\": \"1989-01-21T13:29:09.085Z\",\n  \"updatedAt\": \"2010-10-02T14:17:17.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(28)     　98792-1647\",\n    \"customerId\": 4517,\n    \"status\": \"ACTIVE\",\n    \"cpf\": \"400.431.939-34\",\n    \"birthDate\": \"1995-02-19\",\n    \"email\": \"string\",\n    \"createdAt\": \"1965-03-21T00:31:04.197Z\",\n    \"updatedAt\": \"1983-04-17T03:10:35.667Z\",\n    \"loginAuthId\": 378\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -129,8 +127,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -145,7 +142,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -174,8 +171,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -190,7 +186,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -219,8 +215,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -235,12 +230,12 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								},
 								{
-									"name": "Update user by ID",
+									"name": "Update Wallet by ID",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -265,7 +260,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+											"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -285,12 +280,11 @@
 											],
 											"variable": [
 												{
-													"key": "id",
-													"value": "8228"
+													"key": "id"
 												}
 											]
 										},
-										"description": "Updates a user by their ID provided in the request body."
+										"description": "Updates a Wallet by their ID."
 									},
 									"response": [
 										{
@@ -314,7 +308,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -334,8 +328,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -350,7 +343,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"customerId\": 9761,\n  \"loginUser\": \"string\",\n  \"walletId\": 9432,\n  \"status\": \"BLOCKED\",\n  \"lastOperationType\": \"DEPOSIT\",\n  \"previousBalance\": 7877.669981655955,\n  \"currentBalance\": 8202.392042333973,\n  \"createdAt\": \"1991-01-31T20:40:09.792Z\",\n  \"updatedAt\": \"1961-12-16T21:24:47.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(78)   \\t\\t 1932-2983\",\n    \"customerId\": 1370,\n    \"status\": \"WAITING_VERIFICATION\",\n    \"cpf\": \"810.798.703-09\",\n    \"birthDate\": \"1996-11-11\",\n    \"email\": \"string\",\n    \"createdAt\": \"1968-12-25T00:53:57.807Z\",\n    \"updatedAt\": \"1989-07-12T10:01:25.614Z\",\n    \"loginAuthId\": 4567\n  }\n}"
+											"body": "{\n  \"customerId\": 554,\n  \"walletId\": 3422,\n  \"status\": \"REVIEW\",\n  \"lastOperationType\": \"WITHDRAW\",\n  \"previousBalance\": 6062.861101126508,\n  \"currentBalance\": 4730.63094208019,\n  \"createdAt\": \"1989-01-21T13:29:09.085Z\",\n  \"updatedAt\": \"2010-10-02T14:17:17.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(28)     　98792-1647\",\n    \"customerId\": 4517,\n    \"status\": \"ACTIVE\",\n    \"cpf\": \"400.431.939-34\",\n    \"birthDate\": \"1995-02-19\",\n    \"email\": \"string\",\n    \"createdAt\": \"1965-03-21T00:31:04.197Z\",\n    \"updatedAt\": \"1983-04-17T03:10:35.667Z\",\n    \"loginAuthId\": 378\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -373,7 +366,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -393,8 +386,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -409,7 +401,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -432,7 +424,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -452,8 +444,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -468,7 +459,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -491,7 +482,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -511,8 +502,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -527,7 +517,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -562,7 +552,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+											"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -605,7 +595,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -635,7 +625,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"customerId\": 9761,\n  \"loginUser\": \"string\",\n  \"walletId\": 9432,\n  \"status\": \"BLOCKED\",\n  \"lastOperationType\": \"DEPOSIT\",\n  \"previousBalance\": 7877.669981655955,\n  \"currentBalance\": 8202.392042333973,\n  \"createdAt\": \"1991-01-31T20:40:09.792Z\",\n  \"updatedAt\": \"1961-12-16T21:24:47.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(78)   \\t\\t 1932-2983\",\n    \"customerId\": 1370,\n    \"status\": \"WAITING_VERIFICATION\",\n    \"cpf\": \"810.798.703-09\",\n    \"birthDate\": \"1996-11-11\",\n    \"email\": \"string\",\n    \"createdAt\": \"1968-12-25T00:53:57.807Z\",\n    \"updatedAt\": \"1989-07-12T10:01:25.614Z\",\n    \"loginAuthId\": 4567\n  }\n}"
+											"body": "{\n  \"customerId\": 554,\n  \"walletId\": 3422,\n  \"status\": \"REVIEW\",\n  \"lastOperationType\": \"WITHDRAW\",\n  \"previousBalance\": 6062.861101126508,\n  \"currentBalance\": 4730.63094208019,\n  \"createdAt\": \"1989-01-21T13:29:09.085Z\",\n  \"updatedAt\": \"2010-10-02T14:17:17.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(28)     　98792-1647\",\n    \"customerId\": 4517,\n    \"status\": \"ACTIVE\",\n    \"cpf\": \"400.431.939-34\",\n    \"birthDate\": \"1995-02-19\",\n    \"email\": \"string\",\n    \"createdAt\": \"1965-03-21T00:31:04.197Z\",\n    \"updatedAt\": \"1983-04-17T03:10:35.667Z\",\n    \"loginAuthId\": 378\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -658,7 +648,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -688,7 +678,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -711,7 +701,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -741,7 +731,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -764,7 +754,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"customerId\": 4498,\n  \"loginUser\": \"string\",\n  \"walletId\": 2537,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_SEND\",\n  \"previousBalance\": 2035.7480062204525,\n  \"currentBalance\": 1713.7552504564746,\n  \"createdAt\": \"1949-05-03T12:32:25.601Z\",\n  \"updatedAt\": \"1961-05-07T23:36:05.584Z\"\n}",
+													"raw": "{\n  \"customerId\": 7773,\n  \"walletId\": 6620,\n  \"status\": \"WAITING_VERIFICATION\",\n  \"lastOperationType\": \"TRANSFER_RECEIVED\",\n  \"previousBalance\": 3416.2310381615835,\n  \"currentBalance\": 9856.747580822572,\n  \"createdAt\": \"1986-01-21T10:29:54.744Z\",\n  \"updatedAt\": \"1992-04-08T03:13:53.601Z\"\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -794,7 +784,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -824,7 +814,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=8228&page=0",
+											"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=1020&page=0",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -836,7 +826,7 @@
 											"query": [
 												{
 													"key": "customerId",
-													"value": "8228"
+													"value": "1020"
 												},
 												{
 													"key": "page",
@@ -844,7 +834,7 @@
 												}
 											]
 										},
-										"description": "Retrieves a list Wallets by Customer ID provided in the request body."
+										"description": "Retrieves Wallets by Customer ID."
 									},
 									"response": [
 										{
@@ -863,7 +853,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=8228&page=0",
+													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=7039&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -875,7 +865,7 @@
 													"query": [
 														{
 															"key": "customerId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -894,7 +884,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"page\": {\n    \"size\": 5163,\n    \"number\": 8893,\n    \"totalElements\": 4333,\n    \"totalPages\": 4303\n  }\n}"
+											"body": "{\n  \"page\": {\n    \"size\": 3548,\n    \"number\": 8725,\n    \"totalElements\": 235,\n    \"totalPages\": 3914\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -912,7 +902,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=8228&page=0",
+													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=7039&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -924,7 +914,7 @@
 													"query": [
 														{
 															"key": "customerId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -943,7 +933,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -961,7 +951,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=8228&page=0",
+													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=7039&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -973,7 +963,7 @@
 													"query": [
 														{
 															"key": "customerId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -992,7 +982,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -1010,7 +1000,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=8228&page=0",
+													"raw": "{{baseUrl}}/api/wallets/search-by-customer?customerId=7039&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1022,7 +1012,7 @@
 													"query": [
 														{
 															"key": "customerId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -1041,7 +1031,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -1071,7 +1061,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/api/wallets/list?page=0",
+											"raw": "{{baseUrl}}/api/wallets/list?status=INACTIVE&page=0",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -1081,6 +1071,10 @@
 												"list"
 											],
 											"query": [
+												{
+													"key": "status",
+													"value": "INACTIVE"
+												},
 												{
 													"key": "page",
 													"value": "0"
@@ -1106,7 +1100,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/list?page=0",
+													"raw": "{{baseUrl}}/api/wallets/list?status=INACTIVE&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1116,6 +1110,10 @@
 														"list"
 													],
 													"query": [
+														{
+															"key": "status",
+															"value": "INACTIVE"
+														},
 														{
 															"key": "page",
 															"value": "0"
@@ -1133,7 +1131,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"page\": {\n    \"size\": 5163,\n    \"number\": 8893,\n    \"totalElements\": 4333,\n    \"totalPages\": 4303\n  }\n}"
+											"body": "{\n  \"page\": {\n    \"size\": 3548,\n    \"number\": 8725,\n    \"totalElements\": 235,\n    \"totalPages\": 3914\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -1151,7 +1149,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/list?page=0",
+													"raw": "{{baseUrl}}/api/wallets/list?status=INACTIVE&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1161,6 +1159,10 @@
 														"list"
 													],
 													"query": [
+														{
+															"key": "status",
+															"value": "INACTIVE"
+														},
 														{
 															"key": "page",
 															"value": "0"
@@ -1178,7 +1180,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -1196,7 +1198,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/list?page=0",
+													"raw": "{{baseUrl}}/api/wallets/list?status=INACTIVE&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1206,6 +1208,10 @@
 														"list"
 													],
 													"query": [
+														{
+															"key": "status",
+															"value": "INACTIVE"
+														},
 														{
 															"key": "page",
 															"value": "0"
@@ -1223,7 +1229,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -1241,7 +1247,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/wallets/list?page=0",
+													"raw": "{{baseUrl}}/api/wallets/list?status=INACTIVE&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1251,6 +1257,10 @@
 														"list"
 													],
 													"query": [
+														{
+															"key": "status",
+															"value": "INACTIVE"
+														},
 														{
 															"key": "page",
 															"value": "0"
@@ -1268,7 +1278,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -1308,7 +1318,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+											"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -1350,7 +1360,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+													"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -1380,7 +1390,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}"
+											"body": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -1403,7 +1413,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+													"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -1433,7 +1443,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -1456,7 +1466,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+													"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -1486,7 +1496,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -1509,7 +1519,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+													"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -1539,7 +1549,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -1569,7 +1579,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=8228",
+											"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=7039",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -1585,7 +1595,7 @@
 												},
 												{
 													"key": "value",
-													"value": "8228"
+													"value": "7039"
 												}
 											]
 										}
@@ -1607,7 +1617,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=8228",
+													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=7039",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1623,7 +1633,7 @@
 														},
 														{
 															"key": "value",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -1638,7 +1648,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}"
+											"body": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -1656,7 +1666,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=8228",
+													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=7039",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1672,7 +1682,7 @@
 														},
 														{
 															"key": "value",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -1687,7 +1697,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -1705,7 +1715,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=8228",
+													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=7039",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1721,7 +1731,7 @@
 														},
 														{
 															"key": "value",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -1736,7 +1746,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -1754,7 +1764,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=8228",
+													"raw": "{{baseUrl}}/api/params/adjust?paramName=string&value=7039",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1770,7 +1780,7 @@
 														},
 														{
 															"key": "value",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -1785,7 +1795,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -1827,7 +1837,7 @@
 											"variable": [
 												{
 													"key": "id",
-													"value": "8228"
+													"value": "7039"
 												}
 											]
 										}
@@ -1861,7 +1871,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -1876,7 +1886,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}"
+											"body": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -1906,7 +1916,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -1921,7 +1931,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -1951,7 +1961,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -1966,7 +1976,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -1996,7 +2006,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -2011,7 +2021,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								},
@@ -2048,7 +2058,7 @@
 											"variable": [
 												{
 													"key": "id",
-													"value": "8228"
+													"value": "7039"
 												}
 											]
 										}
@@ -2082,7 +2092,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -2097,7 +2107,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "8666"
+											"body": "9140"
 										},
 										{
 											"name": "Bad Request",
@@ -2127,7 +2137,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -2142,7 +2152,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -2172,7 +2182,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -2187,7 +2197,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -2217,7 +2227,7 @@
 													"variable": [
 														{
 															"key": "id",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -2232,7 +2242,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -2323,7 +2333,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "[\n  {\n    \"id\": 9276,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"1959-01-16\",\n    \"valueDateTime\": \"1974-01-02T00:43:45.953Z\",\n    \"valueBoolean\": false,\n    \"valueLong\": 8195,\n    \"valueInteger\": 7005\n  },\n  {\n    \"id\": 7272,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"1951-01-05\",\n    \"valueDateTime\": \"1961-04-26T05:41:28.599Z\",\n    \"valueBoolean\": true,\n    \"valueLong\": 3913,\n    \"valueInteger\": 8429\n  }\n]"
+											"body": "[\n  {\n    \"id\": 6404,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"2021-10-16\",\n    \"valueDateTime\": \"1967-05-16T02:13:46.389Z\",\n    \"valueBoolean\": false,\n    \"valueLong\": 8686,\n    \"valueInteger\": 4157\n  },\n  {\n    \"id\": 6429,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"1963-12-25\",\n    \"valueDateTime\": \"1987-09-17T10:43:58.757Z\",\n    \"valueBoolean\": false,\n    \"valueLong\": 670,\n    \"valueInteger\": 4688\n  }\n]"
 										},
 										{
 											"name": "Bad Request",
@@ -2368,7 +2378,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -2413,7 +2423,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -2458,7 +2468,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -2490,7 +2500,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+									"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 									"options": {
 										"raw": {
 											"headerFamily": "json",
@@ -2531,7 +2541,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+											"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -2560,7 +2570,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}"
+									"body": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}"
 								},
 								{
 									"name": "Bad Request",
@@ -2583,7 +2593,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+											"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -2612,7 +2622,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "string"
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 								},
 								{
 									"name": "Not Found",
@@ -2635,7 +2645,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+											"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -2664,7 +2674,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "string"
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 								},
 								{
 									"name": "Conflict",
@@ -2687,7 +2697,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\": 4981,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1976-10-29\",\n  \"valueDateTime\": \"1966-07-04T03:26:14.187Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 7420,\n  \"valueInteger\": 7023\n}",
+											"raw": "{\n  \"id\": 3856,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1986-08-09\",\n  \"valueDateTime\": \"1977-07-03T01:45:30.281Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 9622,\n  \"valueInteger\": 2433\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -2716,7 +2726,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "string"
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 								}
 							]
 						}
@@ -2761,11 +2771,11 @@
 											"variable": [
 												{
 													"key": "id",
-													"value": "8228"
+													"value": "1020"
 												}
 											]
 										},
-										"description": "Retrieves a Customer by their ID provided in the request body."
+										"description": "Retrieves customer data by ID. Admin-only operation."
 									},
 									"response": [
 										{
@@ -2795,8 +2805,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -2811,7 +2820,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}"
+											"body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -2840,8 +2849,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -2856,7 +2864,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -2885,8 +2893,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -2901,7 +2908,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -2930,8 +2937,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -2946,7 +2952,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								},
@@ -2976,7 +2982,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
+											"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
 											"options": {
 												"raw": {
 													"headerFamily": "json",
@@ -2996,12 +3002,11 @@
 											],
 											"variable": [
 												{
-													"key": "id",
-													"value": "8228"
+													"key": "id"
 												}
 											]
 										},
-										"description": "Updates a Customer by their ID provided in the request body."
+										"description": "Updates an existing customer by ID. Admin-only operation."
 									},
 									"response": [
 										{
@@ -3025,7 +3030,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
+													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -3045,8 +3050,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -3061,7 +3065,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}"
+											"body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -3084,7 +3088,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
+													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -3104,8 +3108,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -3120,7 +3123,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -3143,7 +3146,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
+													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -3163,8 +3166,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -3179,7 +3181,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -3202,7 +3204,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
+													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -3222,8 +3224,7 @@
 													],
 													"variable": [
 														{
-															"key": "id",
-															"value": "8228"
+															"key": "id"
 														}
 													]
 												}
@@ -3238,284 +3239,17 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
 							]
 						},
 						{
-							"name": "customer",
+							"name": "me",
 							"item": [
 								{
-									"name": "Create a new Customer",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{bearerToken}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											},
-											{
-												"key": "Accept",
-												"value": "*/*"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
-											"options": {
-												"raw": {
-													"headerFamily": "json",
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/api/customers/customer",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"api",
-												"customers",
-												"customer"
-											]
-										},
-										"description": "Creates a new Customer with the data provided in the request body."
-									},
-									"response": [
-										{
-											"name": "OK",
-											"originalRequest": {
-												"method": "POST",
-												"header": [
-													{
-														"key": "Content-Type",
-														"value": "application/json"
-													},
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
-													"options": {
-														"raw": {
-															"headerFamily": "json",
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "{{baseUrl}}/api/customers/customer",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"customers",
-														"customer"
-													]
-												}
-											},
-											"status": "OK",
-											"code": 200,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}"
-										},
-										{
-											"name": "Bad Request",
-											"originalRequest": {
-												"method": "POST",
-												"header": [
-													{
-														"key": "Content-Type",
-														"value": "application/json"
-													},
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
-													"options": {
-														"raw": {
-															"headerFamily": "json",
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "{{baseUrl}}/api/customers/customer",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"customers",
-														"customer"
-													]
-												}
-											},
-											"status": "Bad Request",
-											"code": 400,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "string"
-										},
-										{
-											"name": "Not Found",
-											"originalRequest": {
-												"method": "POST",
-												"header": [
-													{
-														"key": "Content-Type",
-														"value": "application/json"
-													},
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
-													"options": {
-														"raw": {
-															"headerFamily": "json",
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "{{baseUrl}}/api/customers/customer",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"customers",
-														"customer"
-													]
-												}
-											},
-											"status": "Not Found",
-											"code": 404,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "string"
-										},
-										{
-											"name": "Conflict",
-											"originalRequest": {
-												"method": "POST",
-												"header": [
-													{
-														"key": "Content-Type",
-														"value": "application/json"
-													},
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(54) \\t     98931-8505\",\n  \"customerId\": 7141,\n  \"status\": \"ACTIVE\",\n  \"cpf\": \"889.240.737-84\",\n  \"birthDate\": \"1993-03-10\",\n  \"email\": \"string\",\n  \"createdAt\": \"1975-04-09T22:45:42.572Z\",\n  \"updatedAt\": \"1973-08-01T21:27:34.874Z\",\n  \"loginAuthId\": 4108\n}",
-													"options": {
-														"raw": {
-															"headerFamily": "json",
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "{{baseUrl}}/api/customers/customer",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"customers",
-														"customer"
-													]
-												}
-											},
-											"status": "Conflict",
-											"code": 409,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "string"
-										}
-									]
-								}
-							]
-						},
-						{
-							"name": "list",
-							"item": [
-								{
-									"name": "Get all customers",
+									"name": "Get authenticated customer profile",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -3535,27 +3269,17 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/api/customers/list?status=INACTIVE&page=0",
+											"raw": "{{baseUrl}}/api/customers/me",
 											"host": [
 												"{{baseUrl}}"
 											],
 											"path": [
 												"api",
 												"customers",
-												"list"
-											],
-											"query": [
-												{
-													"key": "status",
-													"value": "INACTIVE"
-												},
-												{
-													"key": "page",
-													"value": "0"
-												}
+												"me"
 											]
 										},
-										"description": "Retrieves all customers."
+										"description": "Returns customer data associated with the authenticated user (JWT context)."
 									},
 									"response": [
 										{
@@ -3574,24 +3298,14 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/customers/list?status=INACTIVE&page=0",
+													"raw": "{{baseUrl}}/api/customers/me",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
 														"api",
 														"customers",
-														"list"
-													],
-													"query": [
-														{
-															"key": "status",
-															"value": "INACTIVE"
-														},
-														{
-															"key": "page",
-															"value": "0"
-														}
+														"me"
 													]
 												}
 											},
@@ -3605,7 +3319,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"page\": {\n    \"size\": 5163,\n    \"number\": 8893,\n    \"totalElements\": 4333,\n    \"totalPages\": 4303\n  }\n}"
+											"body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -3623,24 +3337,14 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/customers/list?status=INACTIVE&page=0",
+													"raw": "{{baseUrl}}/api/customers/me",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
 														"api",
 														"customers",
-														"list"
-													],
-													"query": [
-														{
-															"key": "status",
-															"value": "INACTIVE"
-														},
-														{
-															"key": "page",
-															"value": "0"
-														}
+														"me"
 													]
 												}
 											},
@@ -3654,7 +3358,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -3672,24 +3376,14 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/customers/list?status=INACTIVE&page=0",
+													"raw": "{{baseUrl}}/api/customers/me",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
 														"api",
 														"customers",
-														"list"
-													],
-													"query": [
-														{
-															"key": "status",
-															"value": "INACTIVE"
-														},
-														{
-															"key": "page",
-															"value": "0"
-														}
+														"me"
 													]
 												}
 											},
@@ -3703,7 +3397,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -3721,24 +3415,14 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/customers/list?status=INACTIVE&page=0",
+													"raw": "{{baseUrl}}/api/customers/me",
 													"host": [
 														"{{baseUrl}}"
 													],
 													"path": [
 														"api",
 														"customers",
-														"list"
-													],
-													"query": [
-														{
-															"key": "status",
-															"value": "INACTIVE"
-														},
-														{
-															"key": "page",
-															"value": "0"
-														}
+														"me"
 													]
 												}
 											},
@@ -3752,9 +3436,503 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
+								}
+							]
+						},
+						{
+							"name": "List customers",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/customers?status=INACTIVE&page=0",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"customers"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "INACTIVE"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										}
+									]
+								},
+								"description": "Returns a paginated list of customers. Admin-only operation."
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/customers?status=INACTIVE&page=0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											],
+											"query": [
+												{
+													"key": "status",
+													"value": "INACTIVE"
+												},
+												{
+													"key": "page",
+													"value": "0"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"page\": {\n    \"size\": 3548,\n    \"number\": 8725,\n    \"totalElements\": 235,\n    \"totalPages\": 3914\n  }\n}"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/customers?status=INACTIVE&page=0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											],
+											"query": [
+												{
+													"key": "status",
+													"value": "INACTIVE"
+												},
+												{
+													"key": "page",
+													"value": "0"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+								},
+								{
+									"name": "Not Found",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/customers?status=INACTIVE&page=0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											],
+											"query": [
+												{
+													"key": "status",
+													"value": "INACTIVE"
+												},
+												{
+													"key": "page",
+													"value": "0"
+												}
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+								},
+								{
+									"name": "Conflict",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/customers?status=INACTIVE&page=0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											],
+											"query": [
+												{
+													"key": "status",
+													"value": "INACTIVE"
+												},
+												{
+													"key": "page",
+													"value": "0"
+												}
+											]
+										}
+									},
+									"status": "Conflict",
+									"code": 409,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Create a new customer",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/customers",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"customers"
+									]
+								},
+								"description": "Creates a new customer. Admin-only operation."
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/customers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}"
+								},
+								{
+									"name": "Bad Request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/customers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+								},
+								{
+									"name": "Not Found",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/customers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+								},
+								{
+									"name": "Conflict",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "*/*"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(44)2561-0635\",\n  \"customerId\": 2571,\n  \"status\": \"ARCHIVED\",\n  \"cpf\": \"430.861.472-56\",\n  \"birthDate\": \"1992-11-25\",\n  \"email\": \"string\",\n  \"createdAt\": \"1993-04-16T01:19:23.917Z\",\n  \"updatedAt\": \"1956-02-24T21:57:52.251Z\",\n  \"loginAuthId\": 7426\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/customers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"customers"
+											]
+										}
+									},
+									"status": "Conflict",
+									"code": 409,
+									"_postman_previewlanguage": "text",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "*/*"
+										}
+									],
+									"cookie": [],
+									"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 								}
 							]
 						}
@@ -3923,7 +4101,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Not Found",
@@ -3977,7 +4155,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Conflict",
@@ -4031,7 +4209,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												}
 											]
 										}
@@ -4194,7 +4372,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Not Found",
@@ -4248,7 +4426,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Conflict",
@@ -4302,7 +4480,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												}
 											]
 										}
@@ -4465,7 +4643,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Not Found",
@@ -4519,7 +4697,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Conflict",
@@ -4573,7 +4751,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												}
 											]
 										}
@@ -4736,7 +4914,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Not Found",
@@ -4790,7 +4968,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Conflict",
@@ -4844,7 +5022,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												}
 											]
 										}
@@ -5007,7 +5185,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Not Found",
@@ -5061,7 +5239,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Conflict",
@@ -5115,7 +5293,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												}
 											]
 										}
@@ -5155,7 +5333,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"walletId\": 3373,\n  \"amount\": 7460.91394639784\n}",
+													"raw": "{\n  \"walletId\": 5534,\n  \"amount\": 2199.313271364898\n}",
 													"options": {
 														"raw": {
 															"headerFamily": "json",
@@ -5199,7 +5377,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n  \"walletId\": 3373,\n  \"amount\": 7460.91394639784\n}",
+															"raw": "{\n  \"walletId\": 5534,\n  \"amount\": 2199.313271364898\n}",
 															"options": {
 																"raw": {
 																	"headerFamily": "json",
@@ -5231,7 +5409,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "{\n  \"transactionId\": 7760,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2146.854491926273,\n  \"amount\": 2908.271486902165,\n  \"currentBalance\": 463.19041177218526,\n  \"statusTransaction\": \"WALLET_STATUS_INVALID\",\n  \"createdAt\": \"2013-02-27T17:21:31.890Z\",\n  \"wallet\": {\n    \"customerId\": 5220,\n    \"loginUser\": \"string\",\n    \"walletId\": 2763,\n    \"status\": \"ACTIVE\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 359.29903524017925,\n    \"currentBalance\": 500.69362970946554,\n    \"createdAt\": \"1970-01-12T00:37:51.750Z\",\n    \"updatedAt\": \"1961-03-03T10:31:42.936Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(52)   \\u000b 　  \\t 0932-6661\",\n      \"customerId\": 663,\n      \"status\": \"WAITING_VERIFICATION\",\n      \"cpf\": \"079.339.342-34\",\n      \"birthDate\": \"1989-05-14\",\n      \"email\": \"string\",\n      \"createdAt\": \"1972-03-15T04:14:27.778Z\",\n      \"updatedAt\": \"1966-02-19T08:30:49.781Z\",\n      \"loginAuthId\": 4952\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 3936,\n    \"createdAt\": \"2023-08-30T18:45:32.611Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 557.4805782047298,\n    \"statusTransaction\": \"SUCCESS\",\n    \"transactionId\": 9700,\n    \"walletId\": 5832,\n    \"transactionReferenceId\": 372,\n    \"walletReferenceId\": 7375\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 5202.831607341043,\n    \"createdAt\": \"1975-09-15T02:41:48.658Z\",\n    \"senderId\": 6824\n  }\n}"
+													"body": "{\n  \"walletId\": 3301,\n  \"transactionId\": 4453,\n  \"operationType\": \"TRANSFER_RECEIVED\",\n  \"login\": \"string\",\n  \"previousBalance\": 7119.64864156877,\n  \"amount\": 6669.094335358625,\n  \"currentBalance\": 4514.932254035409,\n  \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n  \"createdAt\": \"1948-11-13T12:00:46.976Z\",\n  \"wallet\": {\n    \"customerId\": 553,\n    \"walletId\": 4846,\n    \"status\": \"REVIEW\",\n    \"lastOperationType\": \"TRANSFER_RECEIVED\",\n    \"previousBalance\": 2772.260486547253,\n    \"currentBalance\": 3389.506687886661,\n    \"createdAt\": \"2008-12-16T20:27:19.072Z\",\n    \"updatedAt\": \"1978-02-21T05:33:04.131Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(59)     4425-8373\",\n      \"customerId\": 6627,\n      \"status\": \"PENDING\",\n      \"cpf\": \"174.192.180-53\",\n      \"birthDate\": \"2014-01-31\",\n      \"email\": \"string\",\n      \"createdAt\": \"2006-06-05T01:55:33.386Z\",\n      \"updatedAt\": \"1990-02-02T13:27:43.884Z\",\n      \"loginAuthId\": 4041\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 6802,\n    \"createdAt\": \"1957-11-21T00:57:44.434Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 4945.773158290305,\n    \"statusTransaction\": \"WALLET_INVALID\",\n    \"transactionId\": 7659,\n    \"walletId\": 4692,\n    \"transactionReferenceId\": 496,\n    \"walletReferenceId\": 9252\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 1567.5499619435707,\n    \"createdAt\": \"1947-01-19T13:23:37.949Z\",\n    \"senderId\": 4904\n  }\n}"
 												},
 												{
 													"name": "Bad Request",
@@ -5254,7 +5432,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n  \"walletId\": 3373,\n  \"amount\": 7460.91394639784\n}",
+															"raw": "{\n  \"walletId\": 5534,\n  \"amount\": 2199.313271364898\n}",
 															"options": {
 																"raw": {
 																	"headerFamily": "json",
@@ -5286,7 +5464,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Not Found",
@@ -5309,7 +5487,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n  \"walletId\": 3373,\n  \"amount\": 7460.91394639784\n}",
+															"raw": "{\n  \"walletId\": 5534,\n  \"amount\": 2199.313271364898\n}",
 															"options": {
 																"raw": {
 																	"headerFamily": "json",
@@ -5341,7 +5519,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												},
 												{
 													"name": "Conflict",
@@ -5364,7 +5542,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n  \"walletId\": 3373,\n  \"amount\": 7460.91394639784\n}",
+															"raw": "{\n  \"walletId\": 5534,\n  \"amount\": 2199.313271364898\n}",
 															"options": {
 																"raw": {
 																	"headerFamily": "json",
@@ -5396,7 +5574,7 @@
 														}
 													],
 													"cookie": [],
-													"body": "string"
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												}
 											]
 										}
@@ -5434,7 +5612,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n  \"walletIdSend\": 6529,\n  \"walletIdReceived\": 7064,\n  \"amount\": 2482.9338822502223\n}",
+															"raw": "{\n  \"walletIdSend\": 1323,\n  \"walletIdReceived\": 1133,\n  \"amount\": 2975.541998340212\n}",
 															"options": {
 																"raw": {
 																	"headerFamily": "json",
@@ -5457,7 +5635,7 @@
 															"variable": [
 																{
 																	"key": "walletId",
-																	"value": "8228"
+																	"value": "7039"
 																}
 															]
 														}
@@ -5484,7 +5662,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletIdSend\": 6529,\n  \"walletIdReceived\": 7064,\n  \"amount\": 2482.9338822502223\n}",
+																	"raw": "{\n  \"walletIdSend\": 1323,\n  \"walletIdReceived\": 1133,\n  \"amount\": 2975.541998340212\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -5507,7 +5685,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -5522,7 +5700,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "{\n  \"transactionId\": 7760,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2146.854491926273,\n  \"amount\": 2908.271486902165,\n  \"currentBalance\": 463.19041177218526,\n  \"statusTransaction\": \"WALLET_STATUS_INVALID\",\n  \"createdAt\": \"2013-02-27T17:21:31.890Z\",\n  \"wallet\": {\n    \"customerId\": 5220,\n    \"loginUser\": \"string\",\n    \"walletId\": 2763,\n    \"status\": \"ACTIVE\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 359.29903524017925,\n    \"currentBalance\": 500.69362970946554,\n    \"createdAt\": \"1970-01-12T00:37:51.750Z\",\n    \"updatedAt\": \"1961-03-03T10:31:42.936Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(52)   \\u000b 　  \\t 0932-6661\",\n      \"customerId\": 663,\n      \"status\": \"WAITING_VERIFICATION\",\n      \"cpf\": \"079.339.342-34\",\n      \"birthDate\": \"1989-05-14\",\n      \"email\": \"string\",\n      \"createdAt\": \"1972-03-15T04:14:27.778Z\",\n      \"updatedAt\": \"1966-02-19T08:30:49.781Z\",\n      \"loginAuthId\": 4952\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 3936,\n    \"createdAt\": \"2023-08-30T18:45:32.611Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 557.4805782047298,\n    \"statusTransaction\": \"SUCCESS\",\n    \"transactionId\": 9700,\n    \"walletId\": 5832,\n    \"transactionReferenceId\": 372,\n    \"walletReferenceId\": 7375\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 5202.831607341043,\n    \"createdAt\": \"1975-09-15T02:41:48.658Z\",\n    \"senderId\": 6824\n  }\n}"
+															"body": "{\n  \"walletId\": 3301,\n  \"transactionId\": 4453,\n  \"operationType\": \"TRANSFER_RECEIVED\",\n  \"login\": \"string\",\n  \"previousBalance\": 7119.64864156877,\n  \"amount\": 6669.094335358625,\n  \"currentBalance\": 4514.932254035409,\n  \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n  \"createdAt\": \"1948-11-13T12:00:46.976Z\",\n  \"wallet\": {\n    \"customerId\": 553,\n    \"walletId\": 4846,\n    \"status\": \"REVIEW\",\n    \"lastOperationType\": \"TRANSFER_RECEIVED\",\n    \"previousBalance\": 2772.260486547253,\n    \"currentBalance\": 3389.506687886661,\n    \"createdAt\": \"2008-12-16T20:27:19.072Z\",\n    \"updatedAt\": \"1978-02-21T05:33:04.131Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(59)     4425-8373\",\n      \"customerId\": 6627,\n      \"status\": \"PENDING\",\n      \"cpf\": \"174.192.180-53\",\n      \"birthDate\": \"2014-01-31\",\n      \"email\": \"string\",\n      \"createdAt\": \"2006-06-05T01:55:33.386Z\",\n      \"updatedAt\": \"1990-02-02T13:27:43.884Z\",\n      \"loginAuthId\": 4041\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 6802,\n    \"createdAt\": \"1957-11-21T00:57:44.434Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 4945.773158290305,\n    \"statusTransaction\": \"WALLET_INVALID\",\n    \"transactionId\": 7659,\n    \"walletId\": 4692,\n    \"transactionReferenceId\": 496,\n    \"walletReferenceId\": 9252\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 1567.5499619435707,\n    \"createdAt\": \"1947-01-19T13:23:37.949Z\",\n    \"senderId\": 4904\n  }\n}"
 														},
 														{
 															"name": "Bad Request",
@@ -5545,7 +5723,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletIdSend\": 6529,\n  \"walletIdReceived\": 7064,\n  \"amount\": 2482.9338822502223\n}",
+																	"raw": "{\n  \"walletIdSend\": 1323,\n  \"walletIdReceived\": 1133,\n  \"amount\": 2975.541998340212\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -5568,7 +5746,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -5583,7 +5761,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														},
 														{
 															"name": "Not Found",
@@ -5606,7 +5784,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletIdSend\": 6529,\n  \"walletIdReceived\": 7064,\n  \"amount\": 2482.9338822502223\n}",
+																	"raw": "{\n  \"walletIdSend\": 1323,\n  \"walletIdReceived\": 1133,\n  \"amount\": 2975.541998340212\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -5629,7 +5807,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -5644,7 +5822,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														},
 														{
 															"name": "Conflict",
@@ -5667,7 +5845,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletIdSend\": 6529,\n  \"walletIdReceived\": 7064,\n  \"amount\": 2482.9338822502223\n}",
+																	"raw": "{\n  \"walletIdSend\": 1323,\n  \"walletIdReceived\": 1133,\n  \"amount\": 2975.541998340212\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -5690,7 +5868,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -5705,7 +5883,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														}
 													]
 												}
@@ -5745,7 +5923,7 @@
 														],
 														"body": {
 															"mode": "raw",
-															"raw": "{\n  \"walletId\": 1733,\n  \"amount\": 7460.081360652848,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
+															"raw": "{\n  \"walletId\": 6547,\n  \"amount\": 8915.377053648246,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
 															"options": {
 																"raw": {
 																	"headerFamily": "json",
@@ -5768,7 +5946,7 @@
 															"variable": [
 																{
 																	"key": "walletId",
-																	"value": "8228"
+																	"value": "7039"
 																}
 															]
 														}
@@ -5795,7 +5973,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletId\": 1733,\n  \"amount\": 7460.081360652848,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
+																	"raw": "{\n  \"walletId\": 6547,\n  \"amount\": 8915.377053648246,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -5818,7 +5996,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -5833,7 +6011,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "{\n  \"transactionId\": 7760,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2146.854491926273,\n  \"amount\": 2908.271486902165,\n  \"currentBalance\": 463.19041177218526,\n  \"statusTransaction\": \"WALLET_STATUS_INVALID\",\n  \"createdAt\": \"2013-02-27T17:21:31.890Z\",\n  \"wallet\": {\n    \"customerId\": 5220,\n    \"loginUser\": \"string\",\n    \"walletId\": 2763,\n    \"status\": \"ACTIVE\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 359.29903524017925,\n    \"currentBalance\": 500.69362970946554,\n    \"createdAt\": \"1970-01-12T00:37:51.750Z\",\n    \"updatedAt\": \"1961-03-03T10:31:42.936Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(52)   \\u000b 　  \\t 0932-6661\",\n      \"customerId\": 663,\n      \"status\": \"WAITING_VERIFICATION\",\n      \"cpf\": \"079.339.342-34\",\n      \"birthDate\": \"1989-05-14\",\n      \"email\": \"string\",\n      \"createdAt\": \"1972-03-15T04:14:27.778Z\",\n      \"updatedAt\": \"1966-02-19T08:30:49.781Z\",\n      \"loginAuthId\": 4952\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 3936,\n    \"createdAt\": \"2023-08-30T18:45:32.611Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 557.4805782047298,\n    \"statusTransaction\": \"SUCCESS\",\n    \"transactionId\": 9700,\n    \"walletId\": 5832,\n    \"transactionReferenceId\": 372,\n    \"walletReferenceId\": 7375\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 5202.831607341043,\n    \"createdAt\": \"1975-09-15T02:41:48.658Z\",\n    \"senderId\": 6824\n  }\n}"
+															"body": "{\n  \"walletId\": 3301,\n  \"transactionId\": 4453,\n  \"operationType\": \"TRANSFER_RECEIVED\",\n  \"login\": \"string\",\n  \"previousBalance\": 7119.64864156877,\n  \"amount\": 6669.094335358625,\n  \"currentBalance\": 4514.932254035409,\n  \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n  \"createdAt\": \"1948-11-13T12:00:46.976Z\",\n  \"wallet\": {\n    \"customerId\": 553,\n    \"walletId\": 4846,\n    \"status\": \"REVIEW\",\n    \"lastOperationType\": \"TRANSFER_RECEIVED\",\n    \"previousBalance\": 2772.260486547253,\n    \"currentBalance\": 3389.506687886661,\n    \"createdAt\": \"2008-12-16T20:27:19.072Z\",\n    \"updatedAt\": \"1978-02-21T05:33:04.131Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(59)     4425-8373\",\n      \"customerId\": 6627,\n      \"status\": \"PENDING\",\n      \"cpf\": \"174.192.180-53\",\n      \"birthDate\": \"2014-01-31\",\n      \"email\": \"string\",\n      \"createdAt\": \"2006-06-05T01:55:33.386Z\",\n      \"updatedAt\": \"1990-02-02T13:27:43.884Z\",\n      \"loginAuthId\": 4041\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 6802,\n    \"createdAt\": \"1957-11-21T00:57:44.434Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 4945.773158290305,\n    \"statusTransaction\": \"WALLET_INVALID\",\n    \"transactionId\": 7659,\n    \"walletId\": 4692,\n    \"transactionReferenceId\": 496,\n    \"walletReferenceId\": 9252\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 1567.5499619435707,\n    \"createdAt\": \"1947-01-19T13:23:37.949Z\",\n    \"senderId\": 4904\n  }\n}"
 														},
 														{
 															"name": "Bad Request",
@@ -5856,7 +6034,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletId\": 1733,\n  \"amount\": 7460.081360652848,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
+																	"raw": "{\n  \"walletId\": 6547,\n  \"amount\": 8915.377053648246,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -5879,7 +6057,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -5894,7 +6072,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														},
 														{
 															"name": "Not Found",
@@ -5917,7 +6095,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletId\": 1733,\n  \"amount\": 7460.081360652848,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
+																	"raw": "{\n  \"walletId\": 6547,\n  \"amount\": 8915.377053648246,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -5940,7 +6118,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -5955,7 +6133,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														},
 														{
 															"name": "Conflict",
@@ -5978,7 +6156,7 @@
 																],
 																"body": {
 																	"mode": "raw",
-																	"raw": "{\n  \"walletId\": 1733,\n  \"amount\": 7460.081360652848,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
+																	"raw": "{\n  \"walletId\": 6547,\n  \"amount\": 8915.377053648246,\n  \"cpfSender\": \"string\",\n  \"terminalId\": \"string\",\n  \"senderName\": \"string\"\n}",
 																	"options": {
 																		"raw": {
 																			"headerFamily": "json",
@@ -6001,7 +6179,7 @@
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -6016,7 +6194,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														}
 													]
 												}
@@ -6054,7 +6232,7 @@
 																	}
 																],
 																"url": {
-																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/period/:{walletId}?startDate=2025-01-01&endDate=2025-12-31&page=0",
+																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/period/:walletId?startDate=2012-09-17&endDate=2012-09-17&page=0",
 																	"host": [
 																		"{{baseUrl}}"
 																	],
@@ -6064,16 +6242,16 @@
 																		"transaction",
 																		"search",
 																		"period",
-																		":{walletId}"
+																		":walletId"
 																	],
 																	"query": [
 																		{
 																			"key": "startDate",
-																			"value": "2025-01-01"
+																			"value": "2012-09-17"
 																		},
 																		{
 																			"key": "endDate",
-																			"value": "2025-12-31"
+																			"value": "2012-09-17"
 																		},
 																		{
 																			"key": "page",
@@ -6082,8 +6260,8 @@
 																	],
 																	"variable": [
 																		{
-																			"key": "{walletId}",
-																			"value": "2043"
+																			"key": "walletId",
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -6105,7 +6283,7 @@
 																			}
 																		],
 																		"url": {
-																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/:walletId/period?startDate=1958-11-04&endDate=1958-11-04&page=0",
+																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/period/:walletId?startDate=2012-09-17&endDate=2012-09-17&page=0",
 																			"host": [
 																				"{{baseUrl}}"
 																			],
@@ -6114,17 +6292,17 @@
 																				"wallet-operator",
 																				"transaction",
 																				"search",
-																				":walletId",
-																				"period"
+																				"period",
+																				":walletId"
 																			],
 																			"query": [
 																				{
 																					"key": "startDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "endDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "page",
@@ -6134,7 +6312,7 @@
 																			"variable": [
 																				{
 																					"key": "walletId",
-																					"value": "8228"
+																					"value": "7039"
 																				}
 																			]
 																		}
@@ -6149,7 +6327,7 @@
 																		}
 																	],
 																	"cookie": [],
-																	"body": "{\n  \"page\": {\n    \"size\": 5163,\n    \"number\": 8893,\n    \"totalElements\": 4333,\n    \"totalPages\": 4303\n  }\n}"
+																	"body": "{\n  \"page\": {\n    \"size\": 3548,\n    \"number\": 8725,\n    \"totalElements\": 235,\n    \"totalPages\": 3914\n  }\n}"
 																},
 																{
 																	"name": "Bad Request",
@@ -6167,7 +6345,7 @@
 																			}
 																		],
 																		"url": {
-																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/:walletId/period?startDate=1958-11-04&endDate=1958-11-04&page=0",
+																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/period/:walletId?startDate=2012-09-17&endDate=2012-09-17&page=0",
 																			"host": [
 																				"{{baseUrl}}"
 																			],
@@ -6176,17 +6354,17 @@
 																				"wallet-operator",
 																				"transaction",
 																				"search",
-																				":walletId",
-																				"period"
+																				"period",
+																				":walletId"
 																			],
 																			"query": [
 																				{
 																					"key": "startDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "endDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "page",
@@ -6196,7 +6374,7 @@
 																			"variable": [
 																				{
 																					"key": "walletId",
-																					"value": "8228"
+																					"value": "7039"
 																				}
 																			]
 																		}
@@ -6211,7 +6389,7 @@
 																		}
 																	],
 																	"cookie": [],
-																	"body": "string"
+																	"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 																},
 																{
 																	"name": "Not Found",
@@ -6229,7 +6407,7 @@
 																			}
 																		],
 																		"url": {
-																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/:walletId/period?startDate=1958-11-04&endDate=1958-11-04&page=0",
+																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/period/:walletId?startDate=2012-09-17&endDate=2012-09-17&page=0",
 																			"host": [
 																				"{{baseUrl}}"
 																			],
@@ -6238,17 +6416,17 @@
 																				"wallet-operator",
 																				"transaction",
 																				"search",
-																				":walletId",
-																				"period"
+																				"period",
+																				":walletId"
 																			],
 																			"query": [
 																				{
 																					"key": "startDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "endDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "page",
@@ -6258,7 +6436,7 @@
 																			"variable": [
 																				{
 																					"key": "walletId",
-																					"value": "8228"
+																					"value": "7039"
 																				}
 																			]
 																		}
@@ -6273,7 +6451,7 @@
 																		}
 																	],
 																	"cookie": [],
-																	"body": "string"
+																	"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 																},
 																{
 																	"name": "Conflict",
@@ -6291,7 +6469,7 @@
 																			}
 																		],
 																		"url": {
-																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/:walletId/period?startDate=1958-11-04&endDate=1958-11-04&page=0",
+																			"raw": "{{baseUrl}}/api/wallet-operator/transaction/search/period/:walletId?startDate=2012-09-17&endDate=2012-09-17&page=0",
 																			"host": [
 																				"{{baseUrl}}"
 																			],
@@ -6300,17 +6478,17 @@
 																				"wallet-operator",
 																				"transaction",
 																				"search",
-																				":walletId",
-																				"period"
+																				"period",
+																				":walletId"
 																			],
 																			"query": [
 																				{
 																					"key": "startDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "endDate",
-																					"value": "1958-11-04"
+																					"value": "2012-09-17"
 																				},
 																				{
 																					"key": "page",
@@ -6320,7 +6498,7 @@
 																			"variable": [
 																				{
 																					"key": "walletId",
-																					"value": "8228"
+																					"value": "7039"
 																				}
 																			]
 																		}
@@ -6335,7 +6513,7 @@
 																		}
 																	],
 																	"cookie": [],
-																	"body": "string"
+																	"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 																}
 															]
 														}
@@ -6352,7 +6530,7 @@
 											"name": "{walletId}",
 											"item": [
 												{
-													"name": "get Last Transaction By Wallet Id",
+													"name": "get Last10Transactions",
 													"request": {
 														"auth": {
 															"type": "bearer",
@@ -6372,7 +6550,7 @@
 															}
 														],
 														"url": {
-															"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId",
+															"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId?page=0",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -6383,10 +6561,16 @@
 																"last-movement",
 																":walletId"
 															],
+															"query": [
+																{
+																	"key": "page",
+																	"value": "0"
+																}
+															],
 															"variable": [
 																{
 																	"key": "walletId",
-																	"value": "2043"
+																	"value": "7039"
 																}
 															]
 														}
@@ -6408,7 +6592,7 @@
 																	}
 																],
 																"url": {
-																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId",
+																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId?page=0",
 																	"host": [
 																		"{{baseUrl}}"
 																	],
@@ -6419,10 +6603,16 @@
 																		"last-movement",
 																		":walletId"
 																	],
+																	"query": [
+																		{
+																			"key": "page",
+																			"value": "0"
+																		}
+																	],
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -6437,7 +6627,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "{\n  \"transactionId\": 7760,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2146.854491926273,\n  \"amount\": 2908.271486902165,\n  \"currentBalance\": 463.19041177218526,\n  \"statusTransaction\": \"WALLET_STATUS_INVALID\",\n  \"createdAt\": \"2013-02-27T17:21:31.890Z\",\n  \"wallet\": {\n    \"customerId\": 5220,\n    \"loginUser\": \"string\",\n    \"walletId\": 2763,\n    \"status\": \"ACTIVE\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 359.29903524017925,\n    \"currentBalance\": 500.69362970946554,\n    \"createdAt\": \"1970-01-12T00:37:51.750Z\",\n    \"updatedAt\": \"1961-03-03T10:31:42.936Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(52)   \\u000b 　  \\t 0932-6661\",\n      \"customerId\": 663,\n      \"status\": \"WAITING_VERIFICATION\",\n      \"cpf\": \"079.339.342-34\",\n      \"birthDate\": \"1989-05-14\",\n      \"email\": \"string\",\n      \"createdAt\": \"1972-03-15T04:14:27.778Z\",\n      \"updatedAt\": \"1966-02-19T08:30:49.781Z\",\n      \"loginAuthId\": 4952\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 3936,\n    \"createdAt\": \"2023-08-30T18:45:32.611Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 557.4805782047298,\n    \"statusTransaction\": \"SUCCESS\",\n    \"transactionId\": 9700,\n    \"walletId\": 5832,\n    \"transactionReferenceId\": 372,\n    \"walletReferenceId\": 7375\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 5202.831607341043,\n    \"createdAt\": \"1975-09-15T02:41:48.658Z\",\n    \"senderId\": 6824\n  }\n}"
+															"body": "{\n  \"page\": {\n    \"size\": 3548,\n    \"number\": 8725,\n    \"totalElements\": 235,\n    \"totalPages\": 3914\n  }\n}"
 														},
 														{
 															"name": "Bad Request",
@@ -6455,7 +6645,7 @@
 																	}
 																],
 																"url": {
-																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId",
+																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId?page=0",
 																	"host": [
 																		"{{baseUrl}}"
 																	],
@@ -6466,10 +6656,16 @@
 																		"last-movement",
 																		":walletId"
 																	],
+																	"query": [
+																		{
+																			"key": "page",
+																			"value": "0"
+																		}
+																	],
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -6484,7 +6680,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														},
 														{
 															"name": "Not Found",
@@ -6502,7 +6698,7 @@
 																	}
 																],
 																"url": {
-																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId",
+																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId?page=0",
 																	"host": [
 																		"{{baseUrl}}"
 																	],
@@ -6513,10 +6709,16 @@
 																		"last-movement",
 																		":walletId"
 																	],
+																	"query": [
+																		{
+																			"key": "page",
+																			"value": "0"
+																		}
+																	],
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -6531,7 +6733,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														},
 														{
 															"name": "Conflict",
@@ -6549,7 +6751,7 @@
 																	}
 																],
 																"url": {
-																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId",
+																	"raw": "{{baseUrl}}/api/wallet-operator/transaction/last-movement/:walletId?page=0",
 																	"host": [
 																		"{{baseUrl}}"
 																	],
@@ -6560,10 +6762,16 @@
 																		"last-movement",
 																		":walletId"
 																	],
+																	"query": [
+																		{
+																			"key": "page",
+																			"value": "0"
+																		}
+																	],
 																	"variable": [
 																		{
 																			"key": "walletId",
-																			"value": "8228"
+																			"value": "7039"
 																		}
 																	]
 																}
@@ -6578,7 +6786,7 @@
 																}
 															],
 															"cookie": [],
-															"body": "string"
+															"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 														}
 													]
 												}
@@ -6589,226 +6797,236 @@
 							]
 						},
 						{
-							"name": "{walletId}",
+							"name": "wallets",
 							"item": [
 								{
-									"name": "get Wallet By Id 1",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
+									"name": "{walletId}",
+									"item": [
+										{
+											"name": "get Wallet By Id 1",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{bearerToken}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "*/*"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/wallet-operator/wallets/:walletId",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"wallet-operator",
+														"wallets",
+														":walletId"
+													],
+													"variable": [
+														{
+															"key": "walletId",
+															"value": "7039"
+														}
+													]
+												}
+											},
+											"response": [
 												{
-													"key": "token",
-													"value": "{{bearerToken}}",
-													"type": "string"
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/wallet-operator/wallets/:walletId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"wallet-operator",
+																"wallets",
+																":walletId"
+															],
+															"variable": [
+																{
+																	"key": "walletId",
+																	"value": "7039"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"customerId\": 554,\n  \"walletId\": 3422,\n  \"status\": \"REVIEW\",\n  \"lastOperationType\": \"WITHDRAW\",\n  \"previousBalance\": 6062.861101126508,\n  \"currentBalance\": 4730.63094208019,\n  \"createdAt\": \"1989-01-21T13:29:09.085Z\",\n  \"updatedAt\": \"2010-10-02T14:17:17.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(28)     　98792-1647\",\n    \"customerId\": 4517,\n    \"status\": \"ACTIVE\",\n    \"cpf\": \"400.431.939-34\",\n    \"birthDate\": \"1995-02-19\",\n    \"email\": \"string\",\n    \"createdAt\": \"1965-03-21T00:31:04.197Z\",\n    \"updatedAt\": \"1983-04-17T03:10:35.667Z\",\n    \"loginAuthId\": 378\n  }\n}"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/wallet-operator/wallets/:walletId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"wallet-operator",
+																"wallets",
+																":walletId"
+															],
+															"variable": [
+																{
+																	"key": "walletId",
+																	"value": "7039"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+												},
+												{
+													"name": "Not Found",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/wallet-operator/wallets/:walletId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"wallet-operator",
+																"wallets",
+																":walletId"
+															],
+															"variable": [
+																{
+																	"key": "walletId",
+																	"value": "7039"
+																}
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+												},
+												{
+													"name": "Conflict",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/wallet-operator/wallets/:walletId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"wallet-operator",
+																"wallets",
+																":walletId"
+															],
+															"variable": [
+																{
+																	"key": "walletId",
+																	"value": "7039"
+																}
+															]
+														}
+													},
+													"status": "Conflict",
+													"code": 409,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 												}
 											]
-										},
-										"method": "GET",
-										"header": [
-											{
-												"key": "Accept",
-												"value": "*/*"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/api/wallet-operator/:walletId",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"api",
-												"wallet-operator",
-												":walletId"
-											],
-											"variable": [
-												{
-													"key": "walletId",
-													"value": "8228"
-												}
-											]
-										}
-									},
-									"response": [
-										{
-											"name": "OK",
-											"originalRequest": {
-												"method": "GET",
-												"header": [
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"url": {
-													"raw": "{{baseUrl}}/api/wallet-operator/:walletId",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"wallet-operator",
-														":walletId"
-													],
-													"variable": [
-														{
-															"key": "walletId",
-															"value": "8228"
-														}
-													]
-												}
-											},
-											"status": "OK",
-											"code": 200,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "{\n  \"customerId\": 9761,\n  \"loginUser\": \"string\",\n  \"walletId\": 9432,\n  \"status\": \"BLOCKED\",\n  \"lastOperationType\": \"DEPOSIT\",\n  \"previousBalance\": 7877.669981655955,\n  \"currentBalance\": 8202.392042333973,\n  \"createdAt\": \"1991-01-31T20:40:09.792Z\",\n  \"updatedAt\": \"1961-12-16T21:24:47.011Z\",\n  \"customer\": {\n    \"documentId\": \"string\",\n    \"firstName\": \"string\",\n    \"fullName\": \"string\",\n    \"lastName\": \"string\",\n    \"phoneNumber\": \"(78)   \\t\\t 1932-2983\",\n    \"customerId\": 1370,\n    \"status\": \"WAITING_VERIFICATION\",\n    \"cpf\": \"810.798.703-09\",\n    \"birthDate\": \"1996-11-11\",\n    \"email\": \"string\",\n    \"createdAt\": \"1968-12-25T00:53:57.807Z\",\n    \"updatedAt\": \"1989-07-12T10:01:25.614Z\",\n    \"loginAuthId\": 4567\n  }\n}"
-										},
-										{
-											"name": "Bad Request",
-											"originalRequest": {
-												"method": "GET",
-												"header": [
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"url": {
-													"raw": "{{baseUrl}}/api/wallet-operator/:walletId",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"wallet-operator",
-														":walletId"
-													],
-													"variable": [
-														{
-															"key": "walletId",
-															"value": "8228"
-														}
-													]
-												}
-											},
-											"status": "Bad Request",
-											"code": 400,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "string"
-										},
-										{
-											"name": "Not Found",
-											"originalRequest": {
-												"method": "GET",
-												"header": [
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"url": {
-													"raw": "{{baseUrl}}/api/wallet-operator/:walletId",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"wallet-operator",
-														":walletId"
-													],
-													"variable": [
-														{
-															"key": "walletId",
-															"value": "8228"
-														}
-													]
-												}
-											},
-											"status": "Not Found",
-											"code": 404,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "string"
-										},
-										{
-											"name": "Conflict",
-											"originalRequest": {
-												"method": "GET",
-												"header": [
-													{
-														"key": "Accept",
-														"value": "*/*"
-													},
-													{
-														"key": "Authorization",
-														"value": "Bearer <token>",
-														"description": "Added as a part of security scheme: bearer"
-													}
-												],
-												"url": {
-													"raw": "{{baseUrl}}/api/wallet-operator/:walletId",
-													"host": [
-														"{{baseUrl}}"
-													],
-													"path": [
-														"api",
-														"wallet-operator",
-														":walletId"
-													],
-													"variable": [
-														{
-															"key": "walletId",
-															"value": "8228"
-														}
-													]
-												}
-											},
-											"status": "Conflict",
-											"code": 409,
-											"_postman_previewlanguage": "text",
-											"header": [
-												{
-													"key": "Content-Type",
-													"value": "*/*"
-												}
-											],
-											"cookie": [],
-											"body": "string"
 										}
 									]
 								}
@@ -6843,7 +7061,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/api/transactions/transaction?walletId=8228&amount=1528.9695119075052&walletIdSend=8228&walletIdReceived=8228&cpfSender=string&terminalId=string&senderName=string",
+											"raw": "{{baseUrl}}/api/transactions/transaction?walletId=7039&amount=2641.8404626751935&walletIdSend=7039&walletIdReceived=7039&cpfSender=string&terminalId=string&senderName=string",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -6855,19 +7073,19 @@
 											"query": [
 												{
 													"key": "walletId",
-													"value": "8228"
+													"value": "7039"
 												},
 												{
 													"key": "amount",
-													"value": "1528.9695119075052"
+													"value": "2641.8404626751935"
 												},
 												{
 													"key": "walletIdSend",
-													"value": "8228"
+													"value": "7039"
 												},
 												{
 													"key": "walletIdReceived",
-													"value": "8228"
+													"value": "7039"
 												},
 												{
 													"key": "cpfSender",
@@ -6902,7 +7120,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=8228&amount=1528.9695119075052&walletIdSend=8228&walletIdReceived=8228&cpfSender=string&terminalId=string&senderName=string",
+													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=7039&amount=2641.8404626751935&walletIdSend=7039&walletIdReceived=7039&cpfSender=string&terminalId=string&senderName=string",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -6914,19 +7132,19 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "amount",
-															"value": "1528.9695119075052"
+															"value": "2641.8404626751935"
 														},
 														{
 															"key": "walletIdSend",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "walletIdReceived",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "cpfSender",
@@ -6953,7 +7171,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"transactionId\": 7760,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2146.854491926273,\n  \"amount\": 2908.271486902165,\n  \"currentBalance\": 463.19041177218526,\n  \"statusTransaction\": \"WALLET_STATUS_INVALID\",\n  \"createdAt\": \"2013-02-27T17:21:31.890Z\",\n  \"wallet\": {\n    \"customerId\": 5220,\n    \"loginUser\": \"string\",\n    \"walletId\": 2763,\n    \"status\": \"ACTIVE\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 359.29903524017925,\n    \"currentBalance\": 500.69362970946554,\n    \"createdAt\": \"1970-01-12T00:37:51.750Z\",\n    \"updatedAt\": \"1961-03-03T10:31:42.936Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(52)   \\u000b 　  \\t 0932-6661\",\n      \"customerId\": 663,\n      \"status\": \"WAITING_VERIFICATION\",\n      \"cpf\": \"079.339.342-34\",\n      \"birthDate\": \"1989-05-14\",\n      \"email\": \"string\",\n      \"createdAt\": \"1972-03-15T04:14:27.778Z\",\n      \"updatedAt\": \"1966-02-19T08:30:49.781Z\",\n      \"loginAuthId\": 4952\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 3936,\n    \"createdAt\": \"2023-08-30T18:45:32.611Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 557.4805782047298,\n    \"statusTransaction\": \"SUCCESS\",\n    \"transactionId\": 9700,\n    \"walletId\": 5832,\n    \"transactionReferenceId\": 372,\n    \"walletReferenceId\": 7375\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 5202.831607341043,\n    \"createdAt\": \"1975-09-15T02:41:48.658Z\",\n    \"senderId\": 6824\n  }\n}"
+											"body": "{\n  \"walletId\": 3301,\n  \"transactionId\": 4453,\n  \"operationType\": \"TRANSFER_RECEIVED\",\n  \"login\": \"string\",\n  \"previousBalance\": 7119.64864156877,\n  \"amount\": 6669.094335358625,\n  \"currentBalance\": 4514.932254035409,\n  \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n  \"createdAt\": \"1948-11-13T12:00:46.976Z\",\n  \"wallet\": {\n    \"customerId\": 553,\n    \"walletId\": 4846,\n    \"status\": \"REVIEW\",\n    \"lastOperationType\": \"TRANSFER_RECEIVED\",\n    \"previousBalance\": 2772.260486547253,\n    \"currentBalance\": 3389.506687886661,\n    \"createdAt\": \"2008-12-16T20:27:19.072Z\",\n    \"updatedAt\": \"1978-02-21T05:33:04.131Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(59)     4425-8373\",\n      \"customerId\": 6627,\n      \"status\": \"PENDING\",\n      \"cpf\": \"174.192.180-53\",\n      \"birthDate\": \"2014-01-31\",\n      \"email\": \"string\",\n      \"createdAt\": \"2006-06-05T01:55:33.386Z\",\n      \"updatedAt\": \"1990-02-02T13:27:43.884Z\",\n      \"loginAuthId\": 4041\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 6802,\n    \"createdAt\": \"1957-11-21T00:57:44.434Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 4945.773158290305,\n    \"statusTransaction\": \"WALLET_INVALID\",\n    \"transactionId\": 7659,\n    \"walletId\": 4692,\n    \"transactionReferenceId\": 496,\n    \"walletReferenceId\": 9252\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 1567.5499619435707,\n    \"createdAt\": \"1947-01-19T13:23:37.949Z\",\n    \"senderId\": 4904\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -6971,7 +7189,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=8228&amount=1528.9695119075052&walletIdSend=8228&walletIdReceived=8228&cpfSender=string&terminalId=string&senderName=string",
+													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=7039&amount=2641.8404626751935&walletIdSend=7039&walletIdReceived=7039&cpfSender=string&terminalId=string&senderName=string",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -6983,19 +7201,19 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "amount",
-															"value": "1528.9695119075052"
+															"value": "2641.8404626751935"
 														},
 														{
 															"key": "walletIdSend",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "walletIdReceived",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "cpfSender",
@@ -7022,7 +7240,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -7040,7 +7258,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=8228&amount=1528.9695119075052&walletIdSend=8228&walletIdReceived=8228&cpfSender=string&terminalId=string&senderName=string",
+													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=7039&amount=2641.8404626751935&walletIdSend=7039&walletIdReceived=7039&cpfSender=string&terminalId=string&senderName=string",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7052,19 +7270,19 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "amount",
-															"value": "1528.9695119075052"
+															"value": "2641.8404626751935"
 														},
 														{
 															"key": "walletIdSend",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "walletIdReceived",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "cpfSender",
@@ -7091,7 +7309,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -7109,7 +7327,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=8228&amount=1528.9695119075052&walletIdSend=8228&walletIdReceived=8228&cpfSender=string&terminalId=string&senderName=string",
+													"raw": "{{baseUrl}}/api/transactions/transaction?walletId=7039&amount=2641.8404626751935&walletIdSend=7039&walletIdReceived=7039&cpfSender=string&terminalId=string&senderName=string",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7121,19 +7339,19 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "amount",
-															"value": "1528.9695119075052"
+															"value": "2641.8404626751935"
 														},
 														{
 															"key": "walletIdSend",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "walletIdReceived",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "cpfSender",
@@ -7160,7 +7378,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -7202,7 +7420,7 @@
 											"variable": [
 												{
 													"key": "transactionId",
-													"value": "8228"
+													"value": "7039"
 												}
 											]
 										},
@@ -7237,7 +7455,7 @@
 													"variable": [
 														{
 															"key": "transactionId",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -7252,7 +7470,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"transactionId\": 7760,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2146.854491926273,\n  \"amount\": 2908.271486902165,\n  \"currentBalance\": 463.19041177218526,\n  \"statusTransaction\": \"WALLET_STATUS_INVALID\",\n  \"createdAt\": \"2013-02-27T17:21:31.890Z\",\n  \"wallet\": {\n    \"customerId\": 5220,\n    \"loginUser\": \"string\",\n    \"walletId\": 2763,\n    \"status\": \"ACTIVE\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 359.29903524017925,\n    \"currentBalance\": 500.69362970946554,\n    \"createdAt\": \"1970-01-12T00:37:51.750Z\",\n    \"updatedAt\": \"1961-03-03T10:31:42.936Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(52)   \\u000b 　  \\t 0932-6661\",\n      \"customerId\": 663,\n      \"status\": \"WAITING_VERIFICATION\",\n      \"cpf\": \"079.339.342-34\",\n      \"birthDate\": \"1989-05-14\",\n      \"email\": \"string\",\n      \"createdAt\": \"1972-03-15T04:14:27.778Z\",\n      \"updatedAt\": \"1966-02-19T08:30:49.781Z\",\n      \"loginAuthId\": 4952\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 3936,\n    \"createdAt\": \"2023-08-30T18:45:32.611Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 557.4805782047298,\n    \"statusTransaction\": \"SUCCESS\",\n    \"transactionId\": 9700,\n    \"walletId\": 5832,\n    \"transactionReferenceId\": 372,\n    \"walletReferenceId\": 7375\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 5202.831607341043,\n    \"createdAt\": \"1975-09-15T02:41:48.658Z\",\n    \"senderId\": 6824\n  }\n}"
+											"body": "{\n  \"walletId\": 3301,\n  \"transactionId\": 4453,\n  \"operationType\": \"TRANSFER_RECEIVED\",\n  \"login\": \"string\",\n  \"previousBalance\": 7119.64864156877,\n  \"amount\": 6669.094335358625,\n  \"currentBalance\": 4514.932254035409,\n  \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n  \"createdAt\": \"1948-11-13T12:00:46.976Z\",\n  \"wallet\": {\n    \"customerId\": 553,\n    \"walletId\": 4846,\n    \"status\": \"REVIEW\",\n    \"lastOperationType\": \"TRANSFER_RECEIVED\",\n    \"previousBalance\": 2772.260486547253,\n    \"currentBalance\": 3389.506687886661,\n    \"createdAt\": \"2008-12-16T20:27:19.072Z\",\n    \"updatedAt\": \"1978-02-21T05:33:04.131Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(59)     4425-8373\",\n      \"customerId\": 6627,\n      \"status\": \"PENDING\",\n      \"cpf\": \"174.192.180-53\",\n      \"birthDate\": \"2014-01-31\",\n      \"email\": \"string\",\n      \"createdAt\": \"2006-06-05T01:55:33.386Z\",\n      \"updatedAt\": \"1990-02-02T13:27:43.884Z\",\n      \"loginAuthId\": 4041\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 6802,\n    \"createdAt\": \"1957-11-21T00:57:44.434Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 4945.773158290305,\n    \"statusTransaction\": \"WALLET_INVALID\",\n    \"transactionId\": 7659,\n    \"walletId\": 4692,\n    \"transactionReferenceId\": 496,\n    \"walletReferenceId\": 9252\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 1567.5499619435707,\n    \"createdAt\": \"1947-01-19T13:23:37.949Z\",\n    \"senderId\": 4904\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -7282,7 +7500,7 @@
 													"variable": [
 														{
 															"key": "transactionId",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -7297,7 +7515,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -7327,7 +7545,7 @@
 													"variable": [
 														{
 															"key": "transactionId",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -7342,7 +7560,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -7372,7 +7590,7 @@
 													"variable": [
 														{
 															"key": "transactionId",
-															"value": "8228"
+															"value": "7039"
 														}
 													]
 												}
@@ -7387,7 +7605,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -7417,7 +7635,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=8228&page=25",
+											"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=7039&page=25",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -7429,7 +7647,7 @@
 											"query": [
 												{
 													"key": "walletId",
-													"value": "8228"
+													"value": "7039"
 												},
 												{
 													"key": "page",
@@ -7456,7 +7674,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=8228&page=25",
+													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=7039&page=25",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7468,7 +7686,7 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -7487,7 +7705,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"page\": {\n    \"size\": 5163,\n    \"number\": 8893,\n    \"totalElements\": 4333,\n    \"totalPages\": 4303\n  }\n}"
+											"body": "{\n  \"page\": {\n    \"size\": 3548,\n    \"number\": 8725,\n    \"totalElements\": 235,\n    \"totalPages\": 3914\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -7505,7 +7723,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=8228&page=25",
+													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=7039&page=25",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7517,7 +7735,7 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -7536,7 +7754,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -7554,7 +7772,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=8228&page=25",
+													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=7039&page=25",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7566,7 +7784,7 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -7585,7 +7803,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -7603,7 +7821,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=8228&page=25",
+													"raw": "{{baseUrl}}/api/transactions/search-wallet?walletId=7039&page=25",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7615,7 +7833,7 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "page",
@@ -7634,7 +7852,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -7664,7 +7882,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/api/transactions/list?walletId=8228&typeTransaction=INVALID&page=0",
+											"raw": "{{baseUrl}}/api/transactions/list?walletId=7039&typeTransaction=WALLET_INVALID&page=0",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -7676,11 +7894,11 @@
 											"query": [
 												{
 													"key": "walletId",
-													"value": "8228"
+													"value": "7039"
 												},
 												{
 													"key": "typeTransaction",
-													"value": "INVALID"
+													"value": "WALLET_INVALID"
 												},
 												{
 													"key": "page",
@@ -7707,7 +7925,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/list?walletId=8228&typeTransaction=INVALID&page=0",
+													"raw": "{{baseUrl}}/api/transactions/list?walletId=7039&typeTransaction=WALLET_INVALID&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7719,11 +7937,11 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "typeTransaction",
-															"value": "INVALID"
+															"value": "WALLET_INVALID"
 														},
 														{
 															"key": "page",
@@ -7742,7 +7960,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "{\n  \"page\": {\n    \"size\": 5163,\n    \"number\": 8893,\n    \"totalElements\": 4333,\n    \"totalPages\": 4303\n  }\n}"
+											"body": "{\n  \"page\": {\n    \"size\": 3548,\n    \"number\": 8725,\n    \"totalElements\": 235,\n    \"totalPages\": 3914\n  }\n}"
 										},
 										{
 											"name": "Bad Request",
@@ -7760,7 +7978,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/list?walletId=8228&typeTransaction=INVALID&page=0",
+													"raw": "{{baseUrl}}/api/transactions/list?walletId=7039&typeTransaction=WALLET_INVALID&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7772,11 +7990,11 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "typeTransaction",
-															"value": "INVALID"
+															"value": "WALLET_INVALID"
 														},
 														{
 															"key": "page",
@@ -7795,7 +8013,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -7813,7 +8031,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/list?walletId=8228&typeTransaction=INVALID&page=0",
+													"raw": "{{baseUrl}}/api/transactions/list?walletId=7039&typeTransaction=WALLET_INVALID&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7825,11 +8043,11 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "typeTransaction",
-															"value": "INVALID"
+															"value": "WALLET_INVALID"
 														},
 														{
 															"key": "page",
@@ -7848,7 +8066,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -7866,7 +8084,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{baseUrl}}/api/transactions/list?walletId=8228&typeTransaction=INVALID&page=0",
+													"raw": "{{baseUrl}}/api/transactions/list?walletId=7039&typeTransaction=WALLET_INVALID&page=0",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -7878,11 +8096,11 @@
 													"query": [
 														{
 															"key": "walletId",
-															"value": "8228"
+															"value": "7039"
 														},
 														{
 															"key": "typeTransaction",
-															"value": "INVALID"
+															"value": "WALLET_INVALID"
 														},
 														{
 															"key": "page",
@@ -7901,7 +8119,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -8046,7 +8264,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -8094,7 +8312,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -8142,7 +8360,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -8258,7 +8476,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -8298,7 +8516,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -8338,7 +8556,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										}
 									]
 								}
@@ -8354,29 +8572,29 @@
 											"listen": "test",
 											"script": {
 												"exec": [
+													"// Verifica se o login foi bem-sucedido\r",
 													"if (pm.response.code === 200) {\r",
-													"    // 1. Converter o corpo da resposta em um objeto JSON\r",
-													"    const responseData = pm.response.json();\r",
 													"\r",
-													"    // 2. Extrair o valor que você deseja (exemplo: id da transação ou da carteira)\r",
-													"    // Ajuste o caminho 'responseData.id' conforme a estrutura do seu JSON\r",
-													"    const accessToken = responseData.accessToken; \r",
+													"    const response = pm.response.json();\r",
 													"\r",
-													"    // 3. Salvar na variável global\r",
-													"    pm.globals.set(\"accessToken\", responseData.accessToken);\r",
-													"    pm.globals.set(\"refreshToken\", responseData.refreshToken);\r",
+													"    if (response.accessToken) {\r",
+													"\r",
+													"        // Salva como variável de ambiente (recomendado)\r",
+													"        // pm.environment.set(\"accessToken\", response.accessToken);\r",
+													"\r",
+													"        // Opcional: salvar como global\r",
+													"        pm.globals.set(\"accessToken\", response.accessToken);\r",
+													"        pm.globals.set(\"refreshToken\", response.refreshToken);\r",
+													"\r",
+													"        console.log(\"✅ Access token atualizado com sucesso\");\r",
+													"\r",
+													"    } else {\r",
+													"        console.warn(\"⚠️ accessToken não encontrado no response\");\r",
+													"    }\r",
+													"\r",
+													"} else {\r",
+													"    console.error(\"❌ Login falhou:\", pm.response.code);\r",
 													"}"
-												],
-												"type": "text/javascript",
-												"packages": {},
-												"requests": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
 												],
 												"type": "text/javascript",
 												"packages": {},
@@ -8513,7 +8731,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Not Found",
@@ -8561,7 +8779,7 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
 										},
 										{
 											"name": "Conflict",
@@ -8609,7 +8827,238 @@
 												}
 											],
 											"cookie": [],
-											"body": "string"
+											"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "data",
+							"item": [
+								{
+									"name": "{loginId}",
+									"item": [
+										{
+											"name": "get Data Login",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{bearerToken}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "*/*"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/data/:loginId",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"data",
+														":loginId"
+													],
+													"variable": [
+														{
+															"key": "loginId"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/auth/data/:loginId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"auth",
+																"data",
+																":loginId"
+															],
+															"variable": [
+																{
+																	"key": "loginId"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"accessToken\": \"string\",\n  \"refreshToken\": \"string\"\n}"
+												},
+												{
+													"name": "Bad Request",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/auth/data/:loginId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"auth",
+																"data",
+																":loginId"
+															],
+															"variable": [
+																{
+																	"key": "loginId"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+												},
+												{
+													"name": "Not Found",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/auth/data/:loginId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"auth",
+																"data",
+																":loginId"
+															],
+															"variable": [
+																{
+																	"key": "loginId"
+																}
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+												},
+												{
+													"name": "Conflict",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "*/*"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/auth/data/:loginId",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"auth",
+																"data",
+																":loginId"
+															],
+															"variable": [
+																{
+																	"key": "loginId"
+																}
+															]
+														}
+													},
+													"status": "Conflict",
+													"code": 409,
+													"_postman_previewlanguage": "text",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "*/*"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"status\": 3838,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2018-03-02T02:17:26.287Z\"\n}"
+												}
+											]
 										}
 									]
 								}
@@ -8618,40 +9067,6 @@
 					]
 				}
 			]
-		}
-	],
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{bearerToken}}",
-				"type": "string"
-			}
-		]
-	},
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
 		}
 	],
 	"variable": [

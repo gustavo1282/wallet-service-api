@@ -11,7 +11,7 @@ scrape_configs:
       - targets: ['otel-collector:8889']
         labels:
           environment: 'env-local'
-          application: 'wallet-service-api'
+          application: 'wallet-api-metrics'
 
   # 2. INFRA: Saúde interna do OTel Collector (CPU, RAM, Spans)
   # Alimenta o Dashboard 15983
@@ -20,10 +20,41 @@ scrape_configs:
       - targets: ['otel-collector:8888']
         labels:
           environment: 'env-local'
+          application: 'otel-collector'
 
   # 3. PROMETHEUS: Auto-monitoramento
   - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['prometheus:9090']
         labels:
           environment: 'env-local'
+          application: 'prometheus'
+
+  # 4. GRAFANA - Saúde da Ferramenta, Performance de Queries e Auditoria de Uso
+  # Alimenta o Dashboard: Grafana metrics
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000'] # Ou o IP do seu container/serviço
+        labels:
+          environment: 'env-local'
+          application: 'grafana-monitoring'
+          component: 'grafana'
+
+  # 5. JAEGER - 
+  - job_name: 'jaeger'
+    static_configs:
+      - targets: ['jaeger:14269'] # Porta de métricas do Jaeger
+        labels:
+          environment: 'env-local'
+          application: 'jaeger-monitoring'
+          component: 'jaeger'
+
+  # 6. APPLICATION: Métricas diretas do Spring Boot Actuator
+  - job_name: 'wallet-service-direct'
+    metrics_path: '/wallet-service-api/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080'] # Use o nome do container se a API estiver no Docker
+        labels:
+          environment: 'env-local'
+          namespace: 'env-local'
+          application: 'wallet-service-api'

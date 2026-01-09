@@ -4,7 +4,6 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
-import com.guga.walletserviceapi.audit.AuditLogger;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
@@ -46,11 +44,8 @@ public class CustomerController {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
 
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private JwtAuthenticatedUserProvider authUserProvider;
+    private final CustomerService customerService;
+    private final JwtAuthenticatedUserProvider authUserProvider;
 
     @Value("${spring.data.web.pageable.default-page-size}")
     private int defaultPageSize;
@@ -68,10 +63,10 @@ public class CustomerController {
     public ResponseEntity<Customer> getMyCustomer() {
 
         JwtAuthenticationDetails authDetails = authUserProvider.get();
-
         Long customerId = authDetails.getCustomerId();
 
-        LOGGER.info(LogMarkers.LOG, "GET_CUSTOMER_ME | customerId={} login={}",
+        LOGGER.info(LogMarkers.LOG,
+            "GET_CUSTOMER_ME | customerId={} login={}",
             customerId, authDetails.getLogin()
         );
 
@@ -96,19 +91,18 @@ public class CustomerController {
 
         AuditLogContext auditContext = AuditLogContext.from(authUserProvider.get());
 
-        LOGGER.info(LogMarkers.LOG, "Creating Customer | user={}", auditContext.getUsername());
-        AuditLogger.log("WALLET_CREATE [START]", auditContext);
-        
+        LOGGER.info(LogMarkers.LOG,
+            "CREATE_CUSTOMER | admin={}",
+            auditContext.getUsername()
+        );
+
         Customer createdCustomer = customerService.saveCustomer(customer);
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
-            .path("/{id}")
+            .path("/{customerId}")
             .buildAndExpand(createdCustomer.getCustomerId())
             .toUri();
-
-        LOGGER.info(LogMarkers.LOG, "Customer created successfully | user={}", auditContext.getUsername());
-        AuditLogger.log("CUSTOMER_CREATE [SUCCESS]", auditContext);
 
         return ResponseEntity
             .created(location)
@@ -120,14 +114,15 @@ public class CustomerController {
         summary = "Update customer by ID",
         description = "Updates an existing customer by ID. Admin-only operation."
     )
-    @PutMapping("/{id}")
+    @PutMapping("/{customerId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Customer> updateCustomer(
         @PathVariable Long customerId,
         @RequestBody @Valid Customer customerUpdate
     ) {
 
-        LOGGER.info(LogMarkers.LOG, "UPDATE_CUSTOMER | admin={} customerId={}",
+        LOGGER.info(LogMarkers.LOG,
+            "UPDATE_CUSTOMER | admin={} customerId={}",
             authUserProvider.getLogin(), customerId
         );
 
@@ -140,11 +135,14 @@ public class CustomerController {
         summary = "Get customer by ID",
         description = "Retrieves customer data by ID. Admin-only operation."
     )
-    @GetMapping("/{id}")
+    @GetMapping("/{customerId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable Long customerId) {
+    public ResponseEntity<Customer> getCustomerById(
+        @PathVariable Long customerId
+    ) {
 
-        LOGGER.info(LogMarkers.LOG, "GET_CUSTOMER_BY_ID | admin={} customerId={}",
+        LOGGER.info(LogMarkers.LOG,
+            "GET_CUSTOMER_BY_ID | admin={} customerId={}",
             authUserProvider.getLogin(), customerId
         );
 
@@ -174,5 +172,4 @@ public class CustomerController {
             customerService.filterByStatus(status, pageable)
         );
     }
-
 }
