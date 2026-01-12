@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class LoginAutenticateHeader {
-
+/*
     public LoginAutenticateHeader(String loginName, String application, Boolean autenticated, String loginSession) {
         this.loginName = loginName;
         this.application = application;
@@ -24,5 +24,5 @@ public class LoginAutenticateHeader {
     private Boolean autenticated;
 
     private String loginSession;
-
+ */
 }

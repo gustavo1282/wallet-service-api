@@ -20,7 +20,10 @@ public class GlobalHelper {
     public static final String PATTERN_FORMAT_DATE = "yyyy-MM-dd";
     public static final String PATTERN_FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss.SSSSSSSSS";
 
-    @Value("${spring.jpa.properties.jdbc.batch_size}")
+    public static final String APP_USER_NAME = "wallet_user";
+    public static final String APP_PASSWORD = "wallet_pass";
+
+    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     public static int BATCH_SIZE;
 
     public static Pageable getDefaultPageable() {
@@ -30,26 +33,6 @@ public class GlobalHelper {
                 )
             );
     }
-
-    // public static List<String> matchers() {
-    //     List<String> matchers = Arrays.asList(
-    //         "/actuator/**",
-    //         "/api/auth/login",
-    //         "/api/auth/login",
-    //         "/api/auth/register",
-    //         "/api/auth/refresh",
-    //         "/swagger-ui/index.html",
-    //         "/h2-console/**"
-    //         /*
-    //         "/v3/api-docs/**",
-    //         "/v3/api-docs/v1/**",
-    //         "/swagger-ui/**",
-    //         "/swagger-ui.html",
-    //          */
-    //         );
-    //     return matchers;
-    //}
-    
 
     public static Map<String, String> jwtTokens(String token) {
         String accessToken = "mock-access-token." + UUID.randomUUID().toString();

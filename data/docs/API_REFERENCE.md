@@ -184,6 +184,40 @@ Authorization: Bearer {accessToken}
 
 ---
 
+### Get Current Customer (Me)
+
+**GET** `/api/customers/me`
+
+Recupera os dados do cliente autenticado (contexto `/me`).
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Response (200 OK):**
+```json
+{
+  "customerId": 1,
+  "name": "João Silva",
+  "email": "joao.silva@example.com",
+  "phone": "11987654321",
+  "cpf": "12345678901",
+  "status": "ACTIVE",
+  "createdAt": "2024-12-08T10:30:00Z"
+}
+```
+
+**Error Response (401 Unauthorized):**
+```json
+{
+  "status":401,
+  "error":"UNAUTHORIZED",
+  "message":"Authentication is required to access this resource"
+}
+```
+
+
 ### Update Customer
 
 **PUT** `/api/customers/{id}`
@@ -385,6 +419,57 @@ Content-Type: application/json
 
 ---
 
+### Get My Wallet (Me)
+
+**GET** `/api/wallets/me`
+
+Recupera a carteira principal do cliente autenticado.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Response (200 OK):**
+```json
+{
+  "walletId": 1,
+  "customerId": 1,
+  "walletType": "SAVINGS",
+  "balance": 1500.00,
+  "status": "ACTIVE",
+  "createdAt": "2024-12-08T10:30:00Z"
+}
+```
+
+### Get All My Wallets (Me)
+
+**GET** `/api/wallets/me/all`
+
+Recupera todas as carteiras associadas ao cliente autenticado.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "walletId": 1,
+    "walletType": "SAVINGS",
+    "balance": 1500.00
+  },
+  {
+    "walletId": 2,
+    "walletType": "CHECKING",
+    "balance": 200.00
+  }
+]
+```
+
+
 ### List All Wallets
 
 **GET** `/api/wallets/list`
@@ -462,6 +547,122 @@ Authorization: Bearer {accessToken}
   },
   "totalElements": 1,
   "totalPages": 1
+}
+```
+
+---
+
+## Wallet Operations
+
+Endpoints para operações financeiras diretas em carteiras.
+
+### Deposit to Wallet
+
+**POST** `/api/wallet/deposit`
+
+Realiza um depósito em uma carteira específica.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "walletId": 1,
+  "amount": 500.00,
+  "senderName": "João Silva",
+  "senderCpf": "12345678901",
+  "terminalId": "TERM001"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "transactionId": 1,
+  "walletId": 1,
+  "amount": 500.00,
+  "type": "DEPOSIT",
+  "status": "COMPLETED",
+  "createdAt": "2024-01-05T10:30:00Z"
+}
+```
+
+### Withdraw from Wallet
+
+**POST** `/api/wallet/withdraw`
+
+Realiza um saque de uma carteira específica.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "walletId": 1,
+  "amount": 200.00
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "transactionId": 2,
+  "walletId": 1,
+  "amount": 200.00,
+  "type": "WITHDRAW",
+  "status": "COMPLETED",
+  "createdAt": "2024-01-05T10:35:00Z"
+}
+```
+
+**Error Response (400 Bad Request - Insufficient Balance):**
+```json
+{
+  "error": "Saldo insuficiente",
+  "message": "A carteira não possui saldo suficiente para a operação",
+  "traceId": "abc123-def456"
+}
+```
+
+### Transfer between Wallets
+
+**POST** `/api/wallet/transfer`
+
+Realiza uma transferência entre carteiras.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "fromWalletId": 1,
+  "toWalletId": 2,
+  "amount": 100.00
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "transactionId": 3,
+  "fromWalletId": 1,
+  "toWalletId": 2,
+  "amount": 100.00,
+  "type": "TRANSFER",
+  "status": "COMPLETED",
+  "createdAt": "2024-01-05T10:40:00Z"
 }
 ```
 
@@ -689,6 +890,44 @@ Authorization: Bearer {accessToken}
 ```
 
 ---
+
+### Transactions (Current User - Me)
+
+Os endpoints abaixo retornam transações no contexto do usuário autenticado (`/me`).
+
+**GET** `/api/transactions/me`
+
+Lista todas as transações do usuário autenticado.
+
+**Headers:**
+```
+Authorization: Bearer {accessToken}
+```
+
+**Response (200 OK):**
+```json
+{
+  "content": [ /* transações do usuário */ ],
+  "pageable": { "pageNumber": 0, "pageSize": 25 }
+}
+```
+
+**GET** `/api/transactions/me/deposits`
+
+Lista os depósitos do usuário autenticado.
+
+**GET** `/api/transactions/me/withdraws`
+
+Lista os saques do usuário autenticado.
+
+**GET** `/api/transactions/me/transfers-sent`
+
+Lista as transferências enviadas pelo usuário autenticado.
+
+**GET** `/api/transactions/me/transfers-received`
+
+Lista as transferências recebidas pelo usuário autenticado.
+
 
 ## Wallet Operator
 

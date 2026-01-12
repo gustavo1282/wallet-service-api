@@ -3,24 +3,20 @@ package com.guga.walletserviceapi.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
-import com.guga.walletserviceapi.helpers.FileUtils;
-import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.CustomerRepository;
+import com.guga.walletserviceapi.service.common.DataImportService;
+import com.guga.walletserviceapi.service.common.ImportSummary;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,10 +24,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class CustomerService implements IWalletApiService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
-
+    private final CustomerRepository customerRepository;
     private final ParamAppService paramAppService;
+    private final DataImportService importService;
 
 
     public Customer getCustomerById(Long id) {
@@ -100,28 +95,8 @@ public class CustomerService implements IWalletApiService {
 
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void loadCsvAndSave(MultipartFile file) throws Exception {
-
-        try {
-            ObjectMapper mapper = FileUtils.instanceObjectMapper();
-
-            TypeReference<List<Customer>> customerTypeRef = new TypeReference<List<Customer>>() { };
-
-            List<Customer> customers = mapper.readValue(file.getInputStream(), customerTypeRef);
-
-            for (int i = 0; i < customers.size(); i += GlobalHelper.BATCH_SIZE) {
-
-                int end = Math.min(customers.size(), i + GlobalHelper.BATCH_SIZE);
-                
-                List<Customer> lote = customers.subList(i, end);
-
-                customerRepository.saveAll(lote);
-
-            }
-        } catch (Exception e) {
-            throw new ResourceBadRequestException(e.getMessage());
-        }
+    public ImportSummary importCustomers(MultipartFile file) {        
+        return importService.importJson(file, new TypeReference<List<Customer>>() {}, customerRepository);
     }
 
     @Override

@@ -13,6 +13,11 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerial
 public class WalletServiceApplication {
 
 	public static void main(String[] args) {
+
+		System.out.println("JWT_SECRET=" + System.getenv("JWT_SECRET"));
+		System.out.println("VAULT_URI=" + System.getenv("SPRING_CLOUD_VAULT_URI"));
+
+
 		SpringApplication.run(WalletServiceApplication.class, args);
 	}
 

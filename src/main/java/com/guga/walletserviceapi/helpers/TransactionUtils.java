@@ -25,8 +25,8 @@ public class TransactionUtils {
         StatusTransaction statusTransaction = chekProcessTypeDeposit(wallet, amount);
 
         return DepositMoney.builder()
-                //.walletId(wallet.getWalletId())
-                .wallet(wallet)
+                .walletId(wallet.getWalletId())
+                //.wallet(wallet)
                 .createdAt(LocalDateTime.now())
                 .statusTransaction( statusTransaction )
                 .amount( amount )
@@ -41,8 +41,8 @@ public class TransactionUtils {
 
         return WithdrawMoney.builder()
                 .transactionId( null )
-                //.walletId(wallet.getWalletId())
-                .wallet(wallet)
+                .walletId(wallet.getWalletId())
+                //.wallet(wallet)
                 .createdAt(LocalDateTime.now())
                 .statusTransaction(sttType)
                 .amount( amount )
@@ -57,8 +57,8 @@ public class TransactionUtils {
 
         return TransferMoneySend.builder()
                 //.transactionId( null )
-                //.walletId(wallet.getWalletId())
-                .wallet(wallet)
+                .walletId(wallet.getWalletId())
+                //.wallet(wallet)
                 .createdAt(LocalDateTime.now())
                 .statusTransaction(sttType)
                 .amount( amount )
@@ -74,8 +74,8 @@ public class TransactionUtils {
 
         return TransferMoneyReceived.builder()
                 //.transactionId( null )
-                //.walletId( walletReceivedId )
-                .wallet(walletReceived)
+                .walletId( walletReceivedId )
+                //.wallet(walletReceived)
                 .createdAt(LocalDateTime.now())
                 .statusTransaction( StatusTransaction.SUCCESS )
                 .amount( amount )
@@ -92,10 +92,10 @@ public class TransactionUtils {
 
         return MovementTransaction.builder()
                 .transactionId( transferSend.getTransactionId() )
-                .walletId( transferSend.getWallet().getWalletId() )
+                .walletId( transferSend.getWalletId() )
 
                 .transactionReferenceId( containReceived ? transferReceived.getTransactionId() : null )
-                .walletReferenceId( containReceived ? transferReceived.getWallet().getWalletId() : null )
+                .walletReferenceId( containReceived ? transferReceived.getWalletId() : null )
 
                 .amount( transferSend.getAmount() )
                 .createdAt(LocalDateTime.now())

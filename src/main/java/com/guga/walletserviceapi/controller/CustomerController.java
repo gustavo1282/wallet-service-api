@@ -4,16 +4,13 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,22 +21,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
-import com.guga.walletserviceapi.model.dto.AuditLogContext;
 import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
+import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.service.CustomerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${controller.path.base}/customers")
-@Tag(name = "Customer", description = "Endpoints for managing customers")
+@Tag(name = "Customer", description = "Customer domain operations")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class CustomerController {
@@ -47,106 +45,131 @@ public class CustomerController {
     private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
 
     private final CustomerService customerService;
+    private final JwtAuthenticatedUserProvider authUserProvider;
 
     @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;    
+    private int defaultPageSize;
 
+    // =====================================================
+    // USER CONTEXT
+    // =====================================================
 
-    @Operation(summary = "Create a new Customer", description = "Creates a new Customer with the data provided in the request body.")
-    @PostMapping("/customer")
-    public ResponseEntity<Customer> createCustomer(
-        @RequestBody Customer customer,
-        HttpServletRequest httpRequest
-        ) 
-    {
-    
-        String traceId = ThreadContext.get("traceId");
+    @Operation(
+        summary = "Get authenticated customer profile",
+        description = "Returns customer data associated with the authenticated user (JWT context)."
+    )
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Customer> getMyCustomer() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationDetails authDetails = authUserProvider.get();
+        Long customerId = authDetails.getCustomerId();
 
-        AuditLogContext auditContext = AuditLogContext.builder()
-            .sessionId(httpRequest.getSession().getId())
-            .userAgent(httpRequest.getHeader("User-Agent"))
-            .ipAddress(httpRequest.getRemoteAddr())
-            .username(authentication.getName())
-            .traceId(traceId)
-            .build();
-
-        // LOG FUNCIONAL (application.log)
-        LOGGER.info(LogMarkers.LOG, "Create customer request received | user={} traceId={}",
-            auditContext.getUsername(),
-            traceId
+        LOGGER.info(LogMarkers.LOG,
+            "GET_CUSTOMER_ME | customerId={} login={}",
+            customerId, authDetails.getLogin()
         );
 
+        return ResponseEntity.ok(
+            customerService.getCustomerById(customerId)
+        );
+    }
 
-        LOGGER.info(LogMarkers.AUDIT, "CREATE_CUSTOMER_START | user={} ip={} traceId={}",
-            auditContext.getUsername(),
-            auditContext.getIpAddress(),
-            traceId
+    // =====================================================
+    // ADMIN CONTEXT
+    // =====================================================
+
+    @Operation(
+        summary = "Create a new customer",
+        description = "Creates a new customer. Admin-only operation."
+    )
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Customer> createCustomer(
+        @RequestBody @Valid Customer customer
+    ) {
+
+        AuditLogContext auditContext = AuditLogContext.from(authUserProvider.get());
+
+        LOGGER.info(LogMarkers.LOG,
+            "CREATE_CUSTOMER | admin={}",
+            auditContext.getUsername()
         );
 
         Customer createdCustomer = customerService.saveCustomer(customer);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(createdCustomer.getCustomerId())
-                .toUri();
+            .fromCurrentRequest()
+            .path("/{customerId}")
+            .buildAndExpand(createdCustomer.getCustomerId())
+            .toUri();
 
-        LOGGER.info(LogMarkers.LOG, "CREATE_CUSTOMER_SUCCESS | customerId={} user={} traceId={}",
-            createdCustomer.getCustomerId(),
-            auditContext.getUsername(),
-            traceId
-        );
-
-        return ResponseEntity.created(location)
-            .header("X-Trace-Id", ThreadContext.get("traceId"))
+        return ResponseEntity
+            .created(location)
+            .header("X-Trace-Id", auditContext.getTraceId())
             .body(createdCustomer);
     }
 
-
-    @Operation(summary = "Update customer by ID", description = "Updates a Customer by their ID provided in the request body.")
-    @PutMapping("/{id}")
+    @Operation(
+        summary = "Update customer by ID",
+        description = "Updates an existing customer by ID. Admin-only operation."
+    )
+    @PutMapping("/{customerId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Customer> updateCustomer(
-            @PathVariable Long id,
-            @RequestBody @Valid Customer customerUpdate
-            ) 
-    {
-        Customer customer = customerService.updateCustomer(id, customerUpdate);
-        return new ResponseEntity<>(customer, HttpStatus.OK);
+        @PathVariable Long customerId,
+        @RequestBody @Valid Customer customerUpdate
+    ) {
+
+        LOGGER.info(LogMarkers.LOG,
+            "UPDATE_CUSTOMER | admin={} customerId={}",
+            authUserProvider.getLogin(), customerId
+        );
+
+        return ResponseEntity.ok(
+            customerService.updateCustomer(customerId, customerUpdate)
+        );
     }
 
+    @Operation(
+        summary = "Get customer by ID",
+        description = "Retrieves customer data by ID. Admin-only operation."
+    )
+    @GetMapping("/{customerId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Customer> getCustomerById(
+        @PathVariable Long customerId
+    ) {
 
-    @Operation(summary = "Get customer by ID", description = "Retrieves a Customer by their ID provided in the request body.")
-    @GetMapping("/{id}")
-    public ResponseEntity<Customer> getById(
-        @PathVariable Long id
-        ) 
-    {
-        Customer customer = customerService.getCustomerById(id);
-        return new ResponseEntity<>(customer, HttpStatus.OK);
+        LOGGER.info(LogMarkers.LOG,
+            "GET_CUSTOMER_BY_ID | admin={} customerId={}",
+            authUserProvider.getLogin(), customerId
+        );
+
+        return ResponseEntity.ok(
+            customerService.getCustomerById(customerId)
+        );
     }
 
+    @Operation(
+        summary = "List customers",
+        description = "Returns a paginated list of customers. Admin-only operation."
+    )
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<Customer>> listCustomers(
+        @RequestParam(required = false) Status status,
+        @RequestParam(defaultValue = "0") int page
+    ) {
 
-    @Operation(summary = "Get all customers", description = "Retrieves all customers.")
-    @GetMapping("/list")
-    public ResponseEntity<Page<Customer>> list(
-            @RequestParam(name = "status", required = false) Status status,        
-            @RequestParam(defaultValue = "0") int page
-        ) 
-    {
+        Pageable pageable = PageRequest.of(
+            page,
+            defaultPageSize,
+            Sort.by("createdAt").ascending()
+        );
 
-        Pageable pageable = PageRequest.of(page, defaultPageSize,
-                Sort.by(
-                    Sort.Order.asc("createdAt"),
-                    Sort.Order.asc("status")
-                )
-            );
-
-        Page<Customer> resultCustomers = customerService.filterByStatus(status, pageable);
-
-        return new ResponseEntity<>(resultCustomers, HttpStatus.OK);
+        return ResponseEntity.ok(
+            customerService.filterByStatus(status, pageable)
+        );
     }
-
-
 }

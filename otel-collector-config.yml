@@ -8,28 +8,18 @@ receivers:
 
 processors:
   batch:
-
-  # resource:  # Removido para usar o service.name definido pelo Spring Boot
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 500
+    spike_limit_mib: 100
 
 connectors:
   spanmetrics:
     namespace: traces_span_metrics
     metrics_flush_interval: 15s
-
     histogram:
       explicit:
-        buckets:
-          - 5ms
-          - 10ms
-          - 25ms
-          - 50ms
-          - 100ms
-          - 250ms
-          - 500ms
-          - 1s
-          - 2s
-          - 5s
-
+        buckets: [5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 5s]
     dimensions:
       - name: http.method
       - name: http.route
@@ -38,33 +28,34 @@ connectors:
 exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
-
+  
   otlp/jaeger:
-    endpoint: jaeger:4317
+    endpoint: "cont-wallet-jaeger:4317"
     tls:
       insecure: true
 
-  debug:
+  loki:
+    endpoint: "http://cont-wallet-loki:3100/loki/api/v1/push"
+
+  logging: # Na 0.95 o exportador de debug/console é o 'logging'
     verbosity: detailed
 
 service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [spanmetrics, otlp/jaeger, debug]
-
-    metrics:
-      receivers: [spanmetrics, otlp]
-      processors: [batch]
-      exporters: [prometheus, debug]
-
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [debug]
-
   telemetry:
     metrics:
       address: 0.0.0.0:8888
-      level: detailed
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [spanmetrics, otlp/jaeger, logging]
+
+    metrics:
+      receivers: [spanmetrics, otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus, logging]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [loki, logging]

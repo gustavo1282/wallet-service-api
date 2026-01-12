@@ -2,79 +2,113 @@ package com.guga.walletserviceapi.config;
 
 import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
-import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
-import com.guga.walletserviceapi.security.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.handler.CustomAccessDeniedHandler;
+import com.guga.walletserviceapi.security.handler.CustomAuthenticationEntryPoint;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SpringSecurityConfig {
 
-    @Autowired
-    private SecurityMatchers matchers;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final SecurityMatchers matchers;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-        JwtAuthenticationFilter jwtFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+
+        MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);    
 
         return http
-                .csrf(csrf -> csrf.disable())
+            // =========================
+            // Segurança básica
+            // =========================
+            .csrf(csrf -> csrf.disable())
 
-                .headers(headers -> headers
-                    .frameOptions(frameOptions -> frameOptions.disable())
-                )
+            .cors(cors -> cors.configurationSource(request -> {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOrigins(Arrays.asList("*"));
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(Arrays.asList("*"));
+                config.setAllowCredentials(false);
+                return config;
+            }))
 
-                .cors(cors -> cors.configurationSource(request -> {
-                    CorsConfiguration config = new CorsConfiguration();
-                    //config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://seufrontend.com")); // << SUA ORIGEM AQUI
-                    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    config.setAllowedHeaders(Arrays.asList("*"));
-                    config.setAllowCredentials(true);
-                    return config;
-                }))
+            .sessionManagement(sm ->
+                sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
 
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // =========================
+            // Autorização
+            // =========================
+            .authorizeHttpRequests(auth -> auth
+                // 1. Endpoints de Infraestrutura (Sempre permitidos)
+                .requestMatchers(mvc.pattern("/actuator/**")).permitAll()
+                .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()
+                .requestMatchers(mvc.pattern("/webjars/**")).permitAll()
+
+                // 2. Regras Dinâmicas do YAML (Sanitizadas para remover o context-path se existir)
+                .requestMatchers(clean(matchers.getPublicPaths())).permitAll()
+                .requestMatchers(clean(matchers.getDocumentation())).permitAll()
+                .requestMatchers(clean(matchers.getSecured())).authenticated()
                 
-                .authorizeHttpRequests(auth -> auth
-                    // 1. Libera tudo que você definiu como público/doc no seu YAML
-                    .requestMatchers(matchers.getPublicPaths()).permitAll()
-                    .requestMatchers(matchers.getDocumentation()).permitAll()
+                // 3. Bloqueio residual
+                .anyRequest().denyAll()
+            )
 
-                    // 2. Restringe o Monitoramento (Ex: exige role MONITOR)
-                    //.requestMatchers(matchers.getMonitor()).hasRole("MONITOR")
-                    .requestMatchers(matchers.getMonitor()).hasAnyRole("MONITOR", "ADMIN")
-                    .requestMatchers(matchers.getAdmin()).hasRole("ADMIN")
+            // =========================
+            // JWT Filter
+            // =========================
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
-                    // 3. Todo o resto da API de Wallet exige JWT
-                    .anyRequest().authenticated()
+            // =========================
+            // Tratamento de erros
+            // =========================
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler)
+            )
 
-                )
-                //.httpBasic(Customizer.withDefaults())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                
-                .build();
+            .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    @Bean
-    public HttpExchangeRepository httpExchangeRepository() {
-        return new InMemoryHttpExchangeRepository();
+    /**
+     * Remove o context-path dos matchers para garantir compatibilidade com o 
+     * processamento interno do Spring Security.
+     */
+    private String[] clean(String[] paths) {
+        if (paths == null) return new String[0];
+        return Arrays.stream(paths)
+                .map(p -> p.replace("/wallet-service-api", ""))
+                .toArray(String[]::new);
     }
 
 }

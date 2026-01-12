@@ -18,6 +18,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 
 @ActiveProfiles("test")
@@ -57,10 +59,10 @@ public class JwtAuthenticationFilterTest {
         when(jwtService.validateToken(anyString())).thenReturn(true);
         
         // Quando extractUsername for chamado, retorne "testuser"
-        when(jwtService.extractUsername(anyString())).thenReturn("testuser");
+        when(jwtService.extractLogin(anyString())).thenReturn("testuser");
 
         // Execute o filtro
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        jwtAuthenticationFilter.doFilter(request, response, filterChain);
 
         // Verifique se o usuário foi colocado no contexto de segurança (logado)
         // Isso requer uma verificação mais profunda, mas mostra o conceito de simulação.
@@ -79,7 +81,7 @@ public class JwtAuthenticationFilterTest {
         when(jwtService.validateToken("token_invalido_mock")).thenReturn(false);
 
         // Execute o filtro
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        jwtAuthenticationFilter.doFilter(request, response, filterChain);
 
         // Verifique se a resposta foi 401 Unauthorized (depende da sua implementação exata no filtro)
         // assertEquals(401, response.getStatus()); 

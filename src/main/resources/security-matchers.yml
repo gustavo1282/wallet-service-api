@@ -1,34 +1,57 @@
 security:
   access-levels:
-    # ABERTOS: Essenciais para infraestrutura e onboarding
+
+    # =====================================================
+    # PÚBLICO: Essencial para infra e onboarding
+    # =====================================================
     public-paths:
-      - "/api/auth/login"
-      - "/api/auth/register"
-      - "/api/auth/refresh"
+      # Autenticação / login / refresh tokens
+      - "/api/auth/**"
+      # Actuator público (health, info, prometheus)
       - "/actuator/health/**"
       - "/actuator/info"
-
-    # DOCUMENTAÇÃO: Necessário para o time de dev e testes
-    documentation:
+      - "/actuator/prometheus"
+      - "/actuator/metrics/**"
       - "/v3/api-docs/**"
       - "/swagger-ui/**"
       - "/swagger-ui.html"
       - "/swagger-ui/index.html"
       - "/swagger-resources/**"
-      - "/webjars/**"
-      - "/actuator/**"
-
-    # MONITORAMENTO (Prometheus / Metrics): Foco em métricas numéricas
-    monitor:
-      - "/actuator/prometheus"
-      - "/actuator/metrics/**"
-      - "/actuator/scheduledtasks" # Útil para ver tarefas agendadas
-
-    # ADMINISTRAÇÃO E DIAGNÓSTICO: Foco em Tracing, Logs e Auditoria
-    admin:
+      # Endpoints relacionados a admin 
       - "/actuator/loggers/**"
       - "/actuator/env/**"
-      - "/actuator/httpexchanges" # Fundamental para auditoria de requests
-      - "/actuator/threaddump"    # Diagnóstico de travamentos
-      - "/actuator/heapdump"      # Diagnóstico de memória
-      - "/actuator/beans"         # Verificação de contexto
+      - "/actuator/httpexchanges/**"
+      - "/actuator/threaddump/**"
+      - "/actuator/heapdump/**"
+      - "/actuator/beans/**"
+      # Endpoints relacionados documentation
+      - "/webjars/**"
+    # =====================================================
+    # DOCUMENTAÇÃO: Swagger / OpenAPI
+    # =====================================================
+    documentation:
+ 
+
+    # =====================================================
+    # MONITORAMENTO (opcional: MONITOR / ADMIN)
+    # =====================================================
+    monitor:
+      # Exemplo de endpoints que exigem MONITOR ou ADMIN
+      # Caso queira liberar prometheus como público, não precisa incluir aqui
+      #- "/actuator/metrics/**"
+      #- "/actuator/scheduledtasks/**"
+
+    # =====================================================
+    # ADMIN: somente administradores
+    # =====================================================
+    admin:
+      - "/api/params/**"
+
+    # =====================================================
+    # API SECURED: endpoints de negócio autenticados
+    # =====================================================
+    secured:
+      - "/api/customers/**"
+      - "/api/wallets/**"
+      - "/api/transactions/**"
+      - "/api/wallet-operator/**"

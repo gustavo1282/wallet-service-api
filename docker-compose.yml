@@ -1,49 +1,6 @@
 services:
   # ======================================================================
-  # 1. SERVIÇO DE APLICAÇÃO (WALLET-SERVICE)
-  # ======================================================================
-  #wallet-service-api:
-  #  build:
-  #    context: .
-  #    dockerfile: Dockerfile
-  #  image: wallet_service:latest
-  #  container_name: cont-wallet-service-api
-  #  restart: unless-stopped
-  #  ports:
-  #    - "8080:8080" # Porta da aplicação
-  #    - "5005:5005" # Porta do debug
-  #  deploy:
-  #    resources:
-  #      limits:
-  #        cpus: '1.0'
-  #        memory: 640M
-  #      reservations:
-  #        cpus: '0.25'
-  #        memory: 400M
-  #  volumes:
-  #    - wallet_service_data:/var/lib/wallet_service/data
-  #  environment:
-  #    SPRING_PROFILES_ACTIVE: local
-  #    SERVICE_NAME: wallet-service-api
-  #    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
-  #    SPRING_DATASOURCE_USERNAME: wallet_user
-  #    SPRING_DATASOURCE_PASSWORD: wallet_pass
-  #    SPRING_JPA_HIBERNATE_DDL_AUTO: update
-  #    # AGORA APONTA PARA O COLLECTOR (e não mais direto para o Jaeger)
-  #    MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-collector:4318/v1/traces
-  #    MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
-  #  depends_on:
-  #    postgres:
-  #      condition: service_healthy
-  #    jaeger:
-  #      condition: service_started
-  #    otel-collector:
-  #      condition: service_started
-  #  networks:
-  #    - wallet_network
-
-  # ======================================================================
-  # 2. BANCO DE DADOS (POSTGRESQL)
+  # 1. BANCO DE DADOS (POSTGRESQL)
   # ======================================================================
   postgres:
     image: postgres:15.3-alpine
@@ -71,7 +28,7 @@ services:
       - wallet_network
 
   # ======================================================================
-  # 3. JAEGER (COLETOR E VISUALIZADOR DE TRACES)
+  # 2. COLETORES DE DADOS (JAEGER E LOKI)
   # ======================================================================
   jaeger:
     image: jaegertracing/all-in-one:1.60
@@ -80,16 +37,103 @@ services:
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     ports:
-      - "16686:16686" # Interface Web (UI)
-      - "14268:14268" # Antigo coletor (opcional)
+      - "16686:16686"
+      - "14268:14268"
     volumes:
       - jaeger_tracing_data:/var/lib/jaeger_tracing/data
     networks:
       - wallet_network
 
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: cont-wallet-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/etc/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - wallet_network
+
   # ======================================================================
-  # 4. RUNNER / CI LOCAL (ACT UBUNTU)
+  # 3. OPEN TELEMETRY COLLECTOR (PONTE DE DADOS)
   # ======================================================================
+  otel-collector:
+    #image: otel/opentelemetry-collector-contrib:0.99.0
+    image: otel/opentelemetry-collector-contrib:0.95.0  # Retornando para a sua versão original
+    container_name: cont-wallet-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "4317:4317" # gRPC
+      - "4318:4318" # HTTP
+      - "8889:8889" # Prometheus metrics
+    depends_on:
+      jaeger:
+        condition: service_started
+      loki:
+        condition: service_started
+    networks:
+      - wallet_network
+
+  # ======================================================================
+  # 4. MONITORAMENTO (PROMETHEUS E GRAFANA)
+  # ======================================================================
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: cont-wallet-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    networks:
+      - wallet_network
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: cont-wallet-grafana
+    restart: unless-stopped
+    user: "472"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_started
+      loki:
+        condition: service_started
+    networks:
+      - wallet_network
+
+  # ======================================================================
+  # 5. UTILITÁRIOS E RUNNER
+  # ======================================================================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: cont-wallet-pgadmin4
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'admin@postgres.com'
+      PGADMIN_DEFAULT_PASSWORD: wallet_pass
+    depends_on:
+      - postgres
+    networks:
+      - wallet_network
+
   runner-act:
     image: catthehacker/ubuntu:act-20.04
     container_name: cont-wallet-runner-act
@@ -101,85 +145,8 @@ services:
     networks:
       - wallet_network
 
-  # ======================================================================
-  # 5. MONITORAMENTO E QUALIDADE (PROMETHEUS, GRAFANA, SONARQUBE, OTel)
-  # ======================================================================
-  
-  # NOVO: OPEN TELEMETRY COLLECTOR
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.99.0
-    container_name: cont-wallet-otel-collector
-    restart: unless-stopped
-    command: ["--config=/etc/otel-collector-config.yml"]
-    volumes:
-      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
-    depends_on:
-      - jaeger
-    ports:
-      - "4317:4317" # gRPC receiver (O erro do seu Java Agent sumirá aqui)
-      - "4318:4318" # HTTP receiver
-      - "8889:8889" # Prometheus exporter metrics
-    networks:
-      - wallet_network
-
-  prometheus:
-    image: prom/prometheus:v2.51.0
-    container_name: cont-wallet-prometheus
-    restart: unless-stopped
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - "9090:9090"
-    networks:
-      - wallet_network
-
-  grafana:
-    image: grafana/grafana:10.2.3
-    container_name: cont-wallet-grafana
-    restart: unless-stopped
-    user: "472"
-    ports:
-      - "3000:3000"
-    depends_on:
-      - prometheus
-    networks:
-      - wallet_network
-
-  #sonarqube:
-  #  image: sonarqube:10.5.1-community
-  #  container_name: cont-sonarqube
-  #  ports:
-  #    - "9000:9000"
-  #  environment:
-  #    - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
-  #    - SONARQUBE_JDBC_URL=jdbc:postgresql://host.docker.internal:5432/sonar
-  #    - SONARQUBE_JDBC_USERNAME=sonar
-  #    - SONARQUBE_JDBC_PASSWORD=sonar
-  #  networks:
-  #    - wallet_network
-  #  volumes:
-  #    - sonarqube_data:/opt/sonarqube/data
-  #    - sonarqube_extensions:/opt/sonarqube/extensions
-  #    - sonarqube_logs:/opt/sonarqube/logs
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: cont-wallet-pgadmin4
-    restart: unless-stopped
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: 'admin@postgres.com'
-      PGADMIN_DEFAULT_PASSWORD: wallet_pass
-    depends_on:
-      - postgres
-    networks:
-      - wallet_network
-
 # ======================================================================
-# VOLUMES E REDES
+# DEFINIÇÃO DE VOLUMES E REDES
 # ======================================================================
 volumes:
   postgres_data:
@@ -189,6 +156,9 @@ volumes:
   sonarqube_logs:
   jaeger_tracing_data:
   runner_act_data:
+  pgadmin_data:
+  grafana-data:
+  loki-data:
 
 networks:
   wallet_network:

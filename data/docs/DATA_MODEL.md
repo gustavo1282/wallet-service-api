@@ -6,72 +6,95 @@ Documentação do modelo de dados, schema e relacionamentos do Wallet Service AP
 
 **SGBD Suportado:** PostgreSQL 15.3+ (Produção) | H2 (Desenvolvimento)
 
-**Tipo de Herança JPA:** Single Table Inheritance (Discriminator)
+**Tipo de Herança JPA:** JOINED Inheritance
 
 ## 📊 Tabelas e Entidades
 
-### 1. CUSTOMERS (Clientes)
+### 1. TB_CUSTOMER (Clientes)
 
 Armazena informações dos clientes do sistema.
 
 **Tabela SQL:**
 ```sql
-CREATE TABLE customers (
-    customer_id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    phone VARCHAR(20),
-    cpf VARCHAR(11) UNIQUE NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_status CHECK (status IN ('ACTIVE', 'INACTIVE'))
+CREATE TABLE tb_customer (
+    customer_id BIGINT PRIMARY KEY,
+    document_id VARCHAR(20) NOT NULL,
+    cpf VARCHAR(20) NOT NULL UNIQUE,
+    birth_date DATE NOT NULL,
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
+    full_name VARCHAR(80) NOT NULL,
+    email VARCHAR(80) NOT NULL UNIQUE,
+    phone_number VARCHAR(20) NOT NULL,
+    status INTEGER NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    login_auth_id_fk BIGINT
 );
-
-CREATE INDEX idx_customers_cpf ON customers(cpf);
-CREATE INDEX idx_customers_email ON customers(email);
-CREATE INDEX idx_customers_status ON customers(status);
 ```
 
 **Entidade JPA:**
 ```java
 @Entity
-@Table(name = "customers")
-@Data
-@Builder
+@Table(name = "tb_customer")
+@Builder(toBuilder = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "customerId")
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "customer_id", nullable = false, unique = true)
     private Long customerId;
-    
-    @Column(nullable = false, length = 255)
-    private String name;
-    
-    @Column(unique = true, nullable = false, length = 255)
-    private String email;
-    
-    @Column(length = 20)
-    private String phone;
-    
-    @Column(unique = true, nullable = false, length = 11)
+
+    @NotBlank(message = "Document ID field is required")
+    @Column(name = "documentId", nullable = false, length = 20)
+    private String documentId;
+
+    @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$", message = "CPF field is required")
+    @Column(name = "cpf", unique = true, nullable = false, length = 20)
     private String cpf;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
-    
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "birth_Date", nullable = false)
+    private LocalDate birthDate;
+
+    @NotBlank(message = "FirstName is required.")
+    @Column(name = "first_Name", nullable = false, length = 30)
+    private String firstName;
+
+    @NotBlank(message = "LastName is Required.")
+    @Column(name = "last_Name", nullable = false, length = 30)
+    private String lastName;
+
+    @Email(message = "Email should be valid")
+    @Column(name = "email", unique = true, nullable = false, length = 80)
+    private String email;
+
+    @NotBlank(message = "Fullname is required")
+    @Column(name = "full_name", nullable = false, length = 80)
+    private String fullName;
+
+    @NotNull(message = "Phone number cannot be null")
+    @Pattern(regexp = "^\\(\\d{2}\\)\\s*9?\\d{4}-\\d{4}$", message = "Phone number must be in the format")
+    @Column(name = "phone_number", nullable = false, length = 20)
+    private String phoneNumber;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-    
-    @UpdateTimestamp
-    @Column(nullable = false)
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-    
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Wallet> wallets;
+
+    @Convert(converter = StatusConverter.class)
+    @Column(name = "status", nullable = false, length = 2)
+    private Status status;
+
+    @Column(name = "login_auth_id_fk", nullable = true, insertable = true, updatable = true)
+    private Long loginAuthId;
 }
 ```
 
@@ -79,14 +102,430 @@ public class Customer {
 
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|-----------|----------|
-| `customer_id` | BIGINT | PK, AUTO | Identificador único |
-| `name` | VARCHAR(255) | NOT NULL | Nome do cliente |
-| `email` | VARCHAR(255) | UNIQUE, NOT NULL | Email (único) |
-| `phone` | VARCHAR(20) | - | Telefone de contato |
-| `cpf` | VARCHAR(11) | UNIQUE, NOT NULL | CPF (único) |
-| `status` | ENUM | NOT NULL, DEFAULT='ACTIVE' | ACTIVE ou INACTIVE |
+| `customer_id` | BIGINT | PK | Identificador único |
+| `document_id` | VARCHAR(20) | NOT NULL | Documento de identidade |
+| `cpf` | VARCHAR(20) | UNIQUE, NOT NULL | CPF formatado |
+| `birth_date` | DATE | NOT NULL | Data de nascimento |
+| `first_name` | VARCHAR(30) | NOT NULL | Primeiro nome |
+| `last_name` | VARCHAR(30) | NOT NULL | Sobrenome |
+| `full_name` | VARCHAR(80) | NOT NULL | Nome completo |
+| `email` | VARCHAR(80) | UNIQUE, NOT NULL | Email |
+| `phone_number` | VARCHAR(20) | NOT NULL | Telefone |
+| `status` | INTEGER | NOT NULL | Status (converter) |
 | `created_at` | TIMESTAMP | NOT NULL | Data de criação |
 | `updated_at` | TIMESTAMP | NOT NULL | Data de atualização |
+| `login_auth_id_fk` | BIGINT | - | FK para LoginAuth |
+
+---
+
+### 2. TB_WALLET (Carteiras)
+
+Armazena carteiras digitais dos clientes.
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_wallet (
+    wallet_id BIGINT PRIMARY KEY,
+    customer_id_fk BIGINT NOT NULL,
+    last_operation_type INTEGER,
+    previous_balance NUMERIC(16,2) NOT NULL,
+    current_balance NUMERIC(16,2) NOT NULL,
+    status INTEGER NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    login_user VARCHAR(20) NOT NULL,
+    FOREIGN KEY (customer_id_fk) REFERENCES tb_customer(customer_id)
+);
+```
+
+**Entidade JPA:**
+```java
+@Entity
+@Table(name = "tb_wallet")
+@Builder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "walletId")
+public class Wallet {
+    @Id
+    @Column(name = "wallet_id", nullable = false, unique = true)
+    private Long walletId;
+
+    @NotNull(message = "Customer ID cannot be null")
+    @Column(name = "customer_id_fk", insertable = true, updatable = true)
+    private Long customerId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id_fk", referencedColumnName = "customer_id", nullable = false, insertable = false, updatable = false)
+    private Customer customer;
+
+    @Convert(converter = OperationTypeConverter.class)
+    @JsonProperty("lastOperationType")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @Column(name = "last_operation_type", nullable = true, length = 2, insertable = true, updatable = true)
+    private OperationType lastOperationType;
+
+    @Digits(integer = 14, fraction = 2, message = "Previous balance must have up to 14 integer digits and 2 decimal places")
+    @Column(name = "previous_balance", nullable = false)
+    private BigDecimal previousBalance;
+
+    @Digits(integer = 14, fraction = 2, message = "Current balance must have up to 14 integer digits and 2 decimal places")
+    @Column(name = "current_balance", nullable = false)
+    private BigDecimal currentBalance;
+
+    @Convert(converter = StatusConverter.class)
+    @Column(name = "status", nullable = false, length = 2, insertable = true, updatable = true)
+    private Status status;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "created_At", nullable = false)
+    private LocalDateTime createdAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "updated_At", nullable = false)
+    private LocalDateTime updatedAt;
+}
+```
+
+**Campos:**
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|----------|
+| `wallet_id` | BIGINT | PK | Identificador único |
+| `customer_id_fk` | BIGINT | FK, NOT NULL | Referência ao cliente |
+| `last_operation_type` | INTEGER | - | Última operação (converter) |
+| `previous_balance` | NUMERIC(16,2) | NOT NULL | Saldo anterior |
+| `current_balance` | NUMERIC(16,2) | NOT NULL | Saldo atual |
+| `status` | INTEGER | NOT NULL | Status (converter) |
+| `created_at` | TIMESTAMP | NOT NULL | Data de criação |
+| `updated_at` | TIMESTAMP | NOT NULL | Data de atualização |
+| `login_user` | VARCHAR(20) | NOT NULL | Usuário que logou |
+
+---
+
+### 3. TB_TRANSACTION (Transações)
+
+Classe abstrata base para transações, usando herança JOINED.
+
+**Estratégia de Herança:** JOINED Inheritance
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_transaction (
+    transaction_id BIGINT PRIMARY KEY,
+    login VARCHAR(25) NOT NULL,
+    wallet_id BIGINT NOT NULL,
+    operation_type INTEGER NOT NULL,
+    previous_balance NUMERIC(16,2) NOT NULL,
+    amount NUMERIC(16,2) NOT NULL,
+    current_balance NUMERIC(16,2) NOT NULL,
+    status_transaction INTEGER NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    movement_id_fk BIGINT,
+    FOREIGN KEY (wallet_id_fk) REFERENCES tb_wallet(wallet_id),
+    FOREIGN KEY (movement_id_fk) REFERENCES tb_movement_transfer(movement_id)
+);
+```
+
+**Entidade JPA:**
+```java
+@Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "operationType", visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = DepositMoney.class, name = "DEPOSIT"),
+    @JsonSubTypes.Type(value = WithdrawMoney.class, name = "WITHDRAW"),
+    @JsonSubTypes.Type(value = TransferMoneySend.class, name = "TRANSFER_SEND"),
+    @JsonSubTypes.Type(value = TransferMoneyReceived.class, name = "TRANSFER_RECEIVED")
+})
+@Entity
+@Table(name = "tb_transaction")
+@SuperBuilder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "transactionId")
+public abstract class Transaction {
+    @Id
+    @Column(name = "transaction_id", nullable = false, unique = true)
+    private Long transactionId;
+
+    @Column(name = "login", nullable = false, length = 25)
+    private String login;
+
+    @NotNull(message = "Wallet ID cannot be null")
+    @Column(name = "wallet_id", nullable = false)
+    private Long walletId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "wallet_id", insertable = false, updatable = false)
+    private Wallet wallet;
+
+    @Convert(converter = OperationTypeConverter.class)
+    @Column(name = "operation_type", nullable = false, length = 2)
+    @JsonProperty("operationType")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private OperationType operationType;
+
+    @Digits(integer = 14, fraction = 2)
+    @Column(name = "previous_Balance", nullable = false)
+    private BigDecimal previousBalance;
+
+    @Digits(integer = 14, fraction = 2)
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
+
+    @Digits(integer = 14, fraction = 2)
+    @Column(name = "current_Balance", nullable = false)
+    private BigDecimal currentBalance;
+
+    @Convert(converter = StatusTransactionConverter.class)
+    @Column(name = "status_transaction", nullable = false, length = 2)
+    StatusTransaction statusTransaction;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movement_id_fk", referencedColumnName = "movement_id", nullable = true, insertable = true, updatable = false)
+    private MovementTransaction movementTransaction;
+}
+```
+
+---
+
+### 3.1 TB_DEPOSIT_MONEY (Depósito)
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_deposit_money (
+    transaction_id BIGINT PRIMARY KEY,
+    deposit_sender_id_fk BIGINT UNIQUE,
+    FOREIGN KEY (transaction_id) REFERENCES tb_transaction(transaction_id),
+    FOREIGN KEY (deposit_sender_id_fk) REFERENCES deposit_sender(deposit_sender_id)
+);
+```
+
+**Entidade JPA:**
+```java
+@Entity
+@Table(name = "tb_deposit_money")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@SuperBuilder
+public class DepositMoney extends Transaction {
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "deposit_sender_id_fk", referencedColumnName = "deposit_sender_id", nullable = true, insertable = true, updatable = false)
+    private DepositSender depositSender;
+}
+```
+
+---
+
+### 3.2 TB_WITHDRAW (Saque)
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_withdraw (
+    transaction_id BIGINT PRIMARY KEY,
+    FOREIGN KEY (transaction_id) REFERENCES tb_transaction(transaction_id)
+);
+```
+
+**Entidade JPA:**
+```java
+@Entity
+@Table(name = "tb_withdraw")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@SuperBuilder
+public class WithdrawMoney extends Transaction {
+    // Sem campos adicionais
+}
+```
+
+---
+
+### 3.3 TB_TRANSFER_SEND (Transferência Enviada)
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_transfer_send (
+    transaction_id BIGINT PRIMARY KEY,
+    FOREIGN KEY (transaction_id) REFERENCES tb_transaction(transaction_id)
+);
+```
+
+**Entidade JPA:**
+```java
+@Entity
+@Table(name = "tb_transfer_send")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@SuperBuilder
+public class TransferMoneySend extends Transaction {
+    // Sem campos adicionais
+}
+```
+
+---
+
+### 3.4 TB_TRANSFER_RECEIVED (Transferência Recebida)
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_transfer_received (
+    transaction_id BIGINT PRIMARY KEY,
+    FOREIGN KEY (transaction_id) REFERENCES tb_transaction(transaction_id)
+);
+```
+
+**Entidade JPA:**
+```java
+@Entity
+@Table(name = "tb_transfer_received")
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@SuperBuilder
+public class TransferMoneyReceived extends Transaction {
+    // Sem campos adicionais
+}
+```
+
+---
+
+### 4. TB_MOVEMENT_TRANSFER (Movimentação de Transferência)
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_movement_transfer (
+    movement_id BIGINT PRIMARY KEY,
+    amount NUMERIC(16,2) NOT NULL,
+    operation_type INTEGER NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    transaction_id BIGINT NOT NULL,
+    transaction_to_id BIGINT,
+    wallet_id BIGINT NOT NULL,
+    wallet_to_id BIGINT,
+    FOREIGN KEY (transaction_id) REFERENCES tb_transaction(transaction_id),
+    FOREIGN KEY (transaction_to_id) REFERENCES tb_transaction(transaction_id),
+    FOREIGN KEY (wallet_id) REFERENCES tb_wallet(wallet_id),
+    FOREIGN KEY (wallet_to_id) REFERENCES tb_wallet(wallet_id)
+);
+```
+
+---
+
+### 5. DEPOSIT_SENDER (Remetente de Depósito)
+
+**Tabela SQL:**
+```sql
+CREATE TABLE deposit_sender (
+    deposit_sender_id BIGINT PRIMARY KEY,
+    amount NUMERIC(16,2) NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    cpf VARCHAR(20) NOT NULL,
+    full_name VARCHAR(30) NOT NULL,
+    terminal_id VARCHAR(255) NOT NULL
+);
+```
+
+---
+
+### 6. TB_LOGIN_AUTH (Autenticação de Login)
+
+**Tabela SQL:**
+```sql
+CREATE TABLE tb_login_auth (
+    id BIGINT PRIMARY KEY,
+    status INTEGER NOT NULL,
+    customer_id_fk BIGINT NOT NULL,
+    wallet_id_fk BIGINT NOT NULL UNIQUE,
+    login_auth_type INTEGER NOT NULL,
+    login VARCHAR(80) NOT NULL,
+    access_key VARCHAR(256) NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    last_login_at TIMESTAMP(6),
+    role INTEGER
+);
+```
+
+**Entidade JPA:**
+```java
+@Entity
+@Table(name = "tb_login_auth")
+@Builder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class LoginAuth {
+    @Id
+    @Column(name = "id", nullable = false, unique = true)
+    @JsonProperty("id")
+    private Long id;
+
+    @Convert(converter = StatusConverter.class)
+    @Column(name = "status", nullable = false, length = 2)
+    private Status status;
+
+    @NotNull(message = "Customer cannot be null")
+    @Column(name = "customer_id_fk", nullable = false)
+    private Long customerId;
+
+    @NotNull(message = "Wallet cannot be null")
+    @Column(name = "wallet_id_fk", nullable = false, unique = true)
+    private Long walletId;
+
+    @Convert(converter = LoginAuthTypeConverter.class)
+    @Column(name = "loginAuthType", nullable = false, length = 2)
+    private LoginAuthType loginAuthType;
+
+    @Column(name = "login", nullable = false, length = 80)
+    private String login;
+
+    @Column(name = "access_key", nullable = false, length = 256)
+    private String accessKey;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "last_login_at", nullable = true)
+    private LocalDateTime lastLoginAt;
+
+    @Convert(converter = LoginRoleConverter.class)
+    @Column(name = "role", length = 180)
+    private LoginRole role;
+}
+```
+
+---
+
+**Visão Geral da Herança:**
+```
+Transaction (Abstract)
+├── DepositMoney
+├── WithdrawMoney
+├── TransferMoneySend
+└── TransferMoneyReceived
+```
+
+**Tipo de Herança JPA:** JOINED Inheritance (cada subclasse tem sua própria tabela)
 
 **Enumeração Status:**
 ```java
@@ -758,43 +1197,15 @@ CREATE INDEX idx_transactions_wallet_id ON transactions(wallet_id);
 -- Transações por data (range queries)
 CREATE INDEX idx_transactions_created_at ON transactions(created_at);
 
--- Composite index (comum)
-CREATE INDEX idx_transactions_wallet_date ON transactions(wallet_id, created_at);
-```
-
 ---
 
-## 🛡️ Segurança de Dados
-
-### Campos Sensíveis
-
-- `cpf`: Criptografar em produção (usar extensões PostgreSQL)
-- `password`: Always BCrypt/Argon2 (nunca plaintext)
-- `email`: Validar e sanitizar
-
-### GDPR Compliance
-
-```java
-// Deletar cliente (GDPR Right to Erasure)
-@Transactional
-public void deleteCustomer(Long customerId) {
-    Customer customer = customerRepository.findById(customerId)
-        .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
-    
-    // Wallets são deletadas via cascade
-    customerRepository.delete(customer);
-    
-    // Log para auditoria
-    auditLog("CUSTOMER_DELETED", customerId);
-}
+**Visão Geral da Herança:**
+```
+Transaction (Abstract)
+├── DepositMoney
+├── WithdrawMoney
+├── TransferMoneySend
+└── TransferMoneyReceived
 ```
 
----
-
-## 📖 Referências e Ferramentas
-
-- **PostgreSQL Docs**: https://www.postgresql.org/docs/
-- **JPA/Hibernate**: https://docs.jboss.org/hibernate/stable/orm/
-- **Spring Data JPA**: https://spring.io/projects/spring-data-jpa
-- **Tool Visual**: DBeaver, pgAdmin
-- **Gerador ER**: DbVisualizer, Lucidchart
+**Tipo de Herança JPA:** JOINED Inheritance (cada subclasse tem sua própria tabela)

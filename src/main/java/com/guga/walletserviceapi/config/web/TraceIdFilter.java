@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class TraceIdFilter implements Filter {
 
@@ -19,12 +20,14 @@ public class TraceIdFilter implements Filter {
 
     @Override
     public void doFilter(
-            ServletRequest request,
-            ServletResponse response,
-            FilterChain chain)
-            throws IOException, ServletException {
+        ServletRequest request,
+        ServletResponse response,
+        FilterChain chain)
+        throws IOException, ServletException 
+    {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;        
 
         String traceId = httpRequest.getHeader(TRACE_ID_HEADER);
         if (traceId == null || traceId.isBlank()) {
@@ -32,6 +35,7 @@ public class TraceIdFilter implements Filter {
         }
 
         ThreadContext.put(TRACE_ID_MDC_KEY, traceId);
+        httpResponse.setHeader(TRACE_ID_HEADER, traceId);
 
         try {
             chain.doFilter(request, response);

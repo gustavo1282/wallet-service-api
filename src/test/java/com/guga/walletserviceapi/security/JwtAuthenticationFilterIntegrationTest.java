@@ -16,6 +16,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
+import com.guga.walletserviceapi.security.jwt.JwtService;
+
 import jakarta.servlet.ServletException;
 
 @ActiveProfiles("test")
@@ -40,7 +43,7 @@ public class JwtAuthenticationFilterIntegrationTest {
         MockFilterChain filterChain = new MockFilterChain();
 
         // O filtro deve prosseguir para o próximo filtro, pois não há token
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        jwtAuthenticationFilter.doFilter(request, response, filterChain);
 
         // Verificações: Por exemplo, se o status não é 401, ou se o filterChain.doFilter foi chamado
     }
@@ -55,10 +58,10 @@ public class JwtAuthenticationFilterIntegrationTest {
 
         // Configura o comportamento do mock service
         when(jwtService.validateToken(anyString())).thenReturn(true);
-        when(jwtService.extractUsername(anyString())).thenReturn("testuser");
+        when(jwtService.extractLogin(anyString())).thenReturn("testuser");
 
         // Execute o filtro
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        jwtAuthenticationFilter.doFilter(request, response, filterChain);
 
         // A partir daqui, o usuário "testuser" deve estar no contexto de segurança do Spring
     }

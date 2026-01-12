@@ -3,6 +3,7 @@ server:
   protocol-type: http
   hostname: localhost
   port: '8080'
+  address: 0.0.0.0
   servlet:
     context-path: /wallet-service-api
 
@@ -45,15 +46,17 @@ spring:
   data:
     web:
       pageable:
-        default-page-size: 25
-        max-page-size: 25
-        page-parameter: page
-        size-parameter: size
+        max-page-size: 30
+        default-page-size: 300    #é a quantidade de linhas que serão retornadas da query
+        #page-parameter: page
+        #size-parameter: size
   datasource:
     url: jdbc:postgresql://localhost:5432/wallet_db
     username: wallet_user
     password: wallet_pass
     driver-class-name: org.postgresql.Driver
+    hikari:
+      register-mbeans: true # Permite a exposição via JMX/Metrics
   # Configurações do console H2
   h2:
     console:
@@ -67,22 +70,22 @@ spring:
     property-naming-strategy: LOWER_CAMEL_CASE
     deserialization:
       fail-on-unknown-properties: false
-    #serialization:
-    #  fail-on-empty-beans: false
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update   #none | validate | update | create | create-drop
-      use_sql_comments: true
-      jdbc.batch_size: 1000
+      ddl-auto: update    # none | validate | update | create | create-drop
     generate-ddl: true
-    #properties:
-    show-sql: 'true'
-    format_sql: true
-    #properties:
-    #  hibernate:
-    #    instrumentation:
-    #      enabled: false  # Desabilita instrumentação automática do Hibernate para evitar conflitos com OpenTelemetry
+    show-sql: true
+    properties:
+      hibernate:
+        default_schema: public
+        "[format_sql]": true
+        "[use_sql_comments]": true
+        jdbc:
+          "[batch_size]": 1000
+        "[order_inserts]": true
+        "[order_updates]": true
+        jdbc.batch_versioned_data: true   # Mantenha a versão do dado no batch
   security:
     user:
       name: wallet_user
@@ -90,52 +93,70 @@ spring:
       roles:
       - "MONITOR"
   threads.virtual.enabled: true
+  spring:
+    profiles:
+      active: local
 
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, loggers, prometheus, metrics
+        # Define quais ferramentas podem ler dados da aplicação
+        include: 'health,info,loggers,prometheus,metrics'
   endpoint:
+    health:
+      show-details: always
     prometheus:
       enabled: true
     metrics:
       enabled: true
-    health:
-      show-details: always
-  tags:
-    application: ${spring.application.name}
+  # Configurações de Observabilidade (Logs, Traces e Métricas)
   observations:
     key-values:
-      application: wallet-service-api
-  otlp:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
+      application: ${spring.application.name}
+  # Exportação para Prometheus (Onde o seu Prometheus faz o 'scrape')
+  prometheus:
     metrics:
       export:
-        enabled: false
+        enabled: true
+  # Configuração do OpenTelemetry (Logs e Traces via OTLP)
+  otlp:
+    logging:
+      endpoint: http://localhost:4318/v1/logs
+      timeout: 10s
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+      timeout: 10s
+    metrics:
+      export:
+        enabled: false # Desativado pois você está usando o Prometheus (pull) em vez de OTLP (push)
+  # Métricas Internas e Histogramas (Para Gráficos de Latência/P95)
   metrics:
     distribution:
       percentiles-histogram:
-        http.server.requests: true
-
+        "[http.server.requests]": true
+    enable:
+      process: true
+      jvm: true
+    tags:
+      application: ${spring.application.name}
+  # Configuração de Rastreamento (Distributed Tracing)
   tracing:
     enabled: true
     sampling:
-      probability: 1.0
+      probability: 1.0 # 1.0 envia 100% dos traces (mude para 0.1 em produção)
 
-# Define o nível global como INFO e silencia bibliotecas verbosas
-logging.level.org.springframework.beans.factory: INFO
-logging.level.root: INFO
-logging.level.org.springframework: INFO
-logging.level.org.hibernate: INFO
 
-# Silencia o SpringDoc (Swagger) que está aparecendo muito no seu log
-logging.level.org.springdoc: WARN
-
-# Silencia especificamente a segurança e observabilidade que gera esse stacktrace
-logging.level.org.springframework.security: INFO
-logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: WARN
-
-# Limita o stacktrace para apenas as primeiras 5 linhas em caso de erro
-logging.exception-conversion-word: "%wEx{5}"
+logging:
+  file:
+    name: logs/application.log
+  exception-conversion-word: "%wEx{5}"
+  level:
+    root: INFO
+    com.guga.walletserviceapi: DEBUG
+    org.hibernate: INFO
+    org.springdoc: INFO
+    org.springframework: INFO
+    org.springframework.data.mapping: INFO
+    org.springframework.security: INFO
+    org.springframework.web.filter.CommonsRequestLoggingFilter: INFO

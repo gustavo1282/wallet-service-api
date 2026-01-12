@@ -1,7 +1,6 @@
 package com.guga.walletserviceapi.repository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,25 +9,27 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.enums.OperationType;
 
 @Repository
 public interface TransactionRepository extends
         JpaRepository<Transaction, Long>,
         JpaSpecificationExecutor<Transaction> {
 
-    /***
-     * Searches for transactions by wallet ID and within a time period
-     * @param walletId
-     * @param start
-     * @param end
-     * @param pageable
-     * @return List<Transaction>
-     */
-    Page<Transaction> findByWallet_WalletIdOrderByCreatedAtDesc(Long walletId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    Page<Transaction> findByWalletId(
+        Long walletId, 
+        Pageable pageable);
 
-    Page<Transaction> findTop500ByWallet_WalletId(Long walletId, Pageable pageable);
+    Page<Transaction> findByWalletIdAndCreatedAtBetween(
+        Long walletId,
+        LocalDateTime createdAtStart, 
+        LocalDateTime createdAtEnd,
+        Pageable pageable
+    );
 
-    Optional<Page<Transaction>> findByWallet_WalletId(Long walletId, Pageable pageable);
-    
+    Page<Transaction> findByWalletIdAndOperationType(
+        Long walletId, 
+        OperationType operationType, 
+        Pageable pageable);
 
 }
