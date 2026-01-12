@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.guga.walletserviceapi.controller.TransactionController;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.TransactionUtils;
@@ -50,6 +53,9 @@ public class TransactionService implements IWalletApiService {
     public static final BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
 
     public static final BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
+
+    private static final Logger LOGGER = LogManager.getLogger(TransactionController.class);
+
 
     public Transaction getTransactionById(Long id) {
         return transactionRepository.findById(id)
@@ -332,5 +338,24 @@ public class TransactionService implements IWalletApiService {
             .getNextSequenceId(ParamApp.SEQ_TRANSACTION_ID)
             .getValueLong();
     }
+
+    /**
+     * Filtra transações por Wallet e Tipo de Operação com limite de resultados.
+     * * @param walletId ID da carteira do usuário logado
+     * @param operation Enum OperationType (DEPOSIT, WITHDRAW, TRANSFER_SEND, etc.)
+     * @param pageable Configuração de paginação (no seu caso, fixado em 150 registros)
+     * @return Página de transações filtradas
+     */
+    public Page<Transaction> filterTransactionByWalletIdAndOperationType(
+            Long walletId, 
+            OperationType operation, 
+            Pageable pageable) {
+        
+        LOGGER.debug("Service: Filtering transactions | walletId={} | operation={}", walletId, operation);
+
+        // Chamada ao Repository
+        return transactionRepository.findByWalletIdAndOperationType(walletId, operation, pageable);
+    }
+
 
 }

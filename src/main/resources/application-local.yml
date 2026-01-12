@@ -123,8 +123,10 @@ management:
   otlp:
     logging:
       endpoint: http://localhost:4318/v1/logs
+      timeout: 10s
     tracing:
       endpoint: http://localhost:4318/v1/traces
+      timeout: 10s
     metrics:
       export:
         enabled: false # Desativado pois você está usando o Prometheus (pull) em vez de OTLP (push)
@@ -151,10 +153,10 @@ logging:
   exception-conversion-word: "%wEx{5}"
   level:
     root: INFO
-    com.guga.walletserviceapi: INFO
+    com.guga.walletserviceapi: DEBUG
     org.hibernate: INFO
-    org.springdoc: WARN
+    org.springdoc: INFO
     org.springframework: INFO
-    org.springframework.data.mapping: DEBUG
+    org.springframework.data.mapping: INFO
     org.springframework.security: INFO
-    org.springframework.web.filter.CommonsRequestLoggingFilter: WARN
+    org.springframework.web.filter.CommonsRequestLoggingFilter: INFO

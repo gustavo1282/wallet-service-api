@@ -7,23 +7,30 @@ security:
     public-paths:
       # Autenticação / login / refresh tokens
       - "/api/auth/**"
-
       # Actuator público (health, info, prometheus)
       - "/actuator/health/**"
       - "/actuator/info"
       - "/actuator/prometheus"
       - "/actuator/metrics/**"
-
-    # =====================================================
-    # DOCUMENTAÇÃO: Swagger / OpenAPI
-    # =====================================================
-    documentation:
       - "/v3/api-docs/**"
       - "/swagger-ui/**"
       - "/swagger-ui.html"
       - "/swagger-ui/index.html"
       - "/swagger-resources/**"
+      # Endpoints relacionados a admin 
+      - "/actuator/loggers/**"
+      - "/actuator/env/**"
+      - "/actuator/httpexchanges/**"
+      - "/actuator/threaddump/**"
+      - "/actuator/heapdump/**"
+      - "/actuator/beans/**"
+      # Endpoints relacionados documentation
       - "/webjars/**"
+    # =====================================================
+    # DOCUMENTAÇÃO: Swagger / OpenAPI
+    # =====================================================
+    documentation:
+ 
 
     # =====================================================
     # MONITORAMENTO (opcional: MONITOR / ADMIN)
@@ -38,13 +45,6 @@ security:
     # ADMIN: somente administradores
     # =====================================================
     admin:
-      - "/actuator/loggers/**"
-      - "/actuator/env/**"
-      - "/actuator/httpexchanges/**"
-      - "/actuator/threaddump/**"
-      - "/actuator/heapdump/**"
-      - "/actuator/beans/**"
-
       - "/api/params/**"
 
     # =====================================================
@@ -54,4 +54,4 @@ security:
       - "/api/customers/**"
       - "/api/wallets/**"
       - "/api/transactions/**"
-      - "/api/wallets-operations/**"
+      - "/api/wallet-operator/**"

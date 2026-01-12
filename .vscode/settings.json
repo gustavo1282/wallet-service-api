@@ -30,5 +30,6 @@
     "[javascript]": {
         "editor.formatOnSave": false
     },
-    "java.format.settings.url": ".vscode/java-formatter.xml"
+    "java.format.settings.url": ".vscode/java-formatter.xml",
+    "java.project.explorer.showNonJavaResources": false
 }

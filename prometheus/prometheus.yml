@@ -3,58 +3,76 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  # 1. APM: Métricas da Wallet API processadas pelo Collector
-  # Alimenta o Dashboard 19419
+  # 1. APM: Métricas via OTel Collector (Dados do Spring processados)
+  # Unifica padrões: 'application' para Spring e 'service_name' para OTel/Jaeger
   - job_name: "wallet-api-metrics"
     scrape_interval: 5s
     static_configs:
       - targets: ['otel-collector:8889']
         labels:
           environment: 'env-local'
-          application: 'wallet-api-metrics'
+          env: 'env-local'
+          application: 'wallet-service-api'
+          service_name: 'wallet-service-api'
+          instance: 'wallet-api-01'           # Identificador da instância
+          job: 'wallet-api-metrics'           # Garante consistência em dashboards APM
 
-  # 2. INFRA: Saúde interna do OTel Collector (CPU, RAM, Spans)
-  # Alimenta o Dashboard 15983
+  # 2. INFRA: OTel Collector (Saúde do Coletor)
   - job_name: "otel-collector"
     static_configs:
       - targets: ['otel-collector:8888']
         labels:
           environment: 'env-local'
           application: 'otel-collector'
+          service_name: 'otel-collector'
+          instance: 'otel-collector-01'
+    
 
-  # 3. PROMETHEUS: Auto-monitoramento
+  # 3. PROMETHEUS (Auto-monitoramento)
   - job_name: "prometheus"
     static_configs:
       - targets: ['prometheus:9090']
         labels:
           environment: 'env-local'
           application: 'prometheus'
+          instance: 'prometheus-01'
+    
 
-  # 4. GRAFANA - Saúde da Ferramenta, Performance de Queries e Auditoria de Uso
-  # Alimenta o Dashboard: Grafana metrics
+  # 4. GRAFANA (Performance de UI e Queries)
   - job_name: 'grafana'
     static_configs:
-      - targets: ['grafana:3000'] # Ou o IP do seu container/serviço
+      - targets: ['grafana:3000']
         labels:
           environment: 'env-local'
-          application: 'grafana-monitoring'
-          component: 'grafana'
+          application: 'grafana'
+          instance: 'grafana-01'
+    
 
-  # 5. JAEGER - 
+  # 5. JAEGER (Saúde do rastreamento distribuído)
   - job_name: 'jaeger'
     static_configs:
-      - targets: ['jaeger:14269'] # Porta de métricas do Jaeger
+      - targets: ['jaeger:14269']
         labels:
           environment: 'env-local'
-          application: 'jaeger-monitoring'
-          component: 'jaeger'
+          application: 'jaeger'
+          instance: 'jaeger-01'
+    
 
-  # 6. APPLICATION: Métricas diretas do Spring Boot Actuator
+  # 6. APPLICATION: Spring Boot Actuator (Direct Scrape)
+  # Inclui 'app' e 'namespace' para compatibilidade total com dashboards de terceiros
   - job_name: 'wallet-service-direct'
     metrics_path: '/wallet-service-api/actuator/prometheus'
     static_configs:
-      - targets: ['host.docker.internal:8080'] # Use o nome do container se a API estiver no Docker
+      - targets: ['host.docker.internal:8080']
         labels:
           environment: 'env-local'
+          env: 'env-local'
           namespace: 'env-local'
           application: 'wallet-service-api'
+          app: 'wallet-service-api'
+          service_name: 'wallet-service-api'
+          instance: 'wallet-api-local-ide'     # Diferencia o que roda na IDE do que roda no Docker
+          job: 'wallet-service-api'
+    basic_auth:
+      username: wallet_user
+      password: wallet_pass

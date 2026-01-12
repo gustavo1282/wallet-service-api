@@ -151,6 +151,11 @@ Requisição HTTP → JwtAuthenticationFilter → JwtAuthenticationProvider → 
 - `JwtAuthenticatedUserProvider`: Provider para acesso padronizado ao usuário logado nos controllers.
 - `AuditContextFactory`: Integração entre autenticação e auditoria.
 
+### Endpoints em contexto `/me`
+
+Os controllers foram padronizados para expor recursos no contexto do usuário autenticado usando o sufixo `/me` (por exemplo, `/api/customers/me`, `/api/wallets/me`, `/api/transactions/me`). Esses endpoints retornam dados associados ao usuário logado e exigem um `Authorization: Bearer {accessToken}` válido. Garanta que as configurações em `security-matchers.yml` permitam acesso público apenas aos endpoints de documentação/health e que o filtro JWT passe requests do contexto `/me` após validação do token.
+
+
 ### Configuração de Segurança
 
 **Arquivo:** `src/main/java/com/guga/walletserviceapi/config/SpringSecurityConfig.java`

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.enums.OperationType;
 
 @Repository
 public interface TransactionRepository extends
@@ -25,5 +26,10 @@ public interface TransactionRepository extends
         LocalDateTime createdAtEnd,
         Pageable pageable
     );
+
+    Page<Transaction> findByWalletIdAndOperationType(
+        Long walletId, 
+        OperationType operationType, 
+        Pageable pageable);
 
 }

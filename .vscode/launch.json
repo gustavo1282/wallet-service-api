@@ -1,37 +1,35 @@
-{
-    "configurations": [
-        {
-            "type": "java",
-            "name": "Spring Boot-WalletServiceApplication<wallet-service-api>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
-            "projectName": "wallet-service-api",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env",
-            "vmArgs": [
-                
-                "-javaagent:${workspaceFolder}/lib/opentelemetry-javaagent.jar",
-
-                "-Dotel.service.name=wallet-service-api",
-                "-Dotel.resource.attributes=service.name=wallet-service-api,environment=env-local",
-
-                "-Dotel.traces.exporter=otlp",
-                "-Dotel.metrics.exporter=otlp",
-                "-Dotel.logs.exporter=otlp",
-
-                "-Dotel.exporter.otlp.protocol=http/protobuf",
-                "-Dotel.exporter.otlp.endpoint=http://host.docker.internal:4318",
-
-                "-Dotel.instrumentation.spring-webmvc.enabled=true",
-                "-Dotel.instrumentation.spring-web.enabled=true",
-                "-Dotel.instrumentation.servlet.enabled=true"
-
-                //"-Dotel.exporter.otlp.traces.endpoint=http://host.docker.internal:4318/v1/traces",
-                //"-Dotel.exporter.otlp.metrics.endpoint=http://host.docker.internal:4318/v1/metrics",
-                //"-Dotel.exporter.otlp.logs.endpoint=http://host.docker.internal:4318/v1/logs",
-
-            ]
-        }
-    ]
-}
+    {
+        "configurations": [
+            {
+                "type": "java",
+                "name": "Spring Boot-WalletServiceApplication<wallet-service-api>",
+                "request": "launch",
+                "cwd": "${workspaceFolder}",
+                "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
+                "projectName": "wallet-service-api",
+                "args": "",
+                "envFile": "${workspaceFolder}/.env",
+                "vmArgs": [
+                    "-javaagent:${workspaceFolder}/lib/opentelemetry-javaagent.jar",
+                    "-Dotel.service.name=wallet-service-api",
+                    "-Dotel.resource.attributes=service.name=wallet-service-api,environment=env-local",
+                    "-Dotel.traces.exporter=otlp",
+                    "-Dotel.metrics.exporter=otlp",
+                    "-Dotel.logs.exporter=otlp",
+                    "-Dotel.exporter.otlp.protocol=http/protobuf",
+                    // MUDANÇA: Usando o IP que o curl validou
+                    "-Dotel.exporter.otlp.endpoint=http://127.0.0.1:4318",
+                    // ADIÇÃO: Garante que o OkHttp não se perca no IPv6 do Windows
+                    "-Djava.net.preferIPv4Stack=true",
+                    "-Dotel.exporter.otlp.timeout=10000",
+                    "-Dotel.instrumentation.spring-webmvc.enabled=true",
+                    "-Dotel.instrumentation.spring-web.enabled=true",
+                    "-Dotel.instrumentation.servlet.enabled=true"
+                    // SE VOCÊ ESTIVER RODANDO DENTRO DE UM CONTAINER DO DOCKER, DESCOMENTE AS LINHAS ABAIXO E COMENTE A LINHA ACIMA
+                    //"-Dotel.exporter.otlp.traces.endpoint=http://host.docker.internal:4318/v1/traces",
+                    //"-Dotel.exporter.otlp.metrics.endpoint=http://host.docker.internal:4318/v1/metrics",
+                    //"-Dotel.exporter.otlp.logs.endpoint=http://host.docker.internal:4318/v1/logs",
+                ]
+            }
+        ]
+    }

@@ -2,7 +2,6 @@ package com.guga.walletserviceapi.config;
 
 import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
 import com.guga.walletserviceapi.security.handler.CustomAccessDeniedHandler;
@@ -30,12 +31,12 @@ public class SpringSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-
-    @Autowired
-    private SecurityMatchers matchers;
+    private final SecurityMatchers matchers;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+
+        MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);    
 
         return http
             // =========================
@@ -60,13 +61,20 @@ public class SpringSecurityConfig {
             // Autorização
             // =========================
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(matchers.getPublicPaths()).permitAll()
-                .requestMatchers(matchers.getDocumentation()).permitAll()
-                .requestMatchers(matchers.getMonitor()).hasAnyRole("MONITOR","ADMIN")
-                .requestMatchers(matchers.getAdmin()).hasRole("ADMIN")
-                .requestMatchers(matchers.getSecured()).authenticated()
+                // 1. Endpoints de Infraestrutura (Sempre permitidos)
+                .requestMatchers(mvc.pattern("/actuator/**")).permitAll()
+                .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                .requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()
+                .requestMatchers(mvc.pattern("/webjars/**")).permitAll()
+
+                // 2. Regras Dinâmicas do YAML (Sanitizadas para remover o context-path se existir)
+                .requestMatchers(clean(matchers.getPublicPaths())).permitAll()
+                .requestMatchers(clean(matchers.getDocumentation())).permitAll()
+                .requestMatchers(clean(matchers.getSecured())).authenticated()
+                
+                // 3. Bloqueio residual
                 .anyRequest().denyAll()
-                //.anyRequest().authenticated()
             )
 
             // =========================
@@ -91,4 +99,16 @@ public class SpringSecurityConfig {
     ) throws Exception {
         return config.getAuthenticationManager();
     }
+
+    /**
+     * Remove o context-path dos matchers para garantir compatibilidade com o 
+     * processamento interno do Spring Security.
+     */
+    private String[] clean(String[] paths) {
+        if (paths == null) return new String[0];
+        return Arrays.stream(paths)
+                .map(p -> p.replace("/wallet-service-api", ""))
+                .toArray(String[]::new);
+    }
+
 }

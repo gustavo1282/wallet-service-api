@@ -79,6 +79,42 @@ public class WalletController {
     }
 
     // =====================================================
+    // USER CONTEXT - MY WALLETS
+    // =====================================================
+
+    @Operation(
+        summary = "List all wallets of the authenticated customer",
+        description = "Returns a paginated list of all wallets belonging to the customer identified by the JWT token."
+    )
+    @GetMapping("/me/all")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<Wallet>> getMyWallets(
+        @RequestParam(defaultValue = "0") int page
+    ) {
+        // Extrai o contexto do token (onde o customerId já foi validado pelo filtro)
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+        Long customerId = auditCtx.getCustomerId();
+
+        LOGGER.info(LogMarkers.LOG, "GET_MY_WALLETS | customerId={} user={}",
+            customerId, auditCtx.getUsername()
+        );
+
+        AuditLogger.log("WALLET_GET_MY_LIST", auditCtx);
+
+        // Define a paginação padrão para o usuário
+        Pageable pageable = PageRequest.of(
+            page,
+            defaultPageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        );
+
+        // Reaproveita o serviço de busca por customerId, mas restrito ao ID do próprio token
+        return ResponseEntity.ok(
+            walletService.getWalletByCustomerId(customerId, pageable)
+        );
+    }
+
+    // =====================================================
     // CREATE WALLET (ADMIN)
     // =====================================================
 

@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://host.docker.internal:8080/wallet-service-api",
+      "url": "http://localhost:8080/wallet-service-api",
       "description": "Generated server url"
     }
   ],
@@ -15,10 +15,6 @@
     {
       "name": "Transaction",
       "description": "Endpoints for managing transactions"
-    },
-    {
-      "name": "Wallet Operator",
-      "description": "Endpoints for wallet operations"
     },
     {
       "name": "ParamApp",
@@ -33,20 +29,34 @@
       "description": "Customer domain operations"
     },
     {
+      "name": "Wallet Operator",
+      "description": "Centralized Hub for Customer, Wallet and Transaction operations"
+    },
+    {
       "name": "Wallet",
       "description": "Endpoints for managing wallets"
     }
   ],
   "paths": {
-    "/api/wallets/{id}": {
+    "/api/wallets/{walletId}": {
       "get": {
         "tags": [
           "Wallet"
         ],
-        "summary": "Get Wallet by ID",
-        "description": "Retrieves a Wallet by their ID.",
+        "summary": "Get wallet by ID",
+        "description": "Retrieves a wallet by ID. Admin-only operation.",
         "operationId": "getWalletById",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "walletId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -99,10 +109,20 @@
         "tags": [
           "Wallet"
         ],
-        "summary": "Update Wallet by ID",
-        "description": "Updates a Wallet by their ID.",
+        "summary": "Update wallet",
+        "description": "Updates a wallet by ID. Admin-only operation.",
         "operationId": "updateWallet",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "walletId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -446,13 +466,97 @@
         ]
       }
     },
-    "/api/wallets/wallet": {
+    "/api/wallets": {
+      "get": {
+        "tags": [
+          "Wallet"
+        ],
+        "summary": "List wallets",
+        "description": "Retrieves all wallets with optional status filter. Admin-only operation.",
+        "operationId": "listWallets",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "INACTIVE",
+                "BLOCKED",
+                "PENDING",
+                "REVIEW",
+                "WAITING_VERIFICATION",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "Wallet"
         ],
-        "summary": "Create a new Wallet",
-        "description": "Creates a new Wallet with the data provided in the request body.",
+        "summary": "Create wallet",
+        "description": "Creates a new wallet. Admin-only operation.",
         "operationId": "createWallet",
         "requestBody": {
           "content": {
@@ -513,346 +617,30 @@
         ]
       }
     },
-    "/api/wallet-operator/upload/wallet": {
+    "/api/wallet-operator/uploads/transactions": {
       "post": {
         "tags": [
           "Wallet Operator"
         ],
-        "summary": "Upload the wallet.json file.",
-        "operationId": "uploadWalletJSON",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/FileUploadWrapper"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/wallet-operator/upload/transactions": {
-      "post": {
-        "tags": [
-          "Wallet Operator"
-        ],
-        "summary": "Upload the transactions.json file.",
-        "operationId": "uploadTransactionCsv",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/FileUploadWrapper"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/wallet-operator/upload/movements": {
-      "post": {
-        "tags": [
-          "Wallet Operator"
-        ],
-        "summary": "Upload the moviments.json file.",
-        "operationId": "uploadMovementsJSON",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/FileUploadWrapper"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/wallet-operator/upload/deposit-senders": {
-      "post": {
-        "tags": [
-          "Wallet Operator"
-        ],
-        "summary": "Upload the deposit_sender.json file.",
-        "operationId": "uploadDepositSenderJSON",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/FileUploadWrapper"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/wallet-operator/upload/customer": {
-      "post": {
-        "tags": [
-          "Wallet Operator"
-        ],
-        "summary": "Upload the customer.json file.",
-        "operationId": "uploadCustomerJSON",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/FileUploadWrapper"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/wallet-operator/transaction/withdraw/": {
-      "post": {
-        "tags": [
-          "Wallet Operator"
-        ],
-        "operationId": "createWithdraw",
+        "summary": "Admin: Upload transactions CSV",
+        "operationId": "uploadTransactions",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateWithdrawRequest"
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -860,20 +648,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/DepositMoney"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneyReceived"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneySend"
-                    },
-                    {
-                      "$ref": "#/components/schemas/WithdrawMoney"
-                    }
-                  ]
+                  "type": "string"
                 }
               }
             }
@@ -916,32 +691,30 @@
         ]
       }
     },
-    "/api/wallet-operator/transaction/transfer/{walletId}": {
+    "/api/wallet-operator/uploads/customers": {
       "post": {
         "tags": [
           "Wallet Operator"
         ],
-        "operationId": "createTransfer",
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
+        "summary": "Admin: Upload customers CSV",
+        "operationId": "uploadCustomers",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTransferRequest"
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -949,20 +722,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/DepositMoney"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneyReceived"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneySend"
-                    },
-                    {
-                      "$ref": "#/components/schemas/WithdrawMoney"
-                    }
-                  ]
+                  "type": "string"
                 }
               }
             }
@@ -1005,106 +765,97 @@
         ]
       }
     },
-    "/api/wallet-operator/transaction/deposit/{walletId}": {
-      "post": {
-        "tags": [
-          "Wallet Operator"
-        ],
-        "operationId": "createDeposit",
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateDepositRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/DepositMoney"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneyReceived"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneySend"
-                    },
-                    {
-                      "$ref": "#/components/schemas/WithdrawMoney"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/transactions/transaction": {
+    "/api/transactions/withdraw": {
       "post": {
         "tags": [
           "Transaction"
         ],
-        "summary": "Create a new transaction of type DEPOSIT",
-        "description": "Creates a new transaction with the data provided in the request body.",
-        "operationId": "createNewWithdrawMoneyTransaction",
+        "summary": "Withdraw money",
+        "description": "Creates a WITHDRAW transaction for the authenticated user's wallet.",
+        "operationId": "withdraw",
         "parameters": [
           {
-            "name": "walletId",
+            "name": "amount",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DepositMoney"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TransferMoneyReceived"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TransferMoneySend"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WithdrawMoney"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/transactions/transfer": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Transfer money",
+        "description": "Creates a TRANSFER transaction from the authenticated user's wallet.",
+        "operationId": "transfer",
+        "parameters": [
+          {
+            "name": "walletIdReceived",
             "in": "query",
             "required": true,
             "schema": {
@@ -1119,23 +870,72 @@
             "schema": {
               "type": "number"
             }
-          },
-          {
-            "name": "walletIdSend",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferMoneySend"
+                }
+              }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
           {
-            "name": "walletIdReceived",
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/transactions/deposit": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Deposit money",
+        "description": "Creates a DEPOSIT transaction for the authenticated user's wallet.",
+        "operationId": "deposit",
+        "parameters": [
+          {
+            "name": "amount",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "number"
             }
           },
           {
@@ -1169,20 +969,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/DepositMoney"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneyReceived"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TransferMoneySend"
-                    },
-                    {
-                      "$ref": "#/components/schemas/WithdrawMoney"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/DepositMoney"
                 }
               }
             }
@@ -1621,187 +1408,14 @@
         }
       }
     },
-    "/api/wallets/search-by-customer": {
+    "/api/wallets/me": {
       "get": {
         "tags": [
           "Wallet"
         ],
-        "summary": "Get Wallets by Customer ID",
-        "description": "Retrieves Wallets by Customer ID.",
-        "operationId": "getWalletByCustomerId",
-        "parameters": [
-          {
-            "name": "customerId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedModel"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/wallets/list": {
-      "get": {
-        "tags": [
-          "Wallet"
-        ],
-        "summary": "Get all Wallets",
-        "description": "Retrieves all Wallets.",
-        "operationId": "getAllWallets",
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "ACTIVE",
-                "INACTIVE",
-                "BLOCKED",
-                "PENDING",
-                "REVIEW",
-                "WAITING_VERIFICATION",
-                "ARCHIVED"
-              ]
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedModel"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/wallet-operator/wallets/{walletId}": {
-      "get": {
-        "tags": [
-          "Wallet Operator"
-        ],
-        "operationId": "getWalletById_1",
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
+        "summary": "Get authenticated user's wallet",
+        "description": "Returns the wallet associated with the authenticated user (JWT context).",
+        "operationId": "getMyWallet",
         "responses": {
           "200": {
             "description": "OK",
@@ -1851,15 +1465,86 @@
         ]
       }
     },
-    "/api/wallet-operator/transaction/search/period/{walletId}": {
+    "/api/wallets/me/all": {
       "get": {
         "tags": [
-          "Wallet Operator"
+          "Wallet"
         ],
-        "operationId": "searchTransactionsByPeriod",
+        "summary": "List all wallets of the authenticated customer",
+        "description": "Returns a paginated list of all wallets belonging to the customer identified by the JWT token.",
+        "operationId": "getMyWallets",
         "parameters": [
           {
-            "name": "walletId",
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallets/by-customer/{customerId}": {
+      "get": {
+        "tags": [
+          "Wallet"
+        ],
+        "summary": "Get wallets by customer",
+        "description": "Retrieves wallets by customer ID. Admin-only operation.",
+        "operationId": "getWalletsByCustomer",
+        "parameters": [
+          {
+            "name": "customerId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1867,6 +1552,354 @@
               "format": "int64"
             }
           },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallet-operator/me/wallet": {
+      "get": {
+        "tags": [
+          "Wallet Operator"
+        ],
+        "summary": "Get my wallet details and balance",
+        "operationId": "getMyWalletDetails",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wallet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallet-operator/me/transactions": {
+      "get": {
+        "tags": [
+          "Wallet Operator"
+        ],
+        "summary": "Get my last 100 transactions (All types)",
+        "operationId": "getMyRecentTransactions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallet-operator/me/transactions/withdraws": {
+      "get": {
+        "tags": [
+          "Wallet Operator"
+        ],
+        "summary": "List my last 100 withdraws",
+        "operationId": "listMyWithdraws",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallet-operator/me/transactions/transfers-sent": {
+      "get": {
+        "tags": [
+          "Wallet Operator"
+        ],
+        "summary": "List my last 100 transfers sent",
+        "operationId": "listMyTransfersSent",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallet-operator/me/transactions/transfers-received": {
+      "get": {
+        "tags": [
+          "Wallet Operator"
+        ],
+        "summary": "List my last 100 transfers received",
+        "operationId": "listMyTransfersReceived",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallet-operator/me/transactions/period": {
+      "get": {
+        "tags": [
+          "Wallet Operator"
+        ],
+        "summary": "Search my transactions by period",
+        "operationId": "searchMyTransactionsByPeriod",
+        "parameters": [
           {
             "name": "startDate",
             "in": "query",
@@ -1879,7 +1912,7 @@
           {
             "name": "endDate",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date"
@@ -1945,33 +1978,13 @@
         ]
       }
     },
-    "/api/wallet-operator/transaction/last-movement/{walletId}": {
+    "/api/wallet-operator/me/transactions/deposits": {
       "get": {
         "tags": [
           "Wallet Operator"
         ],
-        "operationId": "getLast10Transactions",
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          }
-        ],
+        "summary": "List my last 100 deposits",
+        "operationId": "listMyDeposits",
         "responses": {
           "200": {
             "description": "OK",
@@ -1979,6 +1992,62 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/wallet-operator/me/customer": {
+      "get": {
+        "tags": [
+          "Wallet Operator"
+        ],
+        "summary": "Get my personal data (Customer)",
+        "operationId": "getMyCustomerData",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
                 }
               }
             }
@@ -2027,7 +2096,7 @@
           "Transaction"
         ],
         "summary": "Get transaction by ID",
-        "description": "Retrieves a transaction by their ID provided in the request body.",
+        "description": "Retrieves a transaction by ID. Admin-only operation.",
         "operationId": "getTransactionById",
         "parameters": [
           {
@@ -2102,22 +2171,33 @@
         ]
       }
     },
-    "/api/transactions/search-wallet": {
+    "/api/transactions/me": {
       "get": {
         "tags": [
           "Transaction"
         ],
-        "summary": "Get transactions by Wallet ID",
-        "description": "Retrieves a list transaction by Wallet ID provided in the request body.",
-        "operationId": "getTransactionByWalletId",
+        "summary": "List my transactions",
+        "description": "Retrieves transactions for the authenticated user's wallet.",
+        "operationId": "listMyTransactions",
         "parameters": [
           {
-            "name": "walletId",
+            "name": "status",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "enum": [
+                "SUCCESS",
+                "INSUFFICIENT_BALANCE",
+                "SAME_WALLET",
+                "INVALID",
+                "AMOUNT_DEPOSIT_INSUFFICIENT",
+                "WALLET_STATUS_INVALID",
+                "AMOUNT_TRANSFER_INVALID",
+                "CUSTOMER_STATUS_INVALID",
+                "WALLET_INVALID",
+                "CUSTOMER_INVALID"
+              ]
             }
           },
           {
@@ -2127,7 +2207,7 @@
             "schema": {
               "type": "integer",
               "format": "int32",
-              "default": 25
+              "default": 0
             }
           }
         ],
@@ -2180,18 +2260,244 @@
         ]
       }
     },
-    "/api/transactions/list": {
+    "/api/transactions/me/withdraws": {
       "get": {
         "tags": [
           "Transaction"
         ],
-        "summary": "Get transactions by Wallet ID and Status",
-        "description": "Retrieves a list transaction by Wallet ID provided in the request body.",
-        "operationId": "getTransactionByWalletIdAndProcessType",
+        "summary": "List my last 150 withdraws",
+        "description": "Retrieves the last 150 WITHDRAW operations for the authenticated user's wallet.",
+        "operationId": "listMyWithdraws_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/transactions/me/transfers-sent": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "List my last 150 sent transfers",
+        "operationId": "listMyTransfersSent_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/transactions/me/transfers-received": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "List my last 150 received transfers",
+        "operationId": "listMyTransfersReceived_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/transactions/me/deposits": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "List my last 150 deposits",
+        "description": "Retrieves the last 150 DEPOSIT operations for the authenticated user's wallet.",
+        "operationId": "listMyDeposits_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/transactions/by-wallet/{walletId}": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "List transactions by wallet",
+        "description": "Retrieves transactions by wallet ID. Admin-only operation.",
+        "operationId": "listTransactionsByWallet",
         "parameters": [
           {
             "name": "walletId",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2199,7 +2505,7 @@
             }
           },
           {
-            "name": "typeTransaction",
+            "name": "type",
             "in": "query",
             "required": false,
             "schema": {
@@ -2776,27 +3082,6 @@
           }
         }
       },
-      "FileUploadWrapper": {
-        "type": "object",
-        "properties": {
-          "file": {
-            "type": "string",
-            "format": "binary"
-          }
-        }
-      },
-      "CreateWithdrawRequest": {
-        "type": "object",
-        "properties": {
-          "walletId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "amount": {
-            "type": "number"
-          }
-        }
-      },
       "DepositMoney": {
         "required": [
           "walletId"
@@ -2996,43 +3281,6 @@
             "$ref": "#/components/schemas/Transaction"
           }
         ]
-      },
-      "CreateTransferRequest": {
-        "type": "object",
-        "properties": {
-          "walletIdSend": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "walletIdReceived": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "amount": {
-            "type": "number"
-          }
-        }
-      },
-      "CreateDepositRequest": {
-        "type": "object",
-        "properties": {
-          "walletId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "amount": {
-            "type": "number"
-          },
-          "cpfSender": {
-            "type": "string"
-          },
-          "terminalId": {
-            "type": "string"
-          },
-          "senderName": {
-            "type": "string"
-          }
-        }
       },
       "LoginRequest": {
         "type": "object",

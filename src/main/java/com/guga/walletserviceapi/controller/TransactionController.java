@@ -26,6 +26,7 @@ import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.TransferMoneySend;
+import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.StatusTransaction;
 import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.service.TransactionService;
@@ -148,6 +149,11 @@ public class TransactionController {
         return ResponseEntity.ok(transfer);
     }
 
+    // =====================================================
+    // USER CONTEXT - SPECIFIC EXTRACTS (LAST 150)
+    // =====================================================
+
+
     @Operation(
         summary = "List my transactions",
         description = "Retrieves transactions for the authenticated user's wallet."
@@ -155,7 +161,7 @@ public class TransactionController {
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<Transaction>> listMyTransactions(
-        @RequestParam(required = false) StatusTransaction type,
+        @RequestParam(required = false) StatusTransaction status,
         @RequestParam(defaultValue = "0") int page
     ) {
 
@@ -175,10 +181,78 @@ public class TransactionController {
 
         return ResponseEntity.ok(
             transactionService.filterTransactionByWalletIdAndProcessType(
-                walletId, type, pageable
+                walletId, status, pageable
             )
         );
     }
+
+// =====================================================
+    // USER CONTEXT - SPECIFIC EXTRACTS (LAST 150)
+    // =====================================================
+
+    @Operation(
+        summary = "List my last 150 deposits",
+        description = "Retrieves the last 150 DEPOSIT operations for the authenticated user's wallet."
+    )
+    @GetMapping("/me/deposits")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<Transaction>> listMyDeposits() {
+        return listMyTransactionsByOperation(OperationType.DEPOSIT);
+    }
+
+    @Operation(
+        summary = "List my last 150 withdraws",
+        description = "Retrieves the last 150 WITHDRAW operations for the authenticated user's wallet."
+    )
+    @GetMapping("/me/withdraws")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<Transaction>> listMyWithdraws() {
+        return listMyTransactionsByOperation(OperationType.WITHDRAW);
+    }
+
+    @Operation(summary = "List my last 150 sent transfers")
+    @GetMapping("/me/transfers-sent")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<Transaction>> listMyTransfersSent() {
+        return listMyTransactionsByOperation(OperationType.TRANSFER_SEND);
+    }
+
+    @Operation(summary = "List my last 150 received transfers")
+    @GetMapping("/me/transfers-received")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Page<Transaction>> listMyTransfersReceived() {
+        return listMyTransactionsByOperation(OperationType.TRANSFER_RECEIVED);
+    }
+
+    /**
+     * Método privado centralizado para extratos específicos do contexto /me.
+     * A tag de auditoria é gerada dinamicamente baseada na operação.
+     */
+    private ResponseEntity<Page<Transaction>> listMyTransactionsByOperation(OperationType operation) {
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+        Long walletId = auditCtx.getWalletId();
+
+        // Limite fixo de 150 registros para garantir performance
+        Pageable limitPageable = PageRequest.of(0, 150, 
+            Sort.by(Sort.Direction.DESC, "createdAt", "transactionId")
+        );
+
+        LOGGER.info(LogMarkers.LOG,
+            "LIST_MY_TRANSACTIONS | walletId={} operation={} limit=150",
+            walletId, operation
+        );
+
+        // Concatenando conforme sua convenção para manter o padrão no Loki/Auditoria
+        String auditTag = "TRANSACTION_LIST_" + operation.name() + "_ME";
+        AuditLogger.log(auditTag, auditCtx);
+
+        return ResponseEntity.ok(
+            transactionService.filterTransactionByWalletIdAndOperationType(walletId, operation, limitPageable)
+        );
+    }
+
+
+
 
     // =====================================================
     // ADMIN CONTEXT
