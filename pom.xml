@@ -14,7 +14,7 @@
 
     <groupId>com.gugawallet</groupId>
     <artifactId>wallet-service-api</artifactId>
-    <version>0.2.7-SNAPSHOT</version>
+    <version>0.2.8-SNAPSHOT</version>
 
     <name>wallet-service-api</name>
     <description>Spring Boot Project for Digital Wallet Features</description>
