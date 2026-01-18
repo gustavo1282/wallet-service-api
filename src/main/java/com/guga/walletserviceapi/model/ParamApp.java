@@ -1,5 +1,6 @@
 package com.guga.walletserviceapi.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -40,7 +41,8 @@ public class ParamApp {
     public static final String SEQ_DEPOSIT_SENDER_ID = "seq-deposit-sender-id";
     public static final String SEQ_MOVEMENT_TRN_ID = "seq-movement-trn-id";
     public static final String SEQ_LOGIN_AUTH_ID = "seq-movement-trn-id";
-
+    public static final String LIMIT_MIN_TO_DEPOSIT = "limit_min_to_deposit";
+    public static final String LIMIT_MIN_TO_TRANSFER = "limit_min_to_transfer";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,6 +64,9 @@ public class ParamApp {
     @Column(name = "valueInteger", nullable = true)
     private Integer valueInteger;
 
+    @Column(name = "valueBigDecimal", nullable = true)
+    private BigDecimal valueBigDecimal;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = GlobalHelper.PATTERN_FORMAT_DATE)
     @Column(name = "valueDate", nullable = true)
     private LocalDate valueDate;
@@ -81,17 +86,22 @@ public class ParamApp {
             .build();
 
         if (value instanceof Integer) {
-            newParam.setValueInteger((Integer)value);
+            newParam.setValueInteger((Integer) value);
         } else if (value instanceof Long) {
-            newParam.setValueLong((Long)value);
+            newParam.setValueLong((Long) value);
         } else if (value instanceof Boolean) {
-            newParam.setValueBoolean((Boolean)value);
+            newParam.setValueBoolean((Boolean) value);
         } else if (value instanceof LocalDate) {
-            newParam.setValueDate((LocalDate)value);
+            newParam.setValueDate((LocalDate) value);
         } else if (value instanceof LocalDateTime) {
-            newParam.setValueDateTime((LocalDateTime)value);
+            newParam.setValueDateTime((LocalDateTime) value);
+        } else if (value instanceof BigDecimal) {
+            newParam.setValueBigDecimal((BigDecimal) value);
+        } else if (value instanceof Number) { 
+            // Captura Double, Float e outros tipos numéricos e converte para BigDecimal
+            newParam.setValueBigDecimal(new BigDecimal(value.toString()));
         } else {
-            newParam.setValueString((String)value);
+            newParam.setValueString(String.valueOf(value)); // Mais seguro que o cast (String)
         }
 
         return newParam;

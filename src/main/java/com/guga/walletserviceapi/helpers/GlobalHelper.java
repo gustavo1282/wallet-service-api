@@ -27,9 +27,9 @@ public class GlobalHelper {
     public static int BATCH_SIZE;
 
     public static Pageable getDefaultPageable() {
-        return PageRequest.of(0, 50,
+        return PageRequest.of(0, 150,
                 Sort.by(
-                    Sort.Order.asc("createdAt")
+                    Sort.Order.desc("createdAt")
                 )
             );
     }

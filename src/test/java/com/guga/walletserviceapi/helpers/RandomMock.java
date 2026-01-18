@@ -173,4 +173,13 @@ public class RandomMock {
 
     }
 
+    public static String generatePhoneNumberAleatory() {
+        // Gera um número de telefone no formato (XX) 9XXXX-XXXX
+        String ddd = String.format("%02d", generateIntNumberByInterval(11, 99)); // DDD entre 11 e 99
+        String firstPart = "9" + String.format("%04d", generateIntNumberByInterval(0, 9999)); // Primeiro bloco com 5 dígitos
+        String secondPart = String.format("%04d", generateIntNumberByInterval(0, 9999)); // Segundo bloco com 4 dígitos
+
+        return String.format("(%s) %s-%s", ddd, firstPart, secondPart);
+    }
+
 }

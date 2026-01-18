@@ -21,7 +21,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class FileUtils {
 
-    public static final String FOLDER_DEFAULT_FILE_JSON = "./data/seed/";
+    public static final String SEED_FOLDER_DEFAULT = "./data/seed/";
 
     public static final String JSON_FILE_PARAMS_APP = "params_app.json";
     public static final String JSON_FILE_CUSTOMER = "customers.json";
@@ -33,6 +33,8 @@ public class FileUtils {
 
     // Define o fuso horário do Brasil (ex: America/Sao_Paulo)
     static ZoneId zoneIdBrazil = ZoneId.of("America/Sao_Paulo");
+
+    static int OLD_MINUTES_CREATED = 10;
 
     /**
      * Escreve uma string de conteúdo em um arquivo no diretório /target/test-data/.
@@ -77,7 +79,7 @@ public class FileUtils {
      * @return true se o arquivo existir E sua data de criação for superior a 2
      *         minutos atrás, false caso contrário.
      */
-    public static boolean isOlderThanFiveMinutes(String fileName) {
+    public static boolean isOlderThanTenMinutes(String fileName) {
 
         try {
             Path filePath = Paths.get(fileName).normalize();
@@ -90,22 +92,22 @@ public class FileUtils {
             FileTime lastModifiedTime = attrs.lastModifiedTime();
 
             Instant lastModifiedInstant = lastModifiedTime.toInstant();
-            Instant fiveMinuteAgo = Instant.now().minus(5, ChronoUnit.MINUTES);
+            Instant fiveMinuteAgo = Instant.now().minus(OLD_MINUTES_CREATED, ChronoUnit.MINUTES);
 
             // --- APENAS MUDANÇAS PARA IMPRESSÃO CORRETA ---
             ZonedDateTime lastModifiedZoned = lastModifiedInstant.atZone(zoneIdBrazil);
-            ZonedDateTime fiveMinuteAgoZoned = fiveMinuteAgo.atZone(zoneIdBrazil);
+            ZonedDateTime tenMinuteAgoZoned = fiveMinuteAgo.atZone(zoneIdBrazil);
 
 
-            if (lastModifiedZoned.isBefore(fiveMinuteAgoZoned)) {
+            if (lastModifiedZoned.isBefore(tenMinuteAgoZoned)) {
                 System.out.println("Arquivo criado em: " + lastModifiedZoned);
-                System.out.println("Corte (5 min atrás): " + fiveMinuteAgoZoned);
-                System.out.println("Resultado: O arquivo é MAIS ANTIGO que 5 minutos.");
+                System.out.println(String.format("Corte (%n min atrás): " + tenMinuteAgoZoned, OLD_MINUTES_CREATED));
+                System.out.println(String.format("Resultado: O arquivo é MAIS NOVO ou tem %n minutos.", OLD_MINUTES_CREATED));
                 return true;
             } else {
                 System.out.println("Arquivo criado em: " + lastModifiedZoned);
-                System.out.println("Corte (5 min atrás): " + fiveMinuteAgoZoned);
-                System.out.println("Resultado: O arquivo é MAIS NOVO ou tem 5 minutos.");
+                System.out.println(String.format("Corte (%n min atrás): " + tenMinuteAgoZoned, OLD_MINUTES_CREATED));
+                System.out.println(String.format("Resultado: O arquivo é MAIS NOVO ou tem %n minutos.", OLD_MINUTES_CREATED));
                 return false;
             }
         } catch (IOException e) {
@@ -156,6 +158,11 @@ public class FileUtils {
             }
 
         return mapper;
+    }
+
+    public static boolean hasFile(String fileref) {
+            Path filePath = Paths.get(fileref).normalize();
+            return Files.exists(filePath);
     }
 
 }

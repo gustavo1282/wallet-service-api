@@ -62,11 +62,13 @@ public class SpringSecurityConfig {
             // =========================
             .authorizeHttpRequests(auth -> auth
                 // 1. Endpoints de Infraestrutura (Sempre permitidos)
-                .requestMatchers(mvc.pattern("/actuator/**")).permitAll()
-                .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
-                .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
-                .requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()
-                .requestMatchers(mvc.pattern("/webjars/**")).permitAll()
+                //.requestMatchers(mvc.pattern("/actuator/**")).permitAll()
+                //.requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
+                //.requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                //.requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()
+                //.requestMatchers(mvc.pattern("/webjars/**")).permitAll()
+                .requestMatchers(clean(matchers.getPermitAllPaths())).permitAll()
+                
 
                 // 2. Regras Dinâmicas do YAML (Sanitizadas para remover o context-path se existir)
                 .requestMatchers(clean(matchers.getPublicPaths())).permitAll()

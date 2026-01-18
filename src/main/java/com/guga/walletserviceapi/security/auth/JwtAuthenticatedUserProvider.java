@@ -2,6 +2,8 @@ package com.guga.walletserviceapi.security.auth;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
 
+@EnableCaching
 @Component
 @RequestScope
 public class JwtAuthenticatedUserProvider 
@@ -18,6 +21,7 @@ public class JwtAuthenticatedUserProvider
 
     private static final Logger LOGGER = LogManager.getLogger(JwtAuthenticatedUserProvider.class);
     
+    @Cacheable(value = "autentication", key = "'jwt-auth-details'")
     public JwtAuthenticationDetails get() {
         return getDetails();
     }

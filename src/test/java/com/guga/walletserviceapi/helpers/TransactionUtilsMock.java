@@ -4,12 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -32,6 +31,7 @@ import com.guga.walletserviceapi.model.TransferMoneyReceived;
 import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.WithdrawMoney;
+import com.guga.walletserviceapi.model.dto.TransactionMockResult;
 import com.guga.walletserviceapi.model.enums.LoginAuthType;
 import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.model.enums.OperationType;
@@ -42,7 +42,7 @@ import net.datafaker.Faker;
 
 public class TransactionUtilsMock {
 
-    private static final boolean APPLY_FILTER_CUSTOMER_BY_STATUS = false;
+    private static final boolean APPLY_FILTER_CUSTOMER_BY_STATUS = true;
     private static final int RANGE_CUSTOMER_ID = 1000;
     private static final int TOTAL_CUSTOMER_ID = 1050;
     private static final int LIMIT_LIST_CUSTOMER = 50;
@@ -61,7 +61,7 @@ public class TransactionUtilsMock {
     public static final int RANGE_DEPOSIT_SENDER = 12000;
     public static final int RANGE_MOVEMENT_TRANSACTION = 13000;
 
-    public static final Double MONEY_MIN = 10D;
+    public static final Double MONEY_MIN = 20D;
     public static final Double MONEY_MAX = 800D;
 
     public static final BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
@@ -88,35 +88,7 @@ public class TransactionUtilsMock {
 
         int rangeCustomerInit = RANGE_CUSTOMER_ID + 2;
         for (int nextId = rangeCustomerInit; nextId < TOTAL_CUSTOMER_ID; nextId++) {
-            String fullName = RandomMock.removeSufixoEPrevixos( faker.name().fullName() ).toUpperCase();
-            String[] partName =  fullName.split(" ");
-            LocalDate birthDate = defineBirthDateMore18YearOld();
-            LocalDateTime dtCreatedAt = RandomMock.generatePastLocalDateTime(2);
-            String cellPhone = faker.phoneNumber().cellPhone();
-            String documentId = faker.idNumber().valid();
-            String cpf = faker.cpf().valid();
-
-            Customer customer = Customer.builder()
-                .customerId((long) (nextId + 1))
-                .status(defineStatus())
-                .fullName(fullName)
-                .firstName(partName[0])
-                .lastName( partName[partName.length-1] )
-                .birthDate(birthDate)
-                .email(faker.internet().emailAddress( partName[0].concat(".")
-                        .concat( partName[partName.length -1 ] ).concat(".")
-                        .concat( String.valueOf(birthDate.getMonthValue()) )
-                        .concat( String.valueOf(birthDate.getYear()) )
-                ))
-                .phoneNumber(cellPhone)
-                .documentId(documentId)
-                .cpf(cpf)
-                .createdAt(dtCreatedAt)
-                .updatedAt(dtCreatedAt)
-                .loginAuthId(null)
-                .build();
-
-            customers.add(customer);
+            customers.add(createCustomerMock(nextId));
         }
 
         return customers;
@@ -138,7 +110,7 @@ public class TransactionUtilsMock {
             
             String accessKey = "k3Y_".concat(walletId.toString());
 
-            LoginRole loginRole = LoginRole.fromValue(RandomMock.generateIntNumberByInterval(1, 4));
+            List<LoginRole> loginRole = Arrays.asList(LoginRole.fromValue(RandomMock.generateIntNumberByInterval(1, 4)));
             
             LoginAuthType loginAuthType = LoginAuthType.fromValue(RandomMock.generateIntNumberByInterval(0, 3));
             switch (loginAuthType) {
@@ -160,7 +132,7 @@ public class TransactionUtilsMock {
                 if (wallet.getStatus().equals(Status.ACTIVE)) {
                     loginAccess = GlobalHelper.APP_USER_NAME;
                     accessKey = GlobalHelper.APP_PASSWORD;
-                    loginRole = LoginRole.USER;
+                    loginRole = Arrays.asList(LoginRole.ADMIN, LoginRole.USER);
                 }
             }
 
@@ -239,6 +211,20 @@ public class TransactionUtilsMock {
         return wallets;
     }
 
+    public static Wallet generateNewWallet(Wallet walletInput){
+        LocalDateTime createAt = LocalDateTime.now();
+        return Wallet.builder()
+            .walletId( walletInput.getWalletId() )
+            .customerId(walletInput.getCustomerId())
+            //.customer(walletInput.getCustomer())
+            .status( walletInput.getStatus() )
+            .currentBalance( BigDecimal.ZERO )
+            .previousBalance( BigDecimal.ZERO )
+            .createdAt(createAt)
+            .updatedAt(createAt)
+            .build();
+    }
+
     private static Wallet validateProcessWallet( List<Customer> customers, List<Wallet> wallets,
         Set<Long> processados) {
 
@@ -301,9 +287,7 @@ public class TransactionUtilsMock {
 
     }
 
-    public static Map<String, List<?>> createTransactionListMock(List<Wallet> walletInput) {
-
-        Map<String, List<?>> resultsMap = new HashMap<>();
+    public static TransactionMockResult createTransactionListMock(List<Wallet> walletInput) {
 
         List<Wallet> walletsMock = new ArrayList<>(walletInput);
 
@@ -341,11 +325,11 @@ public class TransactionUtilsMock {
             SEQUENCE_TRANSACTION++;
             BigDecimal amount = generateMoneyBetweenMinAndMaxValue();
 
-            MovementTransaction movement = MovementTransaction.builder().build();;
+            MovementTransaction movement = MovementTransaction.builder().build();
 
             switch (operationType) {
                 case DEPOSIT:
-                    DepositMoney depositMoney = TransactionUtils.generateDepositMoney(walletSend, amount);
+                    DepositMoney depositMoney = TransactionUtils.generateDepositMoney(walletSend, amount, AMOUNT_MIN_TO_DEPOSIT);
                     depositMoney.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION );
                     depositMoney.setLogin(RandomMock.loginFakeMock());
                     if (depositMoney.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
@@ -387,7 +371,7 @@ public class TransactionUtilsMock {
                     break;
 
                 case TRANSFER_SEND:
-                    TransferMoneySend transferSend = TransactionUtils.generateTransferMoneySend(walletSend, walletReceived, amount);
+                    TransferMoneySend transferSend = TransactionUtils.generateTransferMoneySend(walletSend, walletReceived, amount, AMOUNT_MIN_TO_TRANSFER);
                     transferSend.setTransactionId( RANGE_TRANSACTION + SEQUENCE_TRANSACTION );
                     transferSend.setLogin(RandomMock.loginFakeMock());
 
@@ -434,11 +418,7 @@ public class TransactionUtilsMock {
             }
         }
 
-        resultsMap.put("transactions", transactions);
-        resultsMap.put("movements", movements);
-        resultsMap.put("depositSenders", depositSenders);
-
-        return resultsMap;
+        return new TransactionMockResult(transactions, movements, depositSenders);
     }
 
     public static List<Customer> getCustomersByStatus(List<Customer> customers, Status status) {
@@ -589,15 +569,25 @@ public class TransactionUtilsMock {
             ParamApp.newParam("seq-transaction-id", "Id Sequencial de Transaction.Id", Long.valueOf("0")),
             ParamApp.newParam("seq-deposit-sender-id", "Id Sequencial de DepositSender.Id", Long.valueOf("0")),
             ParamApp.newParam("seq-movement-id", "Id Sequencial de Movement.Id", Long.valueOf("0")),
-            ParamApp.newParam("seq-login-auth-id", "Id Sequencial de LoginAuth  .Id", Long.valueOf("0"))
+            ParamApp.newParam("seq-login-auth-id", "Id Sequencial de LoginAuth  .Id", Long.valueOf("0")),
+            ParamApp.newParam("limit_min_to_deposit", "Id Sequencial de LoginAuth  .Id", new BigDecimal(50.00)),
+            ParamApp.newParam("limit_min_to_transfer", "Id Sequencial de LoginAuth  .Id", new BigDecimal(50.00))            
         );
         return paramApps;
     }
 
     public static Customer addCustomerApplication(long nextCustomerId) {
+        Customer customer = createCustomerMock(nextCustomerId);
+        customer.setFullName( GlobalHelper.APP_USER_NAME.toUpperCase() + " APPLICATION" );
+        customer.setFirstName( GlobalHelper.APP_USER_NAME.toUpperCase() );
+        customer.setLastName( "APPLICATION" );
+        return customer;        
+    }
+
+    public static Customer createCustomerMock(long nextCustomerId) {
         Faker faker = new Faker(new Locale("pt-BR"));
 
-        String fullName = GlobalHelper.APP_USER_NAME.toUpperCase() + " APPLICATION";
+        String fullName = RandomMock.removeSufixoEPrevixos(faker.name().fullName()).toUpperCase();
         String[] partName =  fullName.split(" ");
         LocalDate birthDate = defineBirthDateMore18YearOld();
         LocalDateTime dtCreatedAt = RandomMock.generatePastLocalDateTime(2);
@@ -626,6 +616,61 @@ public class TransactionUtilsMock {
             .build();
 
         return customer;        
+    }
+
+    public static DepositMoney generateDepositMoneyMock(List<Transaction> transactions, Wallet walletSend, BigDecimal amount, List<MovementTransaction> movements, List<DepositSender> depositSenders) {
+
+        MovementTransaction movement = MovementTransaction.builder().build();
+
+        DepositMoney depositMoney = TransactionUtils.generateDepositMoney(walletSend, amount, AMOUNT_MIN_TO_DEPOSIT);        
+        depositMoney.setTransactionId( nextTransactionId(transactions) );
+        depositMoney.setLogin(RandomMock.loginFakeMock());
+
+        if (depositMoney.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            TransactionUtils.adjustBalanceWallet(walletSend, depositMoney);
+
+            movement = TransactionUtils.generateMovementTransaction(depositMoney, null);
+            movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
+            movements.add(movement);
+
+            depositMoney.setMovementTransaction(movement);
+        }
+
+        // Para Mock, gerar dinamicamente o Deposit Sender
+        if ( RandomMock.generateIntNumber (2) == 0 ) {
+            DepositSender depositSender = generateDepositSenderMock(depositMoney);
+            depositSenders.add(depositSender);
+
+            depositMoney.setDepositSender(depositSender);
+        }
+
+        return depositMoney;
+    }
+
+    public static WithdrawMoney generateWithdrawMoneyMock(List<Transaction> transactions, Wallet walletSend, BigDecimal amount, List<MovementTransaction> movements) {
+        MovementTransaction movement = MovementTransaction.builder().build();
+
+        WithdrawMoney withdraw = TransactionUtils.generateWithdraw(walletSend, amount );
+        withdraw.setTransactionId(nextTransactionId(transactions));
+        withdraw.setLogin(RandomMock.loginFakeMock());
+        if (withdraw.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            TransactionUtils.adjustBalanceWallet(walletSend, withdraw);
+
+            movement = TransactionUtils.generateMovementTransaction(withdraw, null);
+            movement.setMovementId( RANGE_MOVEMENT_TRANSACTION + SEQUENCE_TRANSACTION);
+            movements.add(movement);
+
+            withdraw.setMovementTransaction(movement);
+        }
+
+        return withdraw;
+    }
+
+    private static long nextTransactionId(List<Transaction> transactions) {
+        return transactions.stream()
+            .mapToLong(Transaction::getTransactionId)
+            .max()
+            .orElse(0L) + 1;
     }
 
 }

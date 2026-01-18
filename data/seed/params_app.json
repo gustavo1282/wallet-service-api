@@ -1,1 +1,41 @@
-[{"id":null,"name":"seq-customer-id","description":"Id Sequencial de Customer.Id","valueString":null,"valueDate":null,"valueDateTime":null,"valueBoolean":false,"valueLong":0,"valueInteger":null},{"id":null,"name":"seq-wallet-id","description":"Id Sequencial de Wallet.Id","valueString":null,"valueDate":null,"valueDateTime":null,"valueBoolean":false,"valueLong":0,"valueInteger":null},{"id":null,"name":"seq-transaction-id","description":"Id Sequencial de Transaction.Id","valueString":null,"valueDate":null,"valueDateTime":null,"valueBoolean":false,"valueLong":0,"valueInteger":null},{"id":null,"name":"seq-deposit-sender-id","description":"Id Sequencial de DepositSender.Id","valueString":null,"valueDate":null,"valueDateTime":null,"valueBoolean":false,"valueLong":0,"valueInteger":null},{"id":null,"name":"seq-movement-id","description":"Id Sequencial de Movement.Id","valueString":null,"valueDate":null,"valueDateTime":null,"valueBoolean":false,"valueLong":0,"valueInteger":null},{"id":null,"name":"seq-login-auth-id","description":"Id Sequencial de LoginAuth  .Id","valueString":null,"valueDate":null,"valueDateTime":null,"valueBoolean":false,"valueLong":0,"valueInteger":null}]
+[ {
+  "name" : "seq-customer-id",
+  "description" : "Id Sequencial de Customer.Id",
+  "valueBoolean" : false,
+  "valueLong" : 0
+}, {
+  "name" : "seq-wallet-id",
+  "description" : "Id Sequencial de Wallet.Id",
+  "valueBoolean" : false,
+  "valueLong" : 0
+}, {
+  "name" : "seq-transaction-id",
+  "description" : "Id Sequencial de Transaction.Id",
+  "valueBoolean" : false,
+  "valueLong" : 0
+}, {
+  "name" : "seq-deposit-sender-id",
+  "description" : "Id Sequencial de DepositSender.Id",
+  "valueBoolean" : false,
+  "valueLong" : 0
+}, {
+  "name" : "seq-movement-id",
+  "description" : "Id Sequencial de Movement.Id",
+  "valueBoolean" : false,
+  "valueLong" : 0
+}, {
+  "name" : "seq-login-auth-id",
+  "description" : "Id Sequencial de LoginAuth  .Id",
+  "valueBoolean" : false,
+  "valueLong" : 0
+}, {
+  "name" : "limit_min_to_deposit",
+  "description" : "Id Sequencial de LoginAuth  .Id",
+  "valueBoolean" : false,
+  "valueBigDecimal" : 50
+}, {
+  "name" : "limit_min_to_transfer",
+  "description" : "Id Sequencial de LoginAuth  .Id",
+  "valueBoolean" : false,
+  "valueBigDecimal" : 50
+} ]

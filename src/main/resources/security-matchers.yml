@@ -7,25 +7,30 @@ security:
     public-paths:
       # Autenticação / login / refresh tokens
       - "/api/auth/**"
-      # Actuator público (health, info, prometheus)
-      - "/actuator/health/**"
-      - "/actuator/info"
-      - "/actuator/prometheus"
-      - "/actuator/metrics/**"
-      - "/v3/api-docs/**"
       - "/swagger-ui/**"
       - "/swagger-ui.html"
       - "/swagger-ui/index.html"
       - "/swagger-resources/**"
-      # Endpoints relacionados a admin 
-      - "/actuator/loggers/**"
-      - "/actuator/env/**"
-      - "/actuator/httpexchanges/**"
-      - "/actuator/threaddump/**"
-      - "/actuator/heapdump/**"
-      - "/actuator/beans/**"
+
+
+    permit-all-paths:
       # Endpoints relacionados documentation
       - "/webjars/**"
+      - "/v3/api-docs/**"
+      # Actuator público (health, info, prometheus)
+      - "/actuator/**"
+      - "/actuator/prometheus"
+      - "/actuator/metrics/**"
+      - "/actuator/health/**"
+      # - "/actuator/info"
+      # - "/actuator/loggers/**"
+      # - "/actuator/env/**"
+      # # Endpoints relacionados a admin 
+      # - "/actuator/httpexchanges/**"
+      # - "/actuator/threaddump/**"
+      # - "/actuator/heapdump/**"
+      # - "/actuator/beans/**"
+
     # =====================================================
     # DOCUMENTAÇÃO: Swagger / OpenAPI
     # =====================================================

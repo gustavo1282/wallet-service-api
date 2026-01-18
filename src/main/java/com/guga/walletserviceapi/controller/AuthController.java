@@ -111,7 +111,7 @@ public class AuthController {
 
 
     @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/data/{loginId}")
+    @GetMapping("/data")
     @PreAuthorize("hasRole('USER')")
      public ResponseEntity<JwtAuthenticationDetails> getDataLogin() 
     {

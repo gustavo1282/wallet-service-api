@@ -7,12 +7,12 @@ services:
     container_name: cont-wallet-postgres
     restart: unless-stopped
     environment:
-      - TX=America/Sao_Paulo
-      - POSTGRES_DB=wallet_db
-      - POSTGRES_USER=wallet_user
-      - POSTGRES_PASSWORD=wallet_pass
+      TZ: America/Sao_Paulo
+      POSTGRES_DB: wallet_db
+      POSTGRES_USER: wallet_user
+      POSTGRES_PASSWORD: wallet_pass
     ports:
-      - "5432:5432"
+      - "5432:5432" 
     deploy:
       resources:
         limits:
@@ -35,12 +35,13 @@ services:
     container_name: cont-wallet-jaeger
     restart: unless-stopped
     environment:
-      - COLLECTOR_OTLP_ENABLED=true
+      COLLECTOR_OTLP_ENABLED: "true"
+      TZ: America/Sao_Paulo
     ports:
       - "16686:16686"
       - "14268:14268"
     volumes:
-      - jaeger_tracing_data:/var/lib/jaeger_tracing/data
+      - jaeger_tracing_data:/var/lib/jaeger
     networks:
       - wallet_network
 
@@ -48,29 +49,30 @@ services:
     image: grafana/loki:2.9.0
     container_name: cont-wallet-loki
     restart: unless-stopped
+    environment:
+      TZ: America/Sao_Paulo
     ports:
       - "3100:3100"
-    volumes:
-      - loki-data:/etc/loki
     command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki-data:/loki
     networks:
       - wallet_network
 
   # ======================================================================
-  # 3. OPEN TELEMETRY COLLECTOR (PONTE DE DADOS)
+  # 3. OPEN TELEMETRY COLLECTOR
   # ======================================================================
   otel-collector:
-    #image: otel/opentelemetry-collector-contrib:0.99.0
-    image: otel/opentelemetry-collector-contrib:0.95.0  # Retornando para a sua versão original
+    image: otel/opentelemetry-collector-contrib:0.95.0
     container_name: cont-wallet-otel-collector
     restart: unless-stopped
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
       - ./otel-collector-config.yml:/etc/otel-collector-config.yml
     ports:
-      - "4317:4317" # gRPC
-      - "4318:4318" # HTTP
-      - "8889:8889" # Prometheus metrics
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
     depends_on:
       jaeger:
         condition: service_started
@@ -103,6 +105,8 @@ services:
     container_name: cont-wallet-grafana
     restart: unless-stopped
     user: "472"
+    environment:
+      TZ: America/Sao_Paulo
     ports:
       - "3000:3000"
     volumes:
@@ -116,7 +120,38 @@ services:
       - wallet_network
 
   # ======================================================================
-  # 5. UTILITÁRIOS E RUNNER
+  # 5. APLICAÇÃO WALLET SERVICE
+  # ======================================================================
+  wallet-service-api:
+    image: wallet-service:latest
+    build: .
+    container_name: cont-wallet-service-api
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: America/Sao_Paulo
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
+      SPRING_DATASOURCE_USERNAME: wallet_user
+      SPRING_DATASOURCE_PASSWORD: wallet_pass
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,metrics,prometheus" 
+      # Configurações de Segurança e Vault
+      JWT_SECRET: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
+      SPRING_CLOUD_VAULT_ENABLED: "false"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    volumes:
+      - wallet_service_data:/app/data
+    networks:
+      - wallet_network
+
+  # ======================================================================
+  # 6. UTILITÁRIOS
   # ======================================================================
   pgadmin:
     image: dpage/pgadmin4
@@ -127,7 +162,7 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: 'admin@postgres.com'
+      PGADMIN_DEFAULT_EMAIL: admin@postgres.com
       PGADMIN_DEFAULT_PASSWORD: wallet_pass
     depends_on:
       - postgres
@@ -145,21 +180,38 @@ services:
     networks:
       - wallet_network
 
+  # Para habilitar essas métricas no seu Grafana, você deve adicionar o cAdvisor
+  cadvisor:
+      image: gcr.io/cadvisor/cadvisor:v0.47.0
+      container_name: cont-wallet-cadvisor
+      restart: unless-stopped
+      privileged: true
+      volumes:
+        - /:/rootfs:ro
+        - /var/run:/var/run:ro
+        - /sys:/sys:ro
+        - /var/lib/docker/:/var/lib/docker:ro
+        - /dev/disk/:/dev/disk:ro
+      ports:
+        - "8085:8080"
+      networks:
+        - wallet_network
+
 # ======================================================================
-# DEFINIÇÃO DE VOLUMES E REDES
+# VOLUMES
 # ======================================================================
 volumes:
   postgres_data:
   wallet_service_data:
-  sonarqube_data:
-  sonarqube_extensions:
-  sonarqube_logs:
   jaeger_tracing_data:
   runner_act_data:
   pgadmin_data:
   grafana-data:
   loki-data:
 
+# ======================================================================
+# NETWORK
+# ======================================================================
 networks:
   wallet_network:
     driver: bridge

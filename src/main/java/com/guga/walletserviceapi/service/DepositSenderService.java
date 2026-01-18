@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.repository.DepositSenderRepository;
-import com.guga.walletserviceapi.service.common.DataImportService;
-import com.guga.walletserviceapi.service.common.ImportSummary;
+import com.guga.walletserviceapi.service.common.DataPersistenceService;
+import com.guga.walletserviceapi.service.common.PersistenceSummary;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +22,7 @@ public class DepositSenderService implements IWalletApiService{
 
     private final ParamAppService paramAppService;
 
-    private final DataImportService importService;
+    private final DataPersistenceService importService;
 
 
     public DepositSender saveDepositSender(DepositSender depositSender) {
@@ -39,8 +39,8 @@ public class DepositSenderService implements IWalletApiService{
     }
 
 
-    public ImportSummary importDeposits(MultipartFile file) {
-        return importService.importJson(file, new TypeReference<List<DepositSender>>() {}, depositSenderRepository);
+    public PersistenceSummary importDeposits(MultipartFile file) {
+        return importService.importJsonFromUpload(file, new TypeReference<List<DepositSender>>() {}, depositSenderRepository);
     }
     
 }

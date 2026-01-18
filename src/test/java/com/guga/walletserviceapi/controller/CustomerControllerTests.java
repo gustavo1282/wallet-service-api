@@ -1,7 +1,6 @@
 package com.guga.walletserviceapi.controller;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -13,229 +12,362 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
-import com.guga.walletserviceapi.handler.GlobalExceptionHandler;
+import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.RandomMock;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.model.LoginAuth;
+import com.guga.walletserviceapi.model.ParamApp;
+import com.guga.walletserviceapi.model.Wallet;
+import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.model.enums.Status;
-import com.guga.walletserviceapi.repository.CustomerRepository;
+import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
+import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
-import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.CustomerService;
-import com.guga.walletserviceapi.service.LoginAuthService;
+import com.guga.walletserviceapi.service.common.DataPersistenceService;
 
-import net.datafaker.Faker;
-
-@Import(GlobalExceptionHandler.class)
-@ActiveProfiles("test")
-@WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
 @WebMvcTest(CustomerController.class)
+@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Import({
+	//com.guga.walletserviceapi.config.PasswordConfig.class,
+	com.guga.walletserviceapi.service.common.DataPersistenceService.class
+})
 class CustomerControllerTests {
-	
-	// Objeto usado para simular chamadas HTTP
-	@Autowired
-	private MockMvc mockMvc;
-	
-	@MockitoBean
-	private JwtService jwtService;
 
-	@MockitoBean
-	private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@MockitoBean
-	private LoginAuthService loginAuthService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-	@Autowired
-	private ObjectMapper objectMapper;
+    @MockitoBean
+    private CustomerService customerService;
 
-	@MockitoBean
-	private CustomerRepository customerRepository;
+    // Essencial para evitar o erro de ApplicationContext load failure
+    @MockitoBean
+    private JwtAuthenticatedUserProvider jwtAuthenticatedUserProvider;
 
-	@MockitoBean
-	private CustomerService customerService;
-	
-	private static final String API_NAME = "/customers";
-	
-	private static final Logger LOGGER = LogManager.getLogger(CustomerControllerTests.class);
-	
-	private String URI_API;
-	
-	private Faker faker;
-
-	private List<Customer> customers;
-
-	@Value("${controller.path.base}")
-	private String BASE_PATH;
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	@Autowired
-	private Environment env;
+    private DataPersistenceService dataPersistenceService;
 
-	@BeforeEach
-	void setup() {
-		Mockito.reset(customerService);
-		faker = new Faker(new Locale("pt-BR"));
+	//@Autowired
+    //private PasswordEncoder passwordEncoder;
 
-		customers = TransactionUtilsMock.createCustomerListMock();
+    @Value("${controller.path.base}")
+    private String BASE_PATH;
 
-		URI_API = BASE_PATH + API_NAME;
-	}
+    private static final String API_NAME = "/customers";    
 
-	@Test
-	@DisplayName("Deve retornar 201 Created ao criar um Customer com sucesso")
-	void shouldReturn201_WhenCreateNewCustomer() throws Exception {
+    private String URI_API;
+	private List<ParamApp> paramsApp;
+    private List<Customer> customers;
+	private List<Wallet> wallets;
+	private List<LoginAuth> loginAuths;
 
-		Customer customerRef = customers.get(RandomMock.generateIntNumberByInterval(0, customers.size() - 1));
-		Customer customerNew = customerRef.toBuilder().build();
+    private boolean dataLoaded;
 
-		// Simula o sucesso da camada de serviço
-		when(customerService.saveCustomer(any(Customer.class))).thenReturn(customerNew);
+    @BeforeEach
+    void setUp() {
+        URI_API = BASE_PATH + API_NAME;
+        loadMockData();
+    }    
 
-		// Act & Assert
-		mockMvc.perform(post(URI_API + "/customer")
-		.header("X-Trace-Id", UUID.randomUUID().toString())
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(customerRef)))
-			.andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-			.andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
-			.andExpect(status().isCreated())
-			.andExpect(header().exists("Location"))
-			.andExpect(jsonPath("$.customerId", is(customerNew.getCustomerId().intValue())))
-			.andExpect(jsonPath("$.cpf", is(customerNew.getCpf())));
-	}
+    // =========================================================
+    // CONTEXTO PÚBLICO / CRIAÇÃO
+    // =========================================================
 
-	// --------------------------------------------------------------------------------
-	// Teste para GET /{id} (getCustomerById)
-	// --------------------------------------------------------------------------------
-	@Test
-	@DisplayName("Deve retornar 200 OK e o Customer ao buscar por ID")
-	void shouldReturn200_WhenRequestCustomer_WhenExists() throws Exception {
+    @Nested
+    @DisplayName("Operações de Criação (Geralmente Públicas ou Admin)")
+    class CreationContext {
 
-		int indexCustomer = RandomMock.generateIntNumberByInterval(0, 50);
-		Customer foundCustomer = customers.get(indexCustomer).toBuilder().build();
-		Long customerId = foundCustomer.getCustomerId();
+        @Test
+        @DisplayName("Deve criar um novo Customer com sucesso")
+        void createCustomer_created() throws Exception {
 
-		// Simula o retorno de um Customer pelo Service
-		when(customerService.getCustomerById(customerId)).thenReturn(foundCustomer);
+			LoginAuth auth = setupMockAuth(List.of("USER"));
 
-		// Act & Assert
-		mockMvc.perform(get(URI_API + "/{id}", customerId)
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk()) // Verifica o status HTTP 200
-				.andExpect(jsonPath("$.customerId", is(customerId.intValue())))
-				.andExpect(jsonPath("$.cpf", is(foundCustomer.getCpf())));
-	}
+            Customer newCustomer = TransactionUtilsMock.createCustomerMock(nextCustomerId());
+            
+            // Simula o salvamento
+            when(customerService.saveCustomer(any(Customer.class))).thenReturn(newCustomer);
 
-	@Test
-	@DisplayName("Deve retornar 404 Not Found ao buscar Customer por ID inexistente")
-	void shouldReturn404NotFound_WhenSearchingForCustomer_WithNonExistentId() throws Exception {
+            mockMvc.perform(post(URI_API) // Assumindo POST na raiz /customers
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(newCustomer)))
+                    .andExpect(status().isCreated())
+                    .andExpect(header().exists("Location"))
+                    .andExpect(jsonPath("$.customerId").value(newCustomer.getCustomerId()))
+                    .andExpect(jsonPath("$.cpf").value(newCustomer.getCpf()));
+        }
+    }
 
-		Long customerId = (long) RandomMock
-				.generateIntNumberByInterval(customers.size() + 2, customers.size() + 100);
+    // =========================================================
+    // CONTEXTO DE USUÁRIO (Endereços /me)
+    // =========================================================
 
-		when(customerService.getCustomerById(customerId))
-				.thenThrow(new ResourceNotFoundException("Customer not found"));
+    @Nested
+    @DisplayName("Operações do Usuário Autenticado")
+    class UserContext {
 
-		mockMvc.perform(get(URI_API.concat("/{id}"), customerId))
-				.andExpect(status().isNotFound());
-	}
+        @Test
+        @DisplayName("Deve retornar os dados do próprio customer autenticado")
+        void getMyCustomer_ok() throws Exception {
 
-	@Test
-	@DisplayName("Deve retornar 200 OK ao atualizar um Customer existente")
-	void sholdReturn200_WhenUpdateCustomerExistentByID() throws Exception {
+			LoginAuth auth = setupMockAuth(List.of("USER"));
 
-		Customer customerInput = getMockCustomer();
+            Customer mockCustomer = getCustomerById(auth.getCustomerId());
 
-		Long customerId = customerInput.getCustomerId();
+            when(customerService.getCustomerById(mockCustomer.getCustomerId())).thenReturn(mockCustomer);
 
-		when(customerService.getCustomerById(customerId)).thenReturn(customerInput);
+            mockMvc.perform(get(URI_API + "/me"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.customerId").value(mockCustomer.getCustomerId()))
+                    .andExpect(jsonPath("$.fullName").value(mockCustomer.getFullName()));
+        }
 
-		Customer customerUpdated = customerInput.toBuilder()
+        @Test
+        @DisplayName("Deve atualizar os dados do próprio customer")
+        void updateMyCustomer_ok() throws Exception {
+
+			LoginAuth auth = setupMockAuth(List.of("USER"));
+
+            Customer mockCustomer = getCustomerById(auth.getCustomerId());
+
+            // Prepara objeto atualizado
+            Customer updatedCustomer = mockCustomer.toBuilder()
+					.status(TransactionUtilsMock.defineStatus())
+                    .phoneNumber(RandomMock.generatePhoneNumberAleatory())
+					.updatedAt(LocalDateTime.now())
+                    .build();
+
+            when(customerService.updateCustomer(eq(mockCustomer.getCustomerId()), any(Customer.class)))
+                    .thenReturn(updatedCustomer);
+
+            mockMvc.perform(put(URI_API + "/me")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedCustomer)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.phoneNumber").value(updatedCustomer.getPhoneNumber()));
+        }
+    }
+
+    // =========================================================
+    // CONTEXTO ADMINISTRATIVO
+    // =========================================================
+
+    @Nested
+    @DisplayName("Operações Administrativas")
+    class AdminContext {
+
+        @Test
+        @DisplayName("Admin deve obter Customer por ID")
+        void getCustomerById_ok() throws Exception {
+			LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+
+            Customer mockCustomer = getAleatoryCustomer();
+
+            when(customerService.getCustomerById(mockCustomer.getCustomerId())).thenReturn(mockCustomer);
+
+            mockMvc.perform(get(URI_API + "/{id}", mockCustomer.getCustomerId()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.customerId").value(mockCustomer.getCustomerId()));
+        }
+
+        @Test
+        @DisplayName("Admin deve receber 404 ao buscar ID inexistente")
+        void getCustomerById_notFound() throws Exception {
+			LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+
+            Long nonExistentId = nextCustomerId() + 283L;
+
+            when(customerService.getCustomerById(nonExistentId))
+                .thenThrow(new ResourceNotFoundException("Customer not found"));
+
+            mockMvc.perform(get(URI_API + "/{id}", nonExistentId))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("Admin deve listar Customers filtrando por Status")
+        void listCustomers_ok() throws Exception {
+            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+            
+            Status statusFilter = TransactionUtilsMock.defineStatus();
+            List<Customer> customersFiltered = customers.stream()
+                    .filter(c -> c.getStatus().equals(statusFilter))
+                    .limit(10)
+                    .toList();
+
+            when(customerService.filterByStatus(eq(statusFilter), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(customersFiltered));
+
+            mockMvc.perform(get(URI_API) // Assumindo GET na raiz /customers
+                    .param("status", statusFilter.name())
+                    .param("page", "0"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content", hasSize(customersFiltered.size())));
+        }
+        
+        @Test
+        @DisplayName("Deve retornar erro/vazio quando filtro não retorna resultados")
+        void listCustomers_emptyOrError() throws Exception {
+            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+
+            when(customerService.filterByStatus(isNull(), any(Pageable.class)))
+                .thenThrow(new ResourceNotFoundException("Customers not found"));
+
+            mockMvc.perform(get(URI_API))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("Admin deve atualizar Customer por ID")
+        void updateCustomerById_ok() throws Exception {
+
+            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+
+            Customer mockCustomer = getAleatoryCustomer();
+
+			Customer updatedCustomer = mockCustomer.toBuilder()
 				.status(TransactionUtilsMock.defineStatus())
-				.phoneNumber(faker.phoneNumber().cellPhone())
+				.phoneNumber(RandomMock.generatePhoneNumberAleatory())
+				.updatedAt(LocalDateTime.now())
 				.build();
+			
 
-		// Simula o retorno do Customer atualizado
-		when(customerService.updateCustomer(eq(customerId), any(Customer.class)))
-				.thenReturn(customerUpdated);
+            when(customerService.updateCustomer(eq(mockCustomer.getCustomerId()), any(Customer.class)))
+                    .thenReturn(mockCustomer);
 
-		mockMvc.perform(put(URI_API + "/{id}", customerId)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(customerInput)))
-				.andReturn();
+            mockMvc.perform(put(URI_API + "/{id}", mockCustomer.getCustomerId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(mockCustomer)))
+                    .andExpect(status().isOk());
+        }
+    }
 
+    // =========================================================
+    // AUXILIARES
+    // =========================================================
+
+    private LoginAuth setupMockAuth(List<String> roles) {
+		LoginAuth login = getRandomLoginByRole(roles);
+
+        JwtAuthenticationDetails details = JwtAuthenticationDetails.builder()
+                .loginId(login.getId())
+                .login(login.getLogin())
+                .walletId(login.getWalletId())
+                .customerId(login.getCustomerId())
+                .roles(login.getRole())
+                .build();
+
+        List<SimpleGrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                .toList();
+
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(details, null, authorities)
+        );
+
+        // Garante que o provider injetado no Controller retorne o nosso mock
+        when(jwtAuthenticatedUserProvider.get()).thenReturn(details);
+		return login;
+    }
+
+    private Customer getAleatoryCustomer() {
+        int idx = RandomMock.generateIntNumberByInterval(0, customers.size() - 1);
+        return customers.get(idx);
+    }
+
+	private long nextCustomerId() {
+		return customers.stream()
+			.mapToLong(Customer::getCustomerId)
+			.max()
+			.orElse(0L) + 1;
 	}
 
-	private Customer getMockCustomer() {
-		int indexCustomer = RandomMock.generateIntNumberByInterval(0, customers.size() - 1);
-		return customers.get(indexCustomer);
-	}
 
-	// --- 4. Testes para GET /list ---
+    private void loadMockData() {
+        if (!dataLoaded) {
+            paramsApp = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_PARAMS_APP, new TypeReference<List<ParamApp>>() {});
+            customers = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_CUSTOMER, new TypeReference<List<Customer>>() {});
+            wallets = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_WALLET, new TypeReference<List<Wallet>>() {});
+            loginAuths = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_LOGIN_AUTH, new TypeReference<List<LoginAuth>>() {});
+        }
+    }
 
-	@Test
-	@DisplayName("Deve retornar 200 OK e a lista de Customers")
-	void shouldReturn200_WhenRequestingCustomerList_WithValidParameters() throws Exception {
+    private LoginAuth getRandomLoginByRole(List<String> rolesStr) {
+        // 1. Converter as roles alvo para Enum
+        List<LoginRole> targetEnums = rolesStr.stream()
+                .map(role -> LoginRole.valueOf(role.trim().toUpperCase()))
+                .toList();
 
-		Status statusFilter = TransactionUtilsMock.defineStatus();
+		Set<Long> activeCustomerIds = customers.stream()
+				.filter(c -> Status.ACTIVE.equals(c.getStatus()))
+				.map(Customer::getCustomerId)
+				.collect(Collectors.toSet());
 
-		List<Customer> customersFiltered = customers.stream()
-				.filter(customer -> customer.getStatus().equals(statusFilter) &&
-						customer.getCustomerId() > 0)
-				.toList();
+        // 3. Filtrar Logins
+    	return loginAuths.stream()
+            // Filtro de Role
+            .filter(la -> la.getRole().stream().anyMatch(targetEnums::contains))
+            
+            // Filtro de Status (Lookup imediato no Set)
+            // Se o ID do login estiver no conjunto de ativos, passa.
+            .filter(la -> activeCustomerIds.contains(la.getCustomerId()))
+            
+            .findAny()
+            .orElseThrow(() -> new RuntimeException(
+                "Nenhum LoginAuth vinculado a um Customer ATIVO foi encontrado para as roles: " + rolesStr));
+    }
 
-		// Simula uma página com conteúdo
-		when(customerService.filterByStatus(eq(statusFilter), any(Pageable.class)))
-				.thenReturn(new PageImpl<>(customersFiltered));
+	
 
-		// Act & Assert
-		mockMvc.perform(get(URI_API + "/list")
-                        .param("status", statusFilter.name())
-			.contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.content").exists())
-                        .andExpect(jsonPath("$.content").isArray())
-                        .andExpect(jsonPath("$.content", hasSize(customersFiltered.size())))
-                        .andExpect(jsonPath("$.page.totalElements").value(customersFiltered.size()));
-	}
+    // private void encriptAccessKeyLoginAuthListMock(List<LoginAuth> loginAuths) {
+    //     for (LoginAuth loginAuth : loginAuths) {
+    //             String rawAccessKey = loginAuth.getAccessKey();
+    //             String encodedAccessKey = passwordEncoder.encode(rawAccessKey);
+    //             loginAuth.setAccessKey(encodedAccessKey);
+    //     }
+    // }
 
-	@Test
-	@DisplayName("Deve retornar 404 Not Found quando a lista de Customers está vazia")
-	void shouldReturn404WhenNoCustomersFound() throws Exception {
-
-		when(customerService.filterByStatus(isNull(), any(Pageable.class)))
-			.thenThrow(new ResourceNotFoundException("Customers not found"));
-
-		// Act & Assert
-		mockMvc.perform(get(URI_API + "/list"))
-			.andExpect(status().isNotFound()) // Agora vai capturar o 404 do handleResourceNotFound
-            .andExpect(jsonPath("$.status").value(404));
-	}
+    private Customer getCustomerById(Long customerId) {
+        return customers.stream()
+            .filter(c -> c.getCustomerId().equals(customerId))
+            .findFirst()
+            .orElseThrow(() -> new ResourceBadRequestException(String.format("Customer %d não encontrado para o LoginAuth", customerId)));
+    }
 
 }

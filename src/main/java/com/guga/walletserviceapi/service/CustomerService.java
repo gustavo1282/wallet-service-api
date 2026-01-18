@@ -15,8 +15,8 @@ import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.CustomerRepository;
-import com.guga.walletserviceapi.service.common.DataImportService;
-import com.guga.walletserviceapi.service.common.ImportSummary;
+import com.guga.walletserviceapi.service.common.DataPersistenceService;
+import com.guga.walletserviceapi.service.common.PersistenceSummary;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ public class CustomerService implements IWalletApiService {
 
     private final CustomerRepository customerRepository;
     private final ParamAppService paramAppService;
-    private final DataImportService importService;
+    private final DataPersistenceService importService;
 
 
     public Customer getCustomerById(Long id) {
@@ -95,8 +95,8 @@ public class CustomerService implements IWalletApiService {
 
     }
 
-    public ImportSummary importCustomers(MultipartFile file) {        
-        return importService.importJson(file, new TypeReference<List<Customer>>() {}, customerRepository);
+    public PersistenceSummary importCustomers(MultipartFile file) {        
+        return importService.importJsonFromUpload(file, new TypeReference<List<Customer>>() {}, customerRepository);
     }
 
     @Override

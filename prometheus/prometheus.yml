@@ -76,3 +76,9 @@ scrape_configs:
     basic_auth:
       username: wallet_user
       password: wallet_pass
+
+
+  # Para habilitar essas métricas no seu Grafana, você deve adicionar o cAdvisor
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']

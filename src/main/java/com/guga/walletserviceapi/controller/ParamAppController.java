@@ -60,13 +60,12 @@ public class ParamAppController {
     // --- R: READ ALL (GET) ---
     @GetMapping("/list")
     public ResponseEntity<List<ParamApp>> findAll(
-        @RequestParam(defaultValue = "0") int page
-        ) 
-    {
+        //@RequestParam(defaultValue = "0") int page
+        ) {
 
-        Pageable pageable = PageRequest.of(page, defaultPageSize,
+        Pageable pageable = PageRequest.of(0, 150,
                 Sort.by(
-                    Sort.Order.asc("id")
+                    Sort.Order.asc("name")
                 )
             );
 

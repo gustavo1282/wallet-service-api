@@ -9,9 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,9 +23,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
-import com.guga.walletserviceapi.model.Customer;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.Transaction;
-import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.service.CustomerService;
@@ -60,41 +57,44 @@ public class WalletOperatorController {
     @Value("${spring.data.web.pageable.default-page-size}")
     private int defaultPageSize;
 
-    // =====================================================
-    // ME CONTEXT - CUSTOMER & WALLET
-    // =====================================================
+    // // =====================================================
+    // // ME CONTEXT - CUSTOMER & WALLET
+    // // =====================================================
 
-    @Operation(summary = "Get my personal data (Customer)")
-    @GetMapping("/me/customer")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Customer> getMyCustomerData() {
-        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-        AuditLogger.log("CUSTOMER_GET_ME", auditCtx);
-        // Busca os dados do cliente dono do token
-        return ResponseEntity.ok(customerService.getCustomerById(auditCtx.getCustomerId()));
-    }
+    // @Operation(summary = "Get my personal data (Customer)")
+    // @GetMapping("/me/customer")
+    // @PreAuthorize("hasRole('USER')")
+    // public ResponseEntity<Customer> getMyCustomerData() {
+    //     AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+    //     AuditLogger.log("CUSTOMER_GET_ME", auditCtx);
+    //     // Busca os dados do cliente dono do token
+    //     return ResponseEntity.ok(customerService.getCustomerById(auditCtx.getCustomerId()));
+    // }
 
-    @Operation(summary = "Get my wallet details and balance")
-    @GetMapping("/me/wallet")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Wallet> getMyWalletDetails() {
-        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-        AuditLogger.log("WALLET_GET_ME", auditCtx);
-        return ResponseEntity.ok(walletService.getWalletById(auditCtx.getWalletId()));
-    }
+    // @Operation(summary = "Get my wallet details and balance")
+    // @GetMapping("/me/wallet")
+    // @PreAuthorize("hasRole('USER')")
+    // public ResponseEntity<Wallet> getMyWalletDetails() {
+    //     AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+    //     AuditLogger.log("WALLET_GET_ME", auditCtx);
+    //     return ResponseEntity.ok(walletService.getWalletById(auditCtx.getWalletId()));
+    // }
 
     // =====================================================
     // ME CONTEXT - TRANSACTION EXTRACTS (LIMIT 100)
     // =====================================================
 
-    @Operation(summary = "Get my last 100 transactions (All types)")
+    @Operation(summary = "Get my last 50 transactions (All types)")
     @GetMapping("/me/transactions")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<Transaction>> getMyRecentTransactions() {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-        Pageable pageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "createdAt"));
         AuditLogger.log("TRANSACTION_LIST_ALL_ME", auditCtx);
-        return ResponseEntity.ok(transactionService.getLast10Transactions(auditCtx.getWalletId(), pageable));
+                
+        Pageable pageable = GlobalHelper.getDefaultPageable();
+
+        Page<Transaction> trnResult = transactionService.getTransactionsByLimitMax(auditCtx.getWalletId(), pageable);
+        return (trnResult != null) ? ResponseEntity.ok(trnResult) : ResponseEntity.ok(Page.empty());
     }
 
     @Operation(summary = "List my last 100 deposits")
@@ -130,13 +130,14 @@ public class WalletOperatorController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<Transaction>> searchMyTransactionsByPeriod(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-        @RequestParam(defaultValue = "0") int page
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+        //@RequestParam(defaultValue = "0") int page
     ) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : LocalDateTime.now();
-        Pageable pageable = PageRequest.of(page, defaultPageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Pageable pageable = GlobalHelper.getDefaultPageable();
         
         AuditLogger.log("TRANSACTION_LIST_PERIOD_ME", auditCtx);
         return ResponseEntity.ok(transactionService.findByWalletIdAndCreatedAtBetween(auditCtx.getWalletId(), start, end, pageable));
@@ -170,12 +171,15 @@ public class WalletOperatorController {
 
     private ResponseEntity<Page<Transaction>> listMyTransactionsByOperation(OperationType operation) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-        Pageable limitPageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "createdAt"));
-        
         AuditLogger.log("TRANSACTION_LIST_" + operation.name() + "_ME", auditCtx);
         
-        return ResponseEntity.ok(transactionService.filterTransactionByWalletIdAndOperationType(
-            auditCtx.getWalletId(), operation, limitPageable));
+        Pageable pageable = GlobalHelper.getDefaultPageable();
+        
+        Page<Transaction> trnResult = transactionService.filterTransactionByWalletIdAndOperationType(
+            auditCtx.getWalletId(), operation, pageable);
+
+        return (trnResult != null) ? ResponseEntity.ok(trnResult) : ResponseEntity.ok(Page.empty());
+
     }
 
     private URI buildLocation(Long transactionId) {

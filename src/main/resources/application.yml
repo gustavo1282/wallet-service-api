@@ -1,53 +1,56 @@
-spring:
-  profiles.active: local
+server:
+  protocol-type: http
+  hostname: localhost
+  port: 8080
+  address: 0.0.0.0
   servlet:
-    multipart:
-      enabled: true # Deve estar 'true' (geralmente é o padrão)
-      max-file-size: 10MB # Certifique-se de que o arquivo não excede o limite
-      max-request-size: 10MB
-  jpa:
-    properties:
-      jdbc.batch_size: 1000
-      order_inserts: true               # Essencial para otimizar INSERTS
-      order_updates: true               # Essencial para otimizar UPDATES
-      jdbc.batch_versioned_data: true   # Mantenha a versão do dado no batch
+    context-path: /wallet-service-api
 
-# Define o componente uma vez - referente a carga de arquivo csv e upload
-components:
-  requestBodies:
-    FileUpload:
-      description: Arquivo CSV a ser importado.
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            properties:
-              file:
-                type: string
-                format: binary # A chave para o input de arquivo
-paths:
-  /api/customers/upload:
-    post:
-      summary: Importa dados de Clientes via CSV.
-      requestBody: # E aqui
-        $ref: '#/components/requestBodies/FileUpload'
-      responses:
-        '200':
-          description: Upload bem-sucedido.
-  /api/wallets/upload:
-    post:
-      summary: Importa dados de Carteiras via CSV.
-      requestBody: # Referencia o componente aqui
-        $ref: '#/components/requestBodies/FileUpload'
-      responses:
-        '200':
-          description: Upload bem-sucedido.
-  /api/transactions/upload:
-    post:
-      summary: Importa dados de Carteiras via CSV.
-      requestBody: # Referencia o componente aqui
-        $ref: '#/components/requestBodies/FileUpload'
-      responses:
-        '200':
-          description: Upload bem-sucedido.
+controller:
+  path:
+    base: "/api"
+
+wallet-service-api:
+  seed-path: classpath:./data/seed/
+
+spring:
+  application:
+    name: wallet-service-api
+
+  config:
+    import: "optional:classpath:security-matchers.yml"
+
+  data:
+    web:
+      pageable:
+        default-page-size: 25
+        max-page-size: 150
+
+  jackson:
+    default-property-inclusion: non_null
+    property-naming-strategy: LOWER_CAMEL_CASE
+    deserialization:
+      fail-on-unknown-properties: false
+
+  threads:
+    virtual:
+      enabled: true
+
+springdoc:
+  packagesToScan: com.guga.walletserviceapi
+  pathsToMatch: /api/**
+  api-docs:
+    path: /v3/api-docs
+    version: OPENAPI_3_0
+    enabled: true
+  info:
+    title: Microservices Wallet Service
+    description: API REST manages the entire lifecycle of a wallet service
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: false
+    try-it-out-enabled: false
+    groups-order: ASC
+    operationsSorter: alpha
+  show-actuator: true
+  writer-with-default-pretty-printer: true

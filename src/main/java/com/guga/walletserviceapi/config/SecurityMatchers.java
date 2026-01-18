@@ -23,6 +23,7 @@ public class SecurityMatchers {
     private String[] monitor;
     private String[] secured;
     private String[] admin;
+    private String[] permitAllPaths;
 
     private String[] addContextPath(String[] paths) {
         return paths;
@@ -62,6 +63,11 @@ public class SecurityMatchers {
     public String[] getAdmin() {
         return addContextPath(admin);
     }
+    
+    public String[] getPermitAllPaths() {
+        return addContextPath(permitAllPaths);
+    }
+
 
     public List<String> getAllMatchers() {
         List<String> allPublicPatterns = new ArrayList<>();
@@ -80,6 +86,9 @@ public class SecurityMatchers {
         }
         if (getAdmin() != null) {
             allPublicPatterns.addAll( List.of(getAdmin() ) );
+        }
+        if (getPermitAllPaths() != null) {
+            allPublicPatterns.addAll( List.of(getPermitAllPaths()) );
         }
 
         if (allPublicPatterns == null || allPublicPatterns.size() == 0){
@@ -100,5 +109,6 @@ public class SecurityMatchers {
         System.out.println("monitor: " + Arrays.toString(getMonitor()));
         System.out.println("secured: " + Arrays.toString(getSecured()));
         System.out.println("admin: " + Arrays.toString(getAdmin()));
+        System.out.println("permitpaths: " + Arrays.toString(getPermitAllPaths()));
     }
 }

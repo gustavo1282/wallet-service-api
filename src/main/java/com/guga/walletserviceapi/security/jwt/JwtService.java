@@ -86,7 +86,7 @@ public class JwtService {
             .claim("customerId", loginAuth.getCustomerId())
             .claim("loginAuthType", loginAuth.getLoginAuthType())
             .claim("walletId", loginAuth.getWalletId())
-            .claim("roles", List.of(loginAuth.getRole().name()))
+            .claim("roles", loginAuth.getRole())
             .issuedAt( Date.from(now) )
             .expiration( Date.from(now.plusMillis(ACCESS_TOKEN_VALIDITY)) )
             .signWith(key, Jwts.SIG.HS256)

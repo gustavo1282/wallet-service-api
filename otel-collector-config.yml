@@ -13,6 +13,18 @@ processors:
     limit_mib: 500
     spike_limit_mib: 100
 
+  resource:
+    attributes:
+      - key: job
+        value: "wallet-service"
+        action: insert
+      - key: container_name
+        value: "cont-wallet-api"
+        action: insert
+      - key: env
+        value: "development"
+        action: insert
+
 connectors:
   spanmetrics:
     namespace: traces_span_metrics
@@ -36,8 +48,14 @@ exporters:
 
   loki:
     endpoint: "http://cont-wallet-loki:3100/loki/api/v1/push"
+    # Esta é a forma padrão e segura de garantir que o Loki indexe as labels
+    # Sem este bloco, os dados chegam mas não viram variáveis no Grafana
+    default_labels_enabled:
+      exporter: true
+      job: true
+      instance: true
 
-  logging: # Na 0.95 o exportador de debug/console é o 'logging'
+  logging: 
     verbosity: detailed
 
 service:
@@ -47,15 +65,15 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, resource, batch]
       exporters: [spanmetrics, otlp/jaeger, logging]
 
     metrics:
       receivers: [spanmetrics, otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, resource, batch]
       exporters: [prometheus, logging]
 
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, resource, batch]
       exporters: [loki, logging]
