@@ -40,6 +40,8 @@ services:
     ports:
       - "16686:16686"
       - "14268:14268"
+      - "14250:14250" # Porta nativa gRPC (Model)
+      - "14269:14269" # Porta Admin/Health Check
     volumes:
       - jaeger_tracing_data:/var/lib/jaeger
     networks:
@@ -78,6 +80,8 @@ services:
         condition: service_started
       loki:
         condition: service_started
+      tempo:
+        condition: service_started
     networks:
       - wallet_network
 
@@ -88,8 +92,12 @@ services:
     image: prom/prometheus:v2.51.0
     container_name: cont-wallet-prometheus
     restart: unless-stopped
+    environment:
+      PROM_PROFILE: local # use homolog/prod conforme o ambiente
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      #- ./prometheus/prometheus-${PROM_PROFILE:-local}.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
@@ -111,6 +119,7 @@ services:
       - "3000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       prometheus:
         condition: service_started
@@ -123,21 +132,25 @@ services:
   # 5. APLICAÇÃO WALLET SERVICE
   # ======================================================================
   wallet-service-api:
-    image: wallet-service:latest
+    image: wallet-service-api:latest
     build: .
     container_name: cont-wallet-service-api
     restart: unless-stopped
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       TZ: America/Sao_Paulo
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
-      SPRING_DATASOURCE_USERNAME: wallet_user
-      SPRING_DATASOURCE_PASSWORD: wallet_pass
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
-      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,metrics,prometheus" 
-      # Configurações de Segurança e Vault
-      JWT_SECRET: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
-      SPRING_CLOUD_VAULT_ENABLED: "false"
+      SPRING_PROFILES_ACTIVE: homolog
+      SPRING_CLOUD_VAULT_ENABLED: "true"
+      SPRING_CLOUD_VAULT_URI: http://vault:8200
+      SPRING_CLOUD_VAULT_TOKEN: root
+      SPRING_CLOUD_VAULT_KV_ENABLED: "true"
+      SPRING_CLOUD_VAULT_KV_BACKEND: secret
+      SPRING_CLOUD_VAULT_KV_APPLICATION_NAME: wallet-service-api
+      SPRING_CLOUD_VAULT_KV_PROFILES: homolog
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318/v1/traces
+      MANAGEMENT_OTLP_LOGGING_ENDPOINT: http://otel-collector:4318/v1/logs
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-collector:4318/v1/traces
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges" 
     ports:
       - "8080:8080"
     depends_on:
@@ -145,13 +158,17 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
+      vault:
+        condition: service_healthy
     volumes:
       - wallet_service_data:/app/data
+      - ./data/seed:/app/data/seed
+      - ./security-matchers.yml:/app/config/security-matchers.yml
     networks:
       - wallet_network
 
   # ======================================================================
-  # 6. UTILITÁRIOS
+  # UTILITÁRIOS
   # ======================================================================
   pgadmin:
     image: dpage/pgadmin4
@@ -196,6 +213,52 @@ services:
         - "8085:8080"
       networks:
         - wallet_network
+
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: cont-wallet-vault
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      VAULT_API_ADDR: "http://0.0.0.0:8200"
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_TOKEN: "root"
+    cap_add:
+      - IPC_LOCK
+    healthcheck:
+      test: ["CMD-SHELL", "vault kv get secret/wallet-service-api/homolog || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command: >
+      sh -c '
+      vault server -dev -dev-listen-address="0.0.0.0:8200" &
+      sleep 5;
+      vault kv put secret/wallet-service-api/homolog spring.datasource.url="jdbc:postgresql://postgres:5432/wallet_db" spring.datasource.username="wallet_user" spring.datasource.password="wallet_pass" jwt.secret="mock-key-super-secret-jwt.2J8320JRF329FJ23JF9239FHF2F923HF9823HF98238F";
+      wait
+      '
+    networks:
+      - wallet_network
+
+  # ======================================================================
+  # 7. TEMPO - TRACING BACKEND
+  # ======================================================================
+  tempo:
+    image: grafana/tempo:latest
+    container_name: cont-wallet-tempo
+    restart: unless-stopped
+    ports:
+      - "3200:3200"
+      #- "4317" # OTLP gRPC
+      #- "4318" # OTLP HTTP
+    networks:
+      - wallet_network
+    command: >
+      -target=all
+      -storage.trace.backend=local
+      -storage.trace.local.path=/tmp/tempo/traces
 
 # ======================================================================
 # VOLUMES

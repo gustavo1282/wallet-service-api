@@ -1,7 +1,7 @@
 spring:
-  config:
-    activate:
-      on-profile: test
+  cloud:
+    vault:
+      enabled: false
 
   datasource:
     url: jdbc:h2:mem:wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
@@ -13,11 +13,11 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
-    show-sql: false
+    show-sql: true
 
   h2:
     console:
-      enabled: false
+      enabled: true
 
 management:
   endpoints:
@@ -28,6 +28,6 @@ logging:
     root: WARN
 
 # Adicione esta estrutura:
-jwt:
-  # Usar uma frase legível evita o bloqueio do GitHub e provê os 32+ caracteres necessários
-  secret: "${JWT_SECRET:esta-e-uma-chave-de-extrema-seguranca-apenas-para-uso-de-testes-locais}"
+#jwt:
+#  # Usar uma frase legível evita o bloqueio do GitHub e provê os 32+ caracteres necessários
+#  secret: "${JWT_SECRET:esta-e-uma-chave-de-extrema-seguranca-apenas-para-uso-de-testes-locais}"

@@ -9,20 +9,23 @@ receivers:
 processors:
   batch:
   memory_limiter:
-    check_interval: 1s
+    check_interval: 5s
     limit_mib: 500
     spike_limit_mib: 100
 
   resource:
     attributes:
+      - key: service.name
+        value: ${APP_NAME}
+        action: insert
       - key: job
-        value: "wallet-service"
+        value: "cont-${APP_NAME}"
         action: insert
       - key: container_name
-        value: "cont-wallet-api"
+        value: "cont-${APP_NAME}"
         action: insert
       - key: env
-        value: "development"
+        value: "env-local"
         action: insert
 
 connectors:
@@ -41,8 +44,8 @@ exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
   
-  otlp/jaeger:
-    endpoint: "cont-wallet-jaeger:4317"
+  otlphttp/jaeger:
+    endpoint: "http://jaeger:4318"
     tls:
       insecure: true
 
@@ -58,6 +61,11 @@ exporters:
   logging: 
     verbosity: detailed
 
+  otlp/tempo:
+    endpoint: "tempo:4317"
+    tls:
+      insecure: true
+
 service:
   telemetry:
     metrics:
@@ -66,7 +74,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [spanmetrics, otlp/jaeger, logging]
+      exporters: [spanmetrics, otlphttp/jaeger, logging]
 
     metrics:
       receivers: [spanmetrics, otlp]

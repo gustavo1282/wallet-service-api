@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    vault:
+      uri: http://vault:8200
+      token: root
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate

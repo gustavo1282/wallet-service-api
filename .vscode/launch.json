@@ -8,7 +8,7 @@
                 "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
                 "projectName": "wallet-service-api",
                 "args": "",
-                "envFile": "${workspaceFolder}/.env",
+                //"envFile": "${workspaceFolder}/.env",
                 "vmArgs": [
                     "-Dspring.profiles.active=local",
                     "-javaagent:${workspaceFolder}/lib/opentelemetry-javaagent.jar",
@@ -25,14 +25,26 @@
                     "-Dotel.exporter.otlp.timeout=10000",
                     "-Dotel.instrumentation.spring-webmvc.enabled=true",
                     "-Dotel.instrumentation.spring-web.enabled=true",
-                    "-Dotel.instrumentation.servlet.enabled=true"
+                    "-Dotel.instrumentation.servlet.enabled=true",
+                    // INFORMACOES DO VAULT
+                    "-Dspring.cloud.vault.enabled=true",
+                    "-Dspring.cloud.vault.uri=http://localhost:8200",
+                    "-Dspring.cloud.vault.token=root",
+                    "-Dspring.cloud.vault.kv.application-name=wallet-service-api",
+                    "-Dspring.cloud.vault.kv.profiles=local"
                     // SE VOCÊ ESTIVER RODANDO DENTRO DE UM CONTAINER DO DOCKER, DESCOMENTE AS LINHAS ABAIXO E COMENTE A LINHA ACIMA
                     //"-Dotel.exporter.otlp.traces.endpoint=http://host.docker.internal:4318/v1/traces",
                     //"-Dotel.exporter.otlp.metrics.endpoint=http://host.docker.internal:4318/v1/metrics",
                     //"-Dotel.exporter.otlp.logs.endpoint=http://host.docker.internal:4318/v1/logs",
                 ],
                 "env": {
-                    "SPRING_DATASOURCE_PASSWORD": "wallet_pass" 
+                    "SPRING_DATASOURCE_PASSWORD": "wallet_pass",
+                    "APP_NAME": "wallet-service-api",
+                    "PROFILE": "local",
+                    "ENV": "env-local",
+                    "USER_NAME": "wallet_user",
+                    "USER_PASS": "wallet_pass",
+                    "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823"
                 }
             }
         ]

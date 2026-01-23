@@ -86,7 +86,7 @@ class CustomerControllerTests {
 	//@Autowired
     //private PasswordEncoder passwordEncoder;
 
-    @Value("${controller.path.base}")
+    @Value("")
     private String BASE_PATH;
 
     private static final String API_NAME = "/customers";    

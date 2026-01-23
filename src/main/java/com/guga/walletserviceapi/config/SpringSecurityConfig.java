@@ -2,6 +2,7 @@ package com.guga.walletserviceapi.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
@@ -33,10 +35,17 @@ public class SpringSecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final SecurityMatchers matchers;
 
+    @Value("${server.servlet.context-path:}")
+    private String contextPath;
+
+    @Value("${app.api-prefix:}")
+    private String servletPath;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
 
-        MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);    
+        MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);
+        //mvc.servletPath(servletPath);
 
         return http
             // =========================
@@ -61,19 +70,12 @@ public class SpringSecurityConfig {
             // Autorização
             // =========================
             .authorizeHttpRequests(auth -> auth
-                // 1. Endpoints de Infraestrutura (Sempre permitidos)
-                //.requestMatchers(mvc.pattern("/actuator/**")).permitAll()
-                //.requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
-                //.requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
-                //.requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()
-                //.requestMatchers(mvc.pattern("/webjars/**")).permitAll()
-                .requestMatchers(clean(matchers.getPermitAllPaths())).permitAll()
-                
-
-                // 2. Regras Dinâmicas do YAML (Sanitizadas para remover o context-path se existir)
-                .requestMatchers(clean(matchers.getPublicPaths())).permitAll()
-                .requestMatchers(clean(matchers.getDocumentation())).permitAll()
-                .requestMatchers(clean(matchers.getSecured())).authenticated()
+                .requestMatchers(mvcMatchers(mvc, matchers.getPermitAllPaths())).permitAll()
+                .requestMatchers(mvcMatchers(mvc, matchers.getPublicPaths())).permitAll()
+                .requestMatchers(mvcMatchers(mvc, matchers.getAdmin())).authenticated()
+                .requestMatchers(mvcMatchers(mvc, matchers.getSecured())).authenticated()
+                .requestMatchers(mvcMatchers(mvc, matchers.getDocumentation())).permitAll()
+                .requestMatchers(mvcMatchers(mvc, matchers.getMonitor())).authenticated()
                 
                 // 3. Bloqueio residual
                 .anyRequest().denyAll()
@@ -107,10 +109,14 @@ public class SpringSecurityConfig {
      * processamento interno do Spring Security.
      */
     private String[] clean(String[] paths) {
-        if (paths == null) return new String[0];
-        return Arrays.stream(paths)
-                .map(p -> p.replace("/wallet-service-api", ""))
-                .toArray(String[]::new);
+        return paths;
+    }
+
+    private RequestMatcher[] mvcMatchers(MvcRequestMatcher.Builder mvc, String[] paths) {
+        if (paths == null) return new RequestMatcher[0];
+        return Arrays.stream(clean(paths))
+            .map(mvc::pattern)
+            .toArray(RequestMatcher[]::new);
     }
 
 }

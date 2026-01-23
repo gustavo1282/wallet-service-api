@@ -26,6 +26,11 @@ O Wallet Service API segue uma arquitetura em camadas (Layered Architecture) com
 │           Database Layer (PostgreSQL/H2)                      │
 │              (Persistence & Storage)                          │
 └──────────────────────────────────────────────────────────────┘
+                     │
+┌─────────────────────▼────────────────────────────────────────┐
+│           Infrastructure & Security                           │
+│      (HashiCorp Vault, OTel Collector, Jaeger, Tempo)         │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ## 🏗️ Componentes Principais
@@ -72,6 +77,7 @@ Responsável por:
 | `ParamAppService` | Gerenciar parâmetros de configuração |
 | `JwtService` | Gerar, validar e gerenciar tokens JWT |
 | `DepositSenderService` | Gerenciar remetentes de depósitos |
+| `DataPersistenceService` | Orquestração de importação/exportação de dados (CSV/JSON) |
 
 **Padrão: Dependency Injection**
 ```java
@@ -178,6 +184,7 @@ Responsável por:
 | `JwtService` | Gerar tokens, validar, extrair claims |
 | `SpringSecurityConfig` | Configurar filtros, AuthenticationManager |
 | `JwtAuthenticationFilter` | Interceptor para validação de tokens |
+| `SecurityMatchers` | Configuração centralizada de rotas públicas/privadas via properties |
 
 **Fluxo de Autenticação:**
 ```
@@ -500,6 +507,11 @@ CREATE INDEX idx_transactions_date ON transactions(created_at);
 5. **SQL Injection Prevention**
    - Prepared Statements (JPA)
    - Parameterized Queries
+
+6. **Gestão de Segredos (Vault)**
+   - Centralização de credenciais (Banco, JWT)
+   - Rotação de segredos dinâmica
+   - Políticas de acesso granular
 
 ## 📊 Padrões de Escalabilidade
 

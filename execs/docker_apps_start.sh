@@ -1,5 +1,17 @@
 #!/bin/bash
 
+APP_NAME=wallet-service-api
+PROFILE=homolog
+ENV=env-homolog
+USER_NAME=wallet_user
+USER_PASS=wallet_pass
+JWT_SECRET=mock.jwt_secret_value_8235hu23523h523h57823h58723h823
+
+
+export APP_NAME PROFILE ENV USER_NAME USER_PASS JWT_SECRET
+
+
+#
 echo "🚀 Iniciando Infraestrutura de Banco de Dados..."
 docker compose up -d postgres
 

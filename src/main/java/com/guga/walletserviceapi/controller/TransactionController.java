@@ -5,7 +5,6 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${controller.path.base}/transactions")
+@RequestMapping("/transactions")
 @Tag(name = "Transaction", description = "Endpoints for managing transactions")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
@@ -49,9 +48,6 @@ public class TransactionController {
 
     private final TransactionService transactionService;
     private final JwtAuthenticatedUserProvider authUserProvider;
-
-    @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;
 
     // =====================================================
     // USER CONTEXT - CREATION

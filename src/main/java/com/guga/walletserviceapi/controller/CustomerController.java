@@ -4,7 +4,6 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${controller.path.base}/customers")
+@RequestMapping("/customers")
 @Tag(name = "Customer", description = "Customer domain operations")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
@@ -46,9 +45,6 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final JwtAuthenticatedUserProvider authUserProvider;
-
-    @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;
 
     // =====================================================
     // USER CONTEXT

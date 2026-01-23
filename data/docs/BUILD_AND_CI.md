@@ -223,19 +223,20 @@ networks:
 
 ```dockerfile
 # STAGE 1: Build
-FROM maven:3.9.5-amazoncorretto-17 AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
-RUN mvn dependency:go-offline
 COPY src ./src
-RUN mvn package -DskipTests
+RUN mvn clean package -DskipTests
 
 # STAGE 2: Runtime
-FROM eclipse-temurin:17-jre-focal
-EXPOSE 8080
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
 ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 8080
 ```
 
 ### Comandos Docker

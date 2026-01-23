@@ -6,21 +6,21 @@ security:
     # =====================================================
     public-paths:
       # Autenticação / login / refresh tokens
-      - "/api/auth/**"
       - "/swagger-ui/**"
       - "/swagger-ui.html"
       - "/swagger-ui/index.html"
       - "/swagger-resources/**"
-
+      - "/v3/api-docs/**"
+      - "/webjars/**"
+      - "/actuator/**"
 
     permit-all-paths:
+      - "/api/v1/params/**"
+      - "/api/v1/auth/**"
       # Endpoints relacionados documentation
-      - "/webjars/**"
-      - "/v3/api-docs/**"
       # Actuator público (health, info, prometheus)
-      - "/actuator/**"
       - "/actuator/prometheus"
-      - "/actuator/metrics/**"
+      - "/actuator/metrics/"
       - "/actuator/health/**"
       # - "/actuator/info"
       # - "/actuator/loggers/**"
@@ -30,6 +30,7 @@ security:
       # - "/actuator/threaddump/**"
       # - "/actuator/heapdump/**"
       # - "/actuator/beans/**"
+      
 
     # =====================================================
     # DOCUMENTAÇÃO: Swagger / OpenAPI
@@ -50,13 +51,12 @@ security:
     # ADMIN: somente administradores
     # =====================================================
     admin:
-      - "/api/params/**"
 
     # =====================================================
     # API SECURED: endpoints de negócio autenticados
     # =====================================================
     secured:
-      - "/api/customers/**"
-      - "/api/wallets/**"
-      - "/api/transactions/**"
-      - "/api/wallet-operator/**"
+      - "/api/v1/customers/**"
+      - "/api/v1/wallets/**"
+      - "/api/v1/transactions/**"
+      - "/api/v1/wallet-operator/**"

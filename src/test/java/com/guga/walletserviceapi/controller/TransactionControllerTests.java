@@ -92,7 +92,7 @@ class TransactionControllerTests {
     @Autowired
     private DataPersistenceService dataPersistenceService;
 
-    @Value("${controller.path.base}")
+    @Value("${server.servlet.context-path}")
     private String BASE_PATH;
 
     private String URI_API;

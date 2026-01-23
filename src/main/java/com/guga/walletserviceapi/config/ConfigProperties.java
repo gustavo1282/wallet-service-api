@@ -13,7 +13,7 @@ public class ConfigProperties {
     public SecurityMatchers securityMatchers(Environment env) {
         SecurityMatchers matchers = new SecurityMatchers();
         // Garantir que o contextPath seja setado a partir das propriedades do Spring
-        String contextPath = env.getProperty("server.servlet.context-path");
+        String contextPath = env.getProperty("APP_NAME");
         if (contextPath == null || contextPath.trim().isEmpty()) {
             contextPath = "/";
         }

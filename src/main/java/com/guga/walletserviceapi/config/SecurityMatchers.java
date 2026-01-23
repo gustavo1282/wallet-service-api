@@ -15,8 +15,11 @@ import lombok.Setter;
 
 @Getter @Setter
 public class SecurityMatchers {
-    @Value("${server.servlet.context-path:/}")
+    @Value("${server.servlet.context-path:}")
     private String contextPath;
+
+    @Value("${app.api-prefix:}")
+    private String servletPath;
 
     private String[] publicPaths;
     private String[] documentation;
@@ -27,21 +30,6 @@ public class SecurityMatchers {
 
     private String[] addContextPath(String[] paths) {
         return paths;
-        // if (paths == null || paths.length == 0) {
-        //     return paths;
-        // }
-
-        // // Se context path é "/" ou vazio, retorna os paths originais
-        // if ("/".equals(contextPath) || contextPath == null || contextPath.trim().isEmpty()) {
-        //     return paths;
-        // }
-
-        // // Remove trailing slash do context path se existir
-        // String cleanContextPath = contextPath.replaceAll("/$", "");
-
-        // return Arrays.stream(paths)
-        //     .map(path -> cleanContextPath + path)
-        //     .toArray(String[]::new);
     }
 
     public String[] getPublicPaths() {

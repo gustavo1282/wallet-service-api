@@ -8,7 +8,7 @@ global:
     application: "wallet-service-api"
     app: "wallet-service-api"
     service_name: "wallet-service-api"
-    #instance: "wallet-api-local-ide"
+    instance: "wallet-api-local-ide"
 
 rule_files:
   - /etc/prometheus/rules/http_otel_compat.yml

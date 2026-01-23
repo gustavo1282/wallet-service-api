@@ -65,7 +65,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "bbf5ec52-9d17-4791-a5af-27d0585f6f6a"
+        "uid": "b87dd59c-221a-444b-a5cf-62c47d05c084"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -106,9 +106,9 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bbf5ec52-9d17-4791-a5af-27d0585f6f6a"
+            "uid": "b87dd59c-221a-444b-a5cf-62c47d05c084"
           },
-          "expr": "probe_http_status_code",
+          "expr": "http_server_requests_seconds_count",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -163,7 +163,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bbf5ec52-9d17-4791-a5af-27d0585f6f6a"
+        "uid": "b87dd59c-221a-444b-a5cf-62c47d05c084"
       },
       "fieldConfig": {
         "defaults": {
@@ -232,9 +232,9 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bbf5ec52-9d17-4791-a5af-27d0585f6f6a"
+            "uid": "b87dd59c-221a-444b-a5cf-62c47d05c084"
           },
-          "expr": "probe_http_status_code{instance=~\"$site\"}",
+          "expr": "http_server_requests_seconds_count{instance=~\"$site\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -258,7 +258,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "bbf5ec52-9d17-4791-a5af-27d0585f6f6a"
+          "uid": "b87dd59c-221a-444b-a5cf-62c47d05c084"
         },
         "definition": "",
         "hide": 0,
@@ -267,7 +267,7 @@
         "multi": true,
         "name": "site",
         "options": [],
-        "query": "label_values(probe_http_status_code, instance)",
+        "query": "label_values(http_server_requests_seconds_count, instance)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,

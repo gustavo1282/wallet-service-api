@@ -1,0 +1,41 @@
+groups:
+  - name: http-otel-compat
+    interval: 15s
+    rules:
+      - record: http_server_request_duration_seconds_count
+        expr: |
+          sum by (job, scrape_job, instance, method, status) (
+            label_replace(
+              label_replace(http_server_request_duration_seconds_count{exported_job!=""}, "scrape_job", "$1", "job", "(.*)"),
+              "job", "$1", "exported_job", "(.*)"
+            )
+          )
+
+      - record: http_server_request_duration_seconds_sum
+        expr: |
+          sum by (job, scrape_job, instance, method, status) (
+            label_replace(
+              label_replace(http_server_request_duration_seconds_sum{exported_job!=""}, "scrape_job", "$1", "job", "(.*)"),
+              "job", "$1", "exported_job", "(.*)"
+            )
+          )
+
+      - record: http_server_request_duration_seconds_bucket
+        expr: |
+          sum by (job, scrape_job, instance, method, status, le) (
+            label_replace(
+              label_replace(http_server_request_duration_seconds_bucket{exported_job!=""}, "scrape_job", "$1", "job", "(.*)"),
+              "job", "$1", "exported_job", "(.*)"
+            )
+          )
+
+  - name: jvm_otel_compat
+    rules:
+      - record: process_uptime_milliseconds
+        expr: 1000 * process_uptime_seconds
+
+      - record: http_server_requests_milliseconds_count
+        expr: http_server_requests_seconds_count
+
+      - record: http_server_requests_milliseconds_sum
+        expr: 1000 * http_server_requests_seconds_sum

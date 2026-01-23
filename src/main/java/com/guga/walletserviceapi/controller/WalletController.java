@@ -4,7 +4,6 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${controller.path.base}/wallets")
+@RequestMapping("/wallets")
 @Tag(name = "Wallet", description = "Endpoints for managing wallets")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
@@ -46,9 +45,6 @@ public class WalletController {
     private final WalletService walletService;
 
     private final JwtAuthenticatedUserProvider authUserProvider;
-
-    @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;
 
     // =====================================================
     // USER CONTEXT

@@ -1024,81 +1024,65 @@ public class LoginAuth {
 
 ## 🔗 Relacionamentos (ER Diagram)
 
-```
-┌──────────────┐
-│  CUSTOMERS   │
-├──────────────┤
-│ customer_id  │ PK
-│ name         │
-│ email        │ UNIQUE
-│ cpf          │ UNIQUE
-│ status       │
-│ created_at   │
-└──────┬───────┘
-       │ 1
-       │
-       │ *
-┌──────▼──────────┐
-│    WALLETS      │
-├─────────────────┤
-│ wallet_id       │ PK
-│ customer_id     │ FK
-│ balance         │
-│ status          │
-│ created_at      │
-└──────┬──────────┘
-       │ 1
-       │
-       │ *
-┌──────▼──────────────────┐
-│   TRANSACTIONS          │
-├─────────────────────────┤
-│ transaction_id          │ PK
-│ wallet_id               │ FK
-│ amount                  │
-│ dtype (Discriminator)   │
-│ status                  │
-│ [cols específicas]      │
-└─────────────────────────┘
-       │ 1
-       │
-       │ *
-┌──────▼──────────────────┐
-│ MOVEMENT_TRANSACTIONS   │
-├─────────────────────────┤
-│ movement_id             │ PK
-│ transaction_id          │ FK
-│ wallet_id               │ FK
-│ previous_balance        │
-│ new_balance             │
-└─────────────────────────┘
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ WALLET : "possui"
+    CUSTOMER ||--o{ LOGIN_AUTH : "autentica"
+    WALLET ||--o{ TRANSACTION : "realiza"
+    WALLET ||--o{ MOVEMENT_TRANSACTION : "registra"
+    WALLET ||--|| LOGIN_AUTH : "vinculada"
+    TRANSACTION ||--o{ MOVEMENT_TRANSACTION : "gera"
+    TRANSACTION ||--o| DEPOSIT_SENDER : "origem (se deposito)"
 
-┌──────────────────────┐
-│  DEPOSIT_SENDERS     │
-├──────────────────────┤
-│ sender_id            │ PK
-│ cpf                  │ UNIQUE
-│ name                 │
-│ status               │
-└──────────────────────┘
+    CUSTOMER {
+        bigint customer_id PK
+        string cpf UK
+        string email UK
+        string full_name
+        enum status
+    }
 
-┌──────────────────────┐
-│    PARAM_APP         │
-├──────────────────────┤
-│ id                   │ PK
-│ param_name           │ UNIQUE
-│ param_value          │
-│ description          │
-└──────────────────────┘
+    WALLET {
+        bigint wallet_id PK
+        bigint customer_id FK
+        decimal balance
+        enum status
+    }
 
-┌──────────────────────┐
-│    LOGIN_AUTH        │
-├──────────────────────┤
-│ login_id             │ PK
-│ username             │ UNIQUE
-│ password (BCrypt)    │
-│ status               │
-└──────────────────────┘
+    LOGIN_AUTH {
+        bigint id PK
+        bigint customer_id_fk FK
+        bigint wallet_id_fk FK "Unique"
+        string username UK
+        string password
+    }
+
+    TRANSACTION {
+        bigint transaction_id PK
+        bigint wallet_id FK
+        decimal amount
+        string dtype "Discriminator"
+    }
+
+    MOVEMENT_TRANSACTION {
+        bigint movement_id PK
+        bigint transaction_id FK
+        bigint wallet_id FK
+        decimal previous_balance
+        decimal new_balance
+    }
+
+    DEPOSIT_SENDER {
+        bigint sender_id PK
+        string cpf
+        string name
+    }
+
+    PARAM_APP {
+        bigint id PK
+        string param_name UK
+        string param_value
+    }
 ```
 
 ---

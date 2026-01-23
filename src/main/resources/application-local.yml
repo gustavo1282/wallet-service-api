@@ -1,104 +1,17 @@
 spring:
-  #profiles:
-    #active: local    DESATIVADO - NUNCA USAR
-
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      token: root
+      
   datasource:
-    url: jdbc:postgresql://localhost:5432/wallet_db
-    username: wallet_user
-    password: wallet_pass
     driver-class-name: org.postgresql.Driver
-    hikari:
-      register-mbeans: true
-
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    generate-ddl: true
-    show-sql: true
-    properties:
-      hibernate:
-        default_schema: public
-        "[format_sql]": true
-        "[use_sql_comments]": true
-        jdbc:
-          "[batch_size]": 1000
-        "[order_inserts]": true
-        "[order_updates]": true
-        jdbc.batch_versioned_data: true
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
 
   security:
     user:
-      name: wallet_user
-      password: wallet_pass
+      name: ${USER_NAME:wallet_user}
+      password: ${USER_PASSWORD:wallet_pass}
       roles:
-        - "MONITOR"
+        - ADMIN
+        - USER
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges"
-      base-path: /actuator
-
-  endpoint:
-    health:
-      show-details: always
-    prometheus:
-      enabled: true
-    metrics:
-      enabled: true
-
-  observations:
-    key-values:
-      application: ${spring.application.name}
-
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-
-  otlp:
-    logging:
-      endpoint: http://localhost:4318/v1/logs
-      timeout: 10s
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
-      timeout: 10s
-    metrics:
-      export:
-        enabled: false
-
-  metrics:
-    distribution:
-      percentiles-histogram:
-        "[http.server.requests]": true
-    enable:
-      process: true
-      jvm: true
-    tags:
-      application: ${spring.application.name}
-
-  tracing:
-    enabled: true
-    sampling:
-      probability: 1.0
-
-logging:
-  file:
-    name: logs/application.log
-  exception-conversion-word: "%wEx{5}"
-  level:
-    root: INFO
-    com.guga.walletserviceapi: DEBUG
-    org.hibernate: INFO
-    org.springdoc: INFO
-    org.springframework: INFO
-    org.springframework.security: INFO

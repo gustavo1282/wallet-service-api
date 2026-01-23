@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${controller.path.base}/auth")
+@RequestMapping("/auth")
 @Tag(name = "Authenticator", description = "Endpoints for managing Authenticator")
 @RequiredArgsConstructor
 public class AuthController {
@@ -112,7 +112,7 @@ public class AuthController {
 
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/data")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
      public ResponseEntity<JwtAuthenticationDetails> getDataLogin() 
     {
         JwtAuthenticationDetails authDetails = authUserProvider.get();

@@ -32,8 +32,9 @@ public class WalletService implements IWalletApiService {
     private final DataPersistenceService importService;
 
     public Wallet getWalletById(Long id) {
-        return walletRepository.findById(id)
+        Wallet wallet = walletRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Wallet not found with id: %d", id)));
+        return wallet;
     }
 
     public Wallet saveWallet(Wallet wallet) {

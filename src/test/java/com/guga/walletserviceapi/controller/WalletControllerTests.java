@@ -83,7 +83,7 @@ class WalletControllerTests {
     @Autowired
     private DataPersistenceService dataPersistenceService;
 
-    @Value("${controller.path.base}")
+    @Value("${server.servlet.context-path}")
     private String BASE_PATH;
 
     private static final String API_NAME = "/wallets";

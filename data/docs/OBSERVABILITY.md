@@ -21,13 +21,15 @@ A partir da versão 0.2.4, a observabilidade é totalmente containerizada via Do
 - **Prometheus** (porta 9090): Coleta métricas da aplicação e OTel Collector.
 - **Grafana** (porta 3000): Dashboards visuais para métricas e traces.
 - **Jaeger** (porta 16686): Visualização de traces distribuídos.
+- **Loki** (porta 3100): Agregação de logs centralizada.
+- **Tempo** (porta 3200): Backend de tracing integrado ao Grafana.
 - **OpenTelemetry Collector** (portas 4317/4318/8889): Recebe traces via OTLP, gera métricas spanmetrics e exporta para Jaeger/Prometheus.
 
 **Arquivo:** `docker-compose.yml`
 
 **Subir a stack:**
 ```bash
-docker-compose up -d prometheus grafana jaeger otel-collector
+docker-compose up -d prometheus grafana jaeger tempo loki otel-collector
 ```
 
 **Acessar:**
@@ -35,6 +37,47 @@ docker-compose up -d prometheus grafana jaeger otel-collector
 - Grafana: http://localhost:3000 (admin/admin)
 - Jaeger: http://localhost:16686
 - OTel Collector métricas: http://localhost:8889/metrics
+
+## 📊 Dashboards Grafana (catálogo)
+
+### ✅ Disponíveis no repositório (`data/grafana/`)
+
+**Aplicação & JVM**
+- Spring Boot 3.x Statistics (gnetId: 19004) → `data/grafana/19004.json`
+- JVM (Micrometer) (gnetId: 4701) → `data/grafana/4701.json`
+- OpenTelemetry JVM Micrometer (gnetId: 20352) → `data/grafana/20352.json`
+
+**HTTP & API**
+- HTTP Metrics OpenTelemetry (gnetId: 18860) → `data/grafana/18860.json`
+- HTTP Services Status (gnetId: 4859) → `data/grafana/4859.json`
+
+**Logs & Traces**
+- Logs / App (gnetId: 13639) → `data/grafana/13639.json`
+- Loki Metrics Dashboard (gnetId: 17781) → `data/grafana/17781.json`
+- OpenTelemetry APM (gnetId: 19419) → `data/grafana/19419.json`
+- OpenTelemetry Collector (gnetId: 15983) → `data/grafana/15983.json`
+
+**Infra & Containers**
+- Docker Container & Host Metrics (gnetId: 10619) → `data/grafana/10619.json`
+- Monitor Statistics (gnetId: 13625) → `data/grafana/13625.json`
+- Scraping (gnetId: 22934) → `data/grafana/22934.json`
+
+### 📝 Planejados (não versionados ainda)
+
+**Aplicação & JVM**
+- Spring Boot Observability (importação pendente)
+
+**Infra & Containers**
+- Node Exporter Full
+- Node Exporter Dashboard EN 20201010-StarsL.cn
+- Docker and system monitoring
+
+**Orquestração (Kubernetes)**
+- Cluster Monitoring for Kubernetes
+- Kubernetes cluster monitoring (via Prometheus)
+
+**Logs & Traces**
+- OpenTelemetry for HTTP services (verificar se é substituído pelo gnetId 18860)
 
 ## �📝 Logs
 
