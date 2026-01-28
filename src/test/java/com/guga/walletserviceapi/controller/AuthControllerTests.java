@@ -12,10 +12,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -24,8 +26,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.guga.walletserviceapi.controller.AuthController.LoginRequest;
+import com.guga.walletserviceapi.helpers.FileUtils;
+import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.LoginAuth;
+import com.guga.walletserviceapi.model.ParamApp;
+import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.LoginAuthType;
 import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
@@ -42,10 +49,20 @@ class AuthControllerTests extends BaseControllerTest {
 
     private static final String API_NAME = "/auth";
 
+    @BeforeAll
+    void setupOnce() {
+        this.URI_API = getBaseUri(API_NAME);
+        loadMockData();
+    }
+
     @BeforeEach
     void setUp() {
-        this.URI_API = getBaseUri(API_NAME);
-    } 
+        Mockito.reset(
+            this.jwtAuthenticationFilter,            
+            this.jwtService,
+            this.authenticationManager
+        );
+    }  
 
     // =========================================================
     // CONTEXTO DE AUTENTICAÇÃO (Login, Register, Refresh)
@@ -185,7 +202,9 @@ class AuthControllerTests extends BaseControllerTest {
 
     @Override
     public void loadMockData() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loadMockData'");
+        paramsApp = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_PARAMS_APP, new TypeReference<List<ParamApp>>() {});
+        customers = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_CUSTOMER, new TypeReference<List<Customer>>() {});      
+        wallets = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_WALLET, new TypeReference<List<Wallet>>() {});
+        loginAuths = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_LOGIN_AUTH, new TypeReference<List<LoginAuth>>() {});
     }
 }

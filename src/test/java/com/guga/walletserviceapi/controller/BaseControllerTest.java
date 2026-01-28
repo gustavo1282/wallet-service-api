@@ -117,7 +117,8 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
 
     protected String getBaseUri(String controllerPath) {
         // Garante que não haverá barras duplas ou faltando
-        return (CONTEXT_PATH + 
+        return (
+            //CONTEXT_PATH + 
             SERVLET_PATH + 
             controllerPath).replace("//", "/");
     }

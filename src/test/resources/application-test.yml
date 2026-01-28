@@ -76,17 +76,15 @@ spring:
 management:
   endpoints:
     enabled-by-default: false
-  otlp:
-    logging:
-      export:
-        enabled: false
-  endpoints:
     web:
       exposure:
         include: "*"
         #include: "startup,health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges,env"
       base-path: /actuator      
-
+  otlp:
+    logging:
+      export:
+        enabled: false
 
 logging:
   file:
