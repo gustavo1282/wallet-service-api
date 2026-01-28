@@ -62,8 +62,7 @@ public class CustomerController {
         Long customerId = authDetails.getCustomerId();
 
         LOGGER.info(LogMarkers.LOG,
-            "GET_CUSTOMER_ME | customerId={} login={}",
-            customerId, authDetails.getLogin()
+            "GET_CUSTOMER_ME | customerId={} login={}", customerId, authDetails.getLogin()
         );
 
         return ResponseEntity.ok(

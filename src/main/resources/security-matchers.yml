@@ -13,6 +13,8 @@ security:
       - "/v3/api-docs/**"
       - "/webjars/**"
       - "/actuator/**"
+      - "/actuator/startup"
+      - "/actuator/health"
 
     permit-all-paths:
       - "/api/v1/params/**"
@@ -21,7 +23,6 @@ security:
       # Actuator público (health, info, prometheus)
       - "/actuator/prometheus"
       - "/actuator/metrics/"
-      - "/actuator/health/**"
       # - "/actuator/info"
       # - "/actuator/loggers/**"
       # - "/actuator/env/**"

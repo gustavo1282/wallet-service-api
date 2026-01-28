@@ -13,30 +13,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.RandomMock;
@@ -46,61 +38,37 @@ import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.LoginRole;
-import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
-import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
-import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
 import com.guga.walletserviceapi.service.WalletService;
-import com.guga.walletserviceapi.service.common.DataPersistenceService;
 
 @WebMvcTest(WalletController.class)
-@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Import({
         //com.guga.walletserviceapi.config.ConfigProperties.class,
-        com.guga.walletserviceapi.config.PasswordConfig.class,
+        com.guga.walletserviceapi.config.TestPasswordConfig.class,
         com.guga.walletserviceapi.service.common.DataPersistenceService.class
 })
-class WalletControllerTests {
+class WalletControllerTests extends BaseControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private static final String API_NAME = "/wallets";
 
     @MockitoBean
     private WalletService walletService;
 
-    @MockitoBean
-    private JwtAuthenticatedUserProvider jwtAuthenticatedUserProvider;
-
-    @MockitoBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private DataPersistenceService dataPersistenceService;
-
-    @Value("${server.servlet.context-path}")
-    private String BASE_PATH;
-
-    private static final String API_NAME = "/wallets";
-
-    private String URI_API;
-    private List<ParamApp> paramsApp;
-    private List<Customer> customers;
-    private List<Wallet> wallets;
-    private List<LoginAuth> loginAuths;
-
-    private boolean dataLoaded;
 
     @BeforeAll
-    void setUpAll() {
-        URI_API = BASE_PATH + API_NAME;
+    void setupOnce() {
+        this.URI_API = getBaseUri(API_NAME);
         loadMockData();
-    }        
+    }
+
+    @BeforeEach
+    void setUp() {
+        Mockito.reset(
+            this.jwtAuthenticationFilter,            
+            this.jwtService,
+            this.authenticationManager
+        );
+    }    
 
     // =========================================================
     // CONTEXTO DE USUÁRIO (Endereços /me)
@@ -113,21 +81,23 @@ class WalletControllerTests {
         @Test
         @DisplayName("Deve retornar a wallet do usuário autenticado")
         void getMyWallet_ok() throws Exception {
-            LoginAuth auth = setupMockAuth(List.of("USER"));
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
 
             Wallet mockWallet = getWalletById(auth.getWalletId());
 
             when(walletService.getWalletById(auth.getWalletId())).thenReturn(mockWallet);
 
             mockMvc.perform(get(URI_API + "/me"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.walletId").value(mockWallet.getWalletId()));
+                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
+                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.walletId").value(mockWallet.getWalletId()));
         }
 
         @Test
         @DisplayName("Deve listar todas as wallets do customer autenticado")
         void getMyWallets_ok() throws Exception {
-            LoginAuth auth = setupMockAuth(List.of("USER"));
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
 
             List<Wallet> mockWallets = wallets.stream()
                 .filter(w -> w.getCustomerId().equals(auth.getCustomerId()))
@@ -154,7 +124,7 @@ class WalletControllerTests {
         @DisplayName("Admin deve criar uma nova wallet com sucesso")
         void createWallet_created() throws Exception {           
 
-            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
 
             Wallet mockNewWallet = Wallet.builder()
                 .walletId(nextWalletId())
@@ -178,7 +148,7 @@ class WalletControllerTests {
         @DisplayName("Admin deve obter wallet por ID")
         void getWalletById_ok() throws Exception {
 
-            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
 
             Wallet mockWallet = getAleatoryWallet();
 
@@ -193,13 +163,15 @@ class WalletControllerTests {
         @DisplayName("Admin deve atualizar uma wallet")
         void updateWallet_ok() throws Exception {
 
-            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
 
             Wallet mockWallet = getAleatoryWallet();
             mockWallet.setStatus(TransactionUtilsMock.defineStatus());
 
             when(walletService.updateWallet(eq(mockWallet.getWalletId()), any(Wallet.class)))
                     .thenReturn(mockWallet);
+
+            wallets.add(mockWallet);
 
             mockMvc.perform(put(URI_API + "/{id}", mockWallet.getWalletId())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -210,7 +182,7 @@ class WalletControllerTests {
         @Test
         @DisplayName("Admin deve listar todas as wallets de forma paginada")
         void listWallets_ok() throws Exception {
-            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
 
             when(walletService.getAllWallets(any(), any()))
                 .thenReturn(new PageImpl<>(wallets));
@@ -224,7 +196,7 @@ class WalletControllerTests {
         @Test
         @DisplayName("Admin deve listar wallets por ID do Customer")
         void getWalletsByCustomer_ok() throws Exception {
-            LoginAuth auth = setupMockAuth(List.of("ADMIN"));
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
 
             // PASSO 1: Criar um mapa de "ID do Cliente" -> "Quantidade de Wallets"
             Map<Long, Long> contagemPorCliente = wallets.stream()
@@ -252,79 +224,25 @@ class WalletControllerTests {
         }
     }
 
-    // =========================================================
-    // AUXILIARES
-    // =========================================================
-
-    private LoginAuth setupMockAuth(List<String> roles) {
-        LoginAuth login = getRandomLoginByRole(roles);
-
-        JwtAuthenticationDetails details = JwtAuthenticationDetails.builder()
-                .loginId(login.getId())
-                .login(login.getLogin())
-                .walletId(login.getWalletId())
-                .customerId(login.getCustomerId())
-                .roles(login.getRole())
-                .build();
-
-        List<SimpleGrantedAuthority> authorities = roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
-                .toList();
-
-        SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(details, null, authorities)
-        );
-
-        when(jwtAuthenticatedUserProvider.get()).thenReturn(details);
-        return login;
-    }
-
-    private void loadMockData() {
-        if (!dataLoaded) {
-            paramsApp = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_PARAMS_APP, new TypeReference<List<ParamApp>>() {});
-            customers = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_CUSTOMER, new TypeReference<List<Customer>>() {});      
-            wallets = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_WALLET, new TypeReference<List<Wallet>>() {});
-            loginAuths = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_LOGIN_AUTH, new TypeReference<List<LoginAuth>>() {});
-        }
-    }
-
-    private void encriptAccessKeyLoginAuthListMock(List<LoginAuth> loginAuths) {
-        for (LoginAuth loginAuth : loginAuths) {
-                String rawAccessKey = loginAuth.getAccessKey();
-                String encodedAccessKey = passwordEncoder.encode(rawAccessKey);
-                loginAuth.setAccessKey(encodedAccessKey);
-        }
-    }
-
-
-    private LoginAuth getRandomLoginByRole(List<String> rolesStr) {
-        // 1. Converter as roles alvo para Enum
-        List<LoginRole> targetEnums = rolesStr.stream()
-                .map(role -> LoginRole.valueOf(role.trim().toUpperCase()))
-                .toList();
-
-        // 4. Buscar o primeiro LoginAuth que possua a Role desejada e pertença a uma dessas transações
-        return wallets.stream()
-                .map(t -> findLoginAuthByWalletId(t.getWalletId()))
-                .filter(Objects::nonNull)
-                .filter(la -> la.getRole().stream()
-                        .anyMatch(r -> targetEnums.contains(r)))
-                .findFirst()
-                .orElseThrow(() -> new ResourceBadRequestException(
-                    "Não foi possível encontrar um LoginAuth com as roles " + rolesStr + " associado a uma transação de sucesso."));    
+    @Override
+    public void loadMockData() {
+        paramsApp = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_PARAMS_APP, new TypeReference<List<ParamApp>>() {});
+        customers = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_CUSTOMER, new TypeReference<List<Customer>>() {});      
+        wallets = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_WALLET, new TypeReference<List<Wallet>>() {});
+        loginAuths = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_LOGIN_AUTH, new TypeReference<List<LoginAuth>>() {});
     }
 
     // Helper auxiliar para buscar o login pelo ID da carteira na massa de dados
     private LoginAuth findLoginAuthByWalletId(long walletId) {
         return loginAuths.stream()
-                .filter(la -> la.getWalletId() == walletId)
+                .filter(la -> la.getWalletId().equals(walletId))
                 .findFirst()
                 .orElse(null);
     }
  
     private Wallet getWalletById(Long walletId) {
         return wallets.stream()
-            .filter(w -> w.getWalletId() == walletId)
+            .filter(w -> w.getWalletId().equals(walletId))
             .findFirst()
             .orElseThrow(() -> new ResourceBadRequestException("Wallet não encontrada para o LoginAuth"));
     }

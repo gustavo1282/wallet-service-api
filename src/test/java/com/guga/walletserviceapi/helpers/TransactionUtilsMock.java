@@ -13,12 +13,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
@@ -69,13 +66,6 @@ public class TransactionUtilsMock {
 
     private static long SEQUENCE_TRANSACTION;
     private static long SEQUENCE_LOGIN_AUTH_ID;
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
 
     public static List<Customer> createCustomerListMock() {
 
@@ -256,7 +246,7 @@ public class TransactionUtilsMock {
 
             boolean hasWalletActive = (!getWalletsByCustomer.isEmpty()) && 
                 (getWalletsByCustomer.stream()
-                    .anyMatch(w -> w.getStatus() == Status.ACTIVE));
+                    .anyMatch(w -> w.getStatus().equals(Status.ACTIVE)));
         
             if (hasWalletActive) {
                 processados.add(customerId);
@@ -309,8 +299,6 @@ public class TransactionUtilsMock {
 
         List<DepositSender> depositSenders = new ArrayList<>();
 
-
-        //movementTransactionList = (movementTransactionList == null || movementTransactionList.isEmpty()) ? new ArrayList<>() : movementTransactionList;
 
         for (int i = INI_TRANSACTION_ID; i < MAX_TRANSACTION_ID; i++) {
 

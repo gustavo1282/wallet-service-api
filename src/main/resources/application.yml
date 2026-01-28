@@ -1,3 +1,16 @@
+# =========================
+# Vars usadas por placeholders (bootstrapping)
+# =========================
+APP_NAME: wallet-service-api
+
+USER_NAME: wallet_user
+USER_PASS: wallet_pass
+
+###############################
+###############################
+###############################
+###############################
+
 app:
   api-prefix: /api/v1
 
@@ -10,11 +23,13 @@ spring:
     name: ${APP_NAME}
   config:
     import: 
-      - vault://
       - "optional:classpath:security-matchers.yml"
+      - "optional:vault://"
   cloud:
+    bootstrap:
+      enabled: false  # Desativa o carregamento do bootstrap.yml
     vault:
-      enabled: true
+      enabled: false
       authentication: TOKEN
       kv:
         enabled: true
@@ -92,9 +107,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges,env"
+        include: "startup,health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges,env"
       base-path: /actuator
   endpoint:
+    startup:
+      enabled: true
     health:
       show-details: always
     prometheus:
@@ -135,7 +152,7 @@ management:
 
 logging:
   file:
-    name: logs/${APP_NAME}.log
+    name: logs/${APP_NAME:wallet-service-api}.log
   exception-conversion-word: "%wEx{5}"
   level:
     root: INFO
