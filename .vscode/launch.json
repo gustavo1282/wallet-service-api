@@ -65,7 +65,10 @@
                     "-Dmanagement.endpoints.web.exposure.include=startup",
                     "-Dspring.config.import=",
                     "-Dspring.cloud.vault.enabled=false",
-                    "-Djava.net.preferIPv4Stack=true"
+                    "-Djava.net.preferIPv4Stack=true",
+                    "-Dsonar.projectKey=com.gugawallet:wallet-service-api",
+                    "-Dsonar.host.url=http://localhost:9000",
+                    "-Dsonar.token=%SONAR_LOCAL_TOKEN%"
                 ],
                 "env": {
                     "APP_NAME": "wallet-service-api",
@@ -73,7 +76,8 @@
                     "ENV": "env-test",
                     "USER_NAME": "wallet_user",
                     "USER_PASS": "wallet_pass",
-                    "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823"
+                    "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823",
+                    "SONAR_LOCAL_TOKEN": "squ_ea51cedf0f969507efcbb2a7ce1b985455004a61"
                 }
             }
   ]
