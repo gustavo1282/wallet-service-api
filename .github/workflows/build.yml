@@ -44,5 +44,5 @@ jobs:
           mvn -B clean verify sonar:sonar \
           -Dsonar.projectKey='wallet-service-api' \
           -Dsonar.projectName='wallet-service-api' \
-          -Dsonar.organization='${SONAR_ORGANIZATION}'' \
+          -Dsonar.organization='${SONAR_ORGANIZATION}' \
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
