@@ -15,32 +15,21 @@ import lombok.Setter;
 
 @Getter @Setter
 public class SecurityMatchers {
-    @Value("${server.servlet.context-path:/}")
+    @Value("${server.servlet.context-path:}")
     private String contextPath;
+
+    @Value("${app.api-prefix:}")
+    private String servletPath;
 
     private String[] publicPaths;
     private String[] documentation;
     private String[] monitor;
     private String[] secured;
     private String[] admin;
+    private String[] permitAllPaths;
 
     private String[] addContextPath(String[] paths) {
         return paths;
-        // if (paths == null || paths.length == 0) {
-        //     return paths;
-        // }
-
-        // // Se context path é "/" ou vazio, retorna os paths originais
-        // if ("/".equals(contextPath) || contextPath == null || contextPath.trim().isEmpty()) {
-        //     return paths;
-        // }
-
-        // // Remove trailing slash do context path se existir
-        // String cleanContextPath = contextPath.replaceAll("/$", "");
-
-        // return Arrays.stream(paths)
-        //     .map(path -> cleanContextPath + path)
-        //     .toArray(String[]::new);
     }
 
     public String[] getPublicPaths() {
@@ -62,6 +51,11 @@ public class SecurityMatchers {
     public String[] getAdmin() {
         return addContextPath(admin);
     }
+    
+    public String[] getPermitAllPaths() {
+        return addContextPath(permitAllPaths);
+    }
+
 
     public List<String> getAllMatchers() {
         List<String> allPublicPatterns = new ArrayList<>();
@@ -80,6 +74,9 @@ public class SecurityMatchers {
         }
         if (getAdmin() != null) {
             allPublicPatterns.addAll( List.of(getAdmin() ) );
+        }
+        if (getPermitAllPaths() != null) {
+            allPublicPatterns.addAll( List.of(getPermitAllPaths()) );
         }
 
         if (allPublicPatterns == null || allPublicPatterns.size() == 0){
@@ -100,5 +97,6 @@ public class SecurityMatchers {
         System.out.println("monitor: " + Arrays.toString(getMonitor()));
         System.out.println("secured: " + Arrays.toString(getSecured()));
         System.out.println("admin: " + Arrays.toString(getAdmin()));
+        System.out.println("permitpaths: " + Arrays.toString(getPermitAllPaths()));
     }
 }

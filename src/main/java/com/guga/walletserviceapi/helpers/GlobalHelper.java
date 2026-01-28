@@ -8,10 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import com.guga.walletserviceapi.logging.LogMarkers;
 
 public class GlobalHelper {
 
@@ -27,9 +31,9 @@ public class GlobalHelper {
     public static int BATCH_SIZE;
 
     public static Pageable getDefaultPageable() {
-        return PageRequest.of(0, 50,
+        return PageRequest.of(0, 150,
                 Sort.by(
-                    Sort.Order.asc("createdAt")
+                    Sort.Order.desc("createdAt")
                 )
             );
     }
@@ -56,6 +60,28 @@ public class GlobalHelper {
         Instant instant = zonedDateTime.toInstant();
 
         return instant.toEpochMilli();
+    }
+
+    public static void printAllVariables(Environment env, Logger logger) {
+
+        if (env instanceof org.springframework.core.env.AbstractEnvironment abstractEnv) {
+
+            abstractEnv.getPropertySources().forEach(source -> {
+                logger.info(LogMarkers.LOG, ">>> PropertySource: " + source.getName());
+
+                if (source instanceof org.springframework.core.env.EnumerablePropertySource<?> eps) {
+                    for (String name : eps.getPropertyNames()) {
+                        Object value = eps.getProperty(name);
+                        logger.info(LogMarkers.LOG, "  {} = {}", name, value);
+                    }
+                } else {
+                    logger.info(LogMarkers.LOG, "  (non-enumerable)");
+                }
+
+                logger.info(LogMarkers.LOG, " ".repeat(5));
+                }            
+            );
+        }
     }
 
 }

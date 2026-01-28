@@ -1,6 +1,7 @@
 package com.guga.walletserviceapi.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -88,6 +89,6 @@ public class LoginAuth {
     
     @Convert(converter = LoginRoleConverter.class)
     @Column(name = "role", length = 180)
-    private LoginRole role;
+    private List<LoginRole> role;
 
 }

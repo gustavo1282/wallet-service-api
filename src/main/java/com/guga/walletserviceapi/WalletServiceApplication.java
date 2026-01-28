@@ -14,11 +14,9 @@ public class WalletServiceApplication {
 
 	public static void main(String[] args) {
 
-		System.out.println("JWT_SECRET=" + System.getenv("JWT_SECRET"));
-		System.out.println("VAULT_URI=" + System.getenv("SPRING_CLOUD_VAULT_URI"));
-
+		System.out.println("Applicação Wallet Service API inicializada com sucesso.");
 
 		SpringApplication.run(WalletServiceApplication.class, args);
 	}
-
+    
 }

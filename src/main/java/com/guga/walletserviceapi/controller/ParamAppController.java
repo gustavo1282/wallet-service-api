@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${controller.path.base}/params")
+@RequestMapping("/params")
 @Tag(name = "ParamApp", description = "Endpoints for managing application parameters")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
@@ -37,9 +36,6 @@ public class ParamAppController {
 
     @Autowired
     private ParamAppService paramAppService;
-
-    @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;
 
     // --- C: CREATE (POST) ---
     @PostMapping
@@ -60,13 +56,12 @@ public class ParamAppController {
     // --- R: READ ALL (GET) ---
     @GetMapping("/list")
     public ResponseEntity<List<ParamApp>> findAll(
-        @RequestParam(defaultValue = "0") int page
-        ) 
-    {
+        //@RequestParam(defaultValue = "0") int page
+        ) {
 
-        Pageable pageable = PageRequest.of(page, defaultPageSize,
+        Pageable pageable = PageRequest.of(0, 150,
                 Sort.by(
-                    Sort.Order.asc("id")
+                    Sort.Order.asc("name")
                 )
             );
 

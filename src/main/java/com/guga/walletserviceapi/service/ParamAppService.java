@@ -1,11 +1,14 @@
 package com.guga.walletserviceapi.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +19,7 @@ import com.guga.walletserviceapi.repository.ParamAppRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@EnableCaching
 @RequiredArgsConstructor
 @Service
 public class ParamAppService {
@@ -139,4 +143,25 @@ public class ParamAppService {
             throw new ResourceBadRequestException(e.getMessage());
         }
     }
+
+    
+    @Cacheable(value = "params_app", key = "'minAmountToDeposit'")
+    protected BigDecimal getMinAmountToDeposit() {
+        Optional<ParamApp> paramApp = paramAppRepository.findByName(ParamApp.LIMIT_MIN_TO_DEPOSIT);
+        if (!paramApp.isPresent()) {
+            throw new ResourceBadRequestException("Parâmetro de configuração não encontrado: " + ParamApp.LIMIT_MIN_TO_DEPOSIT);
+        }
+        return paramApp.get().getValueBigDecimal();        
+    }
+
+    @Cacheable(value = "params_app", key = "'minAmountToTransfer'")
+    protected BigDecimal getMinAmountToTransfer() {
+        Optional<ParamApp> paramApp = paramAppRepository.findByName(ParamApp.LIMIT_MIN_TO_TRANSFER);
+        if (!paramApp.isPresent()) {
+            throw new ResourceBadRequestException("Parâmetro de configuração não encontrado: " + ParamApp.LIMIT_MIN_TO_TRANSFER);
+        }
+        return paramApp.get().getValueBigDecimal();
+    }
+
+
 }

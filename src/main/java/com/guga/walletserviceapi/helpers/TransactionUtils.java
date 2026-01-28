@@ -18,11 +18,8 @@ import com.guga.walletserviceapi.model.enums.StatusTransaction;
 
 public class TransactionUtils {
 
-    public static BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
-    public static BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
-
-    public static DepositMoney generateDepositMoney(Wallet wallet, BigDecimal amount) {
-        StatusTransaction statusTransaction = chekProcessTypeDeposit(wallet, amount);
+    public static DepositMoney generateDepositMoney(Wallet wallet, BigDecimal amount, BigDecimal limitMinToDeposit) {
+        StatusTransaction statusTransaction = chekProcessTypeDeposit(wallet, amount, limitMinToDeposit);
 
         return DepositMoney.builder()
                 .walletId(wallet.getWalletId())
@@ -52,8 +49,8 @@ public class TransactionUtils {
                 .build();
     }
 
-    public static TransferMoneySend generateTransferMoneySend(Wallet wallet, Wallet walletTo, BigDecimal amount) {
-        StatusTransaction sttType = chekProcessTypeTransfer(wallet, walletTo, amount);
+    public static TransferMoneySend generateTransferMoneySend(Wallet wallet, Wallet walletTo, BigDecimal amount, BigDecimal limitMinToTransfer) {
+        StatusTransaction sttType = chekProcessTypeTransfer(wallet, walletTo, amount, limitMinToTransfer);
 
         return TransferMoneySend.builder()
                 //.transactionId( null )
@@ -123,7 +120,7 @@ public class TransactionUtils {
         wallet.setUpdatedAt( LocalDateTime.now() );
     }
 
-    public static StatusTransaction chekProcessTypeTransfer(Wallet wallet, Wallet walletTo, BigDecimal amount) {
+    public static StatusTransaction chekProcessTypeTransfer(Wallet wallet, Wallet walletTo, BigDecimal amount, BigDecimal limitMinToTransfer) {
         StatusTransaction sttType = chekProcessTypeGeral(wallet);
 
         // se as validações gerais foram bem sucessidas, continua para as especificas da transação
@@ -142,20 +139,20 @@ public class TransactionUtils {
             else if (!walletTo.getStatus().equals(Status.ACTIVE)) {
                 sttType = StatusTransaction.WALLET_STATUS_INVALID;
             }
-            else if (amount.compareTo(AMOUNT_MIN_TO_TRANSFER) == CompareBigDecimal.LESS_THAN.getValue()) {
+            else if (amount.compareTo( limitMinToTransfer ) == CompareBigDecimal.LESS_THAN.getValue()) {
                 sttType = StatusTransaction.AMOUNT_TRANSFER_INVALID;
             }
         }
         return sttType;
     }
 
-    public static StatusTransaction chekProcessTypeDeposit(Wallet wallet, BigDecimal amount) {
+    public static StatusTransaction chekProcessTypeDeposit(Wallet wallet, BigDecimal amount, BigDecimal limitMinToDeposit) {
         StatusTransaction sttType = chekProcessTypeGeral(wallet);
 
         // se as validações gerais foram bem sucessidas, continua para as especificas da transação
         if (sttType.equals(StatusTransaction.SUCCESS)) {
             // VALIDA SE O VALOR DA TRANSAÇÃO É MENOR QUE O MÍNIMO DE DEPOSITO
-            if (amount.compareTo(AMOUNT_MIN_TO_DEPOSIT) == CompareBigDecimal.LESS_THAN.getValue()) {
+            if (amount.compareTo(limitMinToDeposit) == CompareBigDecimal.LESS_THAN.getValue()) {
                 sttType = StatusTransaction.AMOUNT_DEPOSIT_INSUFFICIENT;
             }
         }

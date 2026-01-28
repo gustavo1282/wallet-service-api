@@ -2,222 +2,209 @@ package com.guga.walletserviceapi.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
-import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.guga.walletserviceapi.controller.AuthController.LoginRequest;
+import com.guga.walletserviceapi.helpers.FileUtils;
+import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.LoginAuth;
+import com.guga.walletserviceapi.model.ParamApp;
+import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.LoginAuthType;
-import com.guga.walletserviceapi.repository.LoginAuthRepository;
-import com.guga.walletserviceapi.security.jwt.JwtService;
-import com.guga.walletserviceapi.service.LoginAuthService;
+import com.guga.walletserviceapi.model.enums.LoginRole;
+import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
 
-
-@ActiveProfiles("test")
-@WithMockUser(username = "user", roles = {"USER"})
 @WebMvcTest(AuthController.class)
+@Import({
+    com.guga.walletserviceapi.config.ConfigProperties.class,
+    com.guga.walletserviceapi.config.PasswordConfig.class,
+    com.guga.walletserviceapi.service.common.DataPersistenceService.class
+    }
+)
 @AutoConfigureMockMvc(addFilters = false)
-class AuthControllerTests {
-// --- DEPENDÊNCIAS (Mocks) ---
-    @Autowired
-    private MockMvc mockMvc;
-    
-    @MockitoBean
-    private AuthenticationManager authenticationManager;
-    
-    @MockitoBean
-    private JwtService jwtService;
-    
-    @MockitoBean
-    private LoginAuthService loginAuthService;
-    
-    @MockitoBean
-    private LoginAuthRepository loginAuthRepository;
-    
-    @MockitoBean 
-    private PasswordEncoder passwordEncoder; 
-
-    // --- VARIÁVEIS DE TESTE ---
-    @Value("${controller.path.base}")
-    private String BASE_PATH;
-
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+class AuthControllerTests extends BaseControllerTest {
 
     private static final String API_NAME = "/auth";
-    private static final String LOGIN_USER = "wallet_user";
-    private static final String LOGIN_PASSWORD = "wallet_pass"; // Senha em texto plano
 
-    private static final String TAG_MOCK_ACCESS_TOKEN = "mock-access-token";
-    private static final String TAG_MOCK_REFRESH_TOKEN = "mock-refresh-token"; 
-    private static final String NEW_PASSWORD_REGISTER = "NOVA-SENHA-REGISTER"; 
-    
-    private final PasswordEncoder realEncoder = new BCryptPasswordEncoder();
-    private String URI_API;
-    private Map<String, String> tokens;
-    private String jsonLoginRequest;
-    private String passwordEncodedRegister;
+    @BeforeAll
+    void setupOnce() {
+        this.URI_API = getBaseUri(API_NAME);
+        loadMockData();
+    }
 
     @BeforeEach
-    void setup() {
-        URI_API = BASE_PATH + API_NAME;
-
-        tokens = GlobalHelper.jwtTokens(LOGIN_USER);
-        
-        jsonLoginRequest = String.format("""
-            {
-              "username": "%s",
-              "password": "%s"
-            }
-            """, LOGIN_USER, LOGIN_PASSWORD);
-
-        when(passwordEncoder.encode(anyString()))
-            .thenAnswer(new Answer<String>() {
-                @Override
-                public String answer(InvocationOnMock invocation) throws Throwable {
-                    String rawPassword = invocation.getArgument(0);
-                    return realEncoder.encode(rawPassword);
-                }
-            });
-
-        passwordEncodedRegister = realEncoder.encode(LOGIN_PASSWORD);
-
-    }
-
-
-    @Test
-    void testLoginReturnsTokens() throws Exception {
-
-        Authentication successfulAuthentication = new UsernamePasswordAuthenticationToken(
-            LOGIN_USER, 
-            null, 
-            List.of(new SimpleGrantedAuthority("ROLE_USER"))
+    void setUp() {
+        Mockito.reset(
+            this.jwtAuthenticationFilter,            
+            this.jwtService,
+            this.authenticationManager
         );
+    }  
 
-        LoginAuth loginAuth = LoginAuth.builder()
-            .login(LOGIN_USER)
-            .loginAuthType(LoginAuthType.USER_NAME)
-            .id(9878L)
-            .accessKey(UUID.randomUUID().toString())
-            .build();
+    // =========================================================
+    // CONTEXTO DE AUTENTICAÇÃO (Login, Register, Refresh)
+    // =========================================================
 
-        when(loginAuthService.findByLogin(anyString()))
-            .thenReturn(loginAuth);
+    @Nested
+    @DisplayName("Operações de Autenticação (Públicas)")
+    class AuthenticationContext {
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-            .thenReturn(successfulAuthentication);
+        @Test
+        @DisplayName("Deve realizar login com sucesso e retornar tokens")
+        void login_ok() throws Exception {
+            // 1. Arrange
+            LoginRequest request = new LoginRequest(MOCK_USER_NAME, MOCK_USER_PASS);
+            LoginAuth loginAuthMock = createLoginAuthMock();
 
-        when(jwtService.generateAccessToken(eq(loginAuth)))
-            .thenReturn(tokens.get(TAG_MOCK_ACCESS_TOKEN));
+            // Simula autenticação bem sucedida pelo Spring Security
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                MOCK_USER_NAME, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+
+            when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(auth);
+
+            when(loginAuthService.findByLogin(request.username()))
+                .thenReturn(loginAuthMock);
+
+            when(jwtService.generateAccessToken(loginAuthMock)).thenReturn(MOCK_JWT_SECRET);
+            when(jwtService.generateRefreshToken(loginAuthMock)).thenReturn(MOCK_JWT_SECRET_REFRESH);
+
+            // 2. Act & Assert
+            mockMvc.perform(post(URI_API + "/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.accessToken").value(MOCK_JWT_SECRET))
+                    .andExpect(jsonPath("$.refreshToken").value(MOCK_JWT_SECRET_REFRESH));
+        }
+
+        @Test
+        @DisplayName("Deve registrar novo usuário e retornar dados do LoginAuth")
+        void register_ok() throws Exception {
+            // 1. Arrange
+            LoginRequest request = new LoginRequest(MOCK_USER_NAME, MOCK_USER_PASS);
+            LoginAuth createdAuth = createLoginAuthMock();
             
-        when(jwtService.generateRefreshToken(eq(loginAuth)))
-            .thenReturn(tokens.get(TAG_MOCK_REFRESH_TOKEN));
+            when(loginAuthService.register(request.username(), request.password()))
+                .thenReturn(createdAuth);
 
-        mockMvc.perform(post(URI_API + "/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonLoginRequest))
-                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value(tokens.get(TAG_MOCK_ACCESS_TOKEN)))
-                .andExpect(jsonPath("$.refreshToken").value(tokens.get(TAG_MOCK_REFRESH_TOKEN)));
+            loginAuths.add(createdAuth);
+
+            // 2. Act & Assert
+            mockMvc.perform(post(URI_API + "/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.login").value(MOCK_USER_NAME))
+                    .andExpect(jsonPath("$.accessKey").exists());
+        }
+
+        @Test
+        @DisplayName("Deve renovar token (Refresh) com sucesso")
+        void refreshToken_ok() throws Exception {
+            // 1. Arrange
+            String oldRefreshToken = MOCK_JWT_SECRET_REFRESH;
+            String newAccessToken = "new.mock.access.token";
+            LoginAuth loginAuthMock = createLoginAuthMock();
+
+            when(jwtService.validateToken(oldRefreshToken)).thenReturn(true);
+            when(jwtService.extractLogin(oldRefreshToken)).thenReturn(MOCK_USER_NAME);
+            when(loginAuthService.findByLogin(MOCK_USER_NAME)).thenReturn(loginAuthMock);
+            when(jwtService.generateAccessToken(loginAuthMock)).thenReturn(newAccessToken);
+
+            // 2. Act & Assert
+            // Nota: O endpoint espera @RequestParam, então usamos .param()
+            mockMvc.perform(post(URI_API + "/refresh")
+                    .param("refreshToken", oldRefreshToken))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.accessToken").value(newAccessToken))
+                    .andExpect(jsonPath("$.refreshToken").value(oldRefreshToken));
+        }
+
+        @Test
+        @DisplayName("Deve retornar 400 Bad Request se refresh token for inválido")
+        void refreshToken_badRequest() throws Exception {
+            when(jwtService.validateToken(anyString())).thenReturn(false);
+
+            mockMvc.perform(post(URI_API + "/refresh")
+                    .param("refreshToken", "invalid_token"))
+                    .andExpect(status().isBadRequest());
+        }
     }
 
-    @Test
-    void testRegisterReturnsEncodedPassword() throws Exception {
+    // =========================================================
+    // CONTEXTO DE INFORMAÇÕES DO USUÁRIO
+    // =========================================================
 
-        LoginAuth mockLoginAuth = createLoginAuthMock();
-        
-        String newPasswordRegistrer = realEncoder.encode(NEW_PASSWORD_REGISTER);
-        mockLoginAuth.setAccessKey(newPasswordRegistrer);
+    @Nested
+    @DisplayName("Dados do Usuário Autenticado")
+    class UserContext {
 
-        //when(loginAuthRepository.findByLogin(LOGIN_USER))
-        //    .thenReturn(java.util.Optional.of(mockLoginAuth));
+        @Test
+        @DisplayName("Deve retornar os detalhes da autenticação atual")
+        void getDataLogin_ok() throws Exception {
+            // 1. Arrange
+            JwtAuthenticationDetails details = JwtAuthenticationDetails.builder()
+                .login(MOCK_USER_NAME)
+                .customerId(100L)
+                .roles(List.of(LoginRole.USER))
+                .build();
 
-        when(loginAuthService.register(anyString(), anyString()))
-            .thenReturn(mockLoginAuth);
+            when(authUserProvider.get()).thenReturn(details);
 
-        mockMvc.perform(post(URI_API + "/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(jsonLoginRequest))
-            .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-            .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.login").value(LOGIN_USER))
-            .andExpect(jsonPath("$.accessKey").value(newPasswordRegistrer))
-            ;
+            // 2. Act & Assert
+            mockMvc.perform(get(URI_API + "/data"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.login").value(MOCK_USER_NAME))
+                    .andExpect(jsonPath("$.customerId").value(100));
+        }
     }
 
-    @Test
-    void testRefreshGeneratesNewAccessToken() throws Exception {
-        
-        LoginAuth loginAuth = LoginAuth.builder()
-            .login(LOGIN_USER)
-            .loginAuthType(LoginAuthType.USER_NAME)
-            .id(9878L)
-            .accessKey(UUID.randomUUID().toString())
-            .build();
-
-        when(loginAuthService.findByLogin(anyString()))
-            .thenReturn(loginAuth);
-
-        Map<String, String> newTokenGenerate = GlobalHelper.jwtTokens(LOGIN_USER);
-
-        when(jwtService.validateToken(anyString())).thenReturn(true);
-        when(jwtService.extractLogin(anyString())).thenReturn(LOGIN_USER);
-
-        when(jwtService.generateAccessToken(eq(loginAuth))).thenReturn(newTokenGenerate.get(TAG_MOCK_ACCESS_TOKEN));
-        when(jwtService.generateRefreshToken(eq(loginAuth))).thenReturn(newTokenGenerate.get(TAG_MOCK_REFRESH_TOKEN));
-
-        mockMvc.perform(post(URI_API + "/refresh")
-            .param("refreshToken", tokens.get(TAG_MOCK_ACCESS_TOKEN)))
-            .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-            .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.refreshToken").value(tokens.get(TAG_MOCK_ACCESS_TOKEN)))
-            .andExpect(jsonPath("$.accessToken").value(newTokenGenerate.get(TAG_MOCK_ACCESS_TOKEN)))
-            ;
-    }
+    // =========================================================
+    // AUXILIARES
+    // =========================================================
 
     private LoginAuth createLoginAuthMock() {
-        LocalDateTime now = LocalDateTime.now();
         return LoginAuth.builder()
-            .id( 1L )
-            .customerId(1L)
-            .login(LOGIN_USER)
-            .accessKey(passwordEncodedRegister)
+            .id(1L)
+            .customerId(100L)
+            .login(MOCK_USER_NAME)
+            .accessKey(UUID.randomUUID().toString()) // Simula senha criptografada
             .loginAuthType(LoginAuthType.USER_NAME)
-            .createdAt(now)
-            .updatedAt(now)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .build();
     }
 
+    @Override
+    public void loadMockData() {
+        paramsApp = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_PARAMS_APP, new TypeReference<List<ParamApp>>() {});
+        customers = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_CUSTOMER, new TypeReference<List<Customer>>() {});      
+        wallets = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_WALLET, new TypeReference<List<Wallet>>() {});
+        loginAuths = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_LOGIN_AUTH, new TypeReference<List<LoginAuth>>() {});
+    }
 }

@@ -1,0 +1,87 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: "env-local"
+    env: "env-local"
+    namespace: "env-local"
+    application: "wallet-service-api"
+    app: "wallet-service-api"
+    service_name: "wallet-service-api"
+    instance: "wallet-api-local-ide"
+
+rule_files:
+  - /etc/prometheus/rules/http_otel_compat.yml
+
+scrape_configs:
+  - job_name: "wallet-api-metrics"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["otel-collector:8889"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: env, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "wallet-service-api" }
+      - { target_label: app, replacement: "wallet-service-api" }
+      - { target_label: service_name, replacement: "wallet-service-api" }
+
+  - job_name: "otel-collector"
+    static_configs:
+      - targets: ["otel-collector:8888"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "otel-collector" }
+      - { target_label: service_name, replacement: "otel-collector" }
+
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["prometheus:9090"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "prometheus" }
+      - { target_label: service_name, replacement: "prometheus" }
+
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "grafana" }
+
+  - job_name: "jaeger"
+    static_configs:
+      - targets: ["jaeger:14269"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "jaeger" }
+
+  - job_name: "wallet-service-direct"
+    metrics_path: "/wallet-service-api/actuator/prometheus"
+    static_configs:
+      - targets: ["host.docker.internal:8080"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: env, replacement: "env-local" }
+      - { target_label: deployment_environment, replacement: "env-local" }
+      - { target_label: service_version, replacement: "local" }
+      - { target_label: host_name, replacement: "wallet-api-local-ide" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "wallet-service-api" }
+      - { target_label: app, replacement: "wallet-service-api" }
+      - { target_label: service_name, replacement: "wallet-service-api" }
+    basic_auth:
+      username: "wallet_user"
+      password: "wallet_pass"
+
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "cadvisor" }

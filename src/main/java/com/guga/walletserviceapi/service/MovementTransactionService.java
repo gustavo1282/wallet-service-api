@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.guga.walletserviceapi.model.MovementTransaction;
 import com.guga.walletserviceapi.repository.MovementTransactionRepository;
-import com.guga.walletserviceapi.service.common.DataImportService;
-import com.guga.walletserviceapi.service.common.ImportSummary;
+import com.guga.walletserviceapi.service.common.DataPersistenceService;
+import com.guga.walletserviceapi.service.common.PersistenceSummary;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,10 +19,10 @@ public class MovementTransactionService {
 
     private final MovementTransactionRepository moveTrnRepository;
 
-    private final DataImportService importService;
+    private final DataPersistenceService importService;
 
-    public ImportSummary importMovementTransactions(MultipartFile file) {
-        return importService.importJson(file, new TypeReference<List<MovementTransaction>>() {}, moveTrnRepository);
+    public PersistenceSummary importMovementTransactions(MultipartFile file) {
+        return importService.importJsonFromUpload(file, new TypeReference<List<MovementTransaction>>() {}, moveTrnRepository);
     }
 
 }

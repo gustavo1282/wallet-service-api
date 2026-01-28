@@ -17,8 +17,8 @@ import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.WalletRepository;
-import com.guga.walletserviceapi.service.common.DataImportService;
-import com.guga.walletserviceapi.service.common.ImportSummary;
+import com.guga.walletserviceapi.service.common.DataPersistenceService;
+import com.guga.walletserviceapi.service.common.PersistenceSummary;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,11 +29,12 @@ public class WalletService implements IWalletApiService {
     private final WalletRepository walletRepository;
     private final ParamAppService paramAppService;
     private final CustomerService customerService;
-    private final DataImportService importService;
+    private final DataPersistenceService importService;
 
     public Wallet getWalletById(Long id) {
-        return walletRepository.findById(id)
+        Wallet wallet = walletRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Wallet not found with id: %d", id)));
+        return wallet;
     }
 
     public Wallet saveWallet(Wallet wallet) {
@@ -96,8 +97,8 @@ public class WalletService implements IWalletApiService {
 
     }
 
-    public ImportSummary importWallets(MultipartFile file) {
-        return importService.importJson(file, new TypeReference<List<Wallet>>() {}, walletRepository);
+    public PersistenceSummary importWallets(MultipartFile file) {
+        return importService.importJsonFromUpload(file, new TypeReference<List<Wallet>>() {}, walletRepository);
     }
 
     public Page<Wallet> getWalletByCustomerId(Long customerId, Pageable pageable) {

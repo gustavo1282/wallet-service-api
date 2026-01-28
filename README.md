@@ -12,6 +12,7 @@ O Wallet Service API é um microserviço moderno que fornece:
 - **Transações Financeiras** (Depósito, Saque, Transferência)
 - **Upload de Dados** via CSV com processamento em lote
 - **Documentação Interativa** via Swagger/OpenAPI
+- **Gestão de Segredos** com HashiCorp Vault
 - **Observabilidade** com Prometheus e métricas
 - **Suporte Multiplataforma** com Docker e Docker Compose
 
@@ -45,9 +46,18 @@ mvnw.cmd clean package -DskipTests
 
 ### 3. Executar a Aplicação
 
-#### Opção A: Com Docker (Recomendado)
+O projeto suporta dois modos de execução: **Local** (para desenvolvimento) e **Docker** (para ambientes completos). Utilize os scripts facilitadores na pasta `execs/`.
+
+#### 💻 Desenvolvimento Local (Contribuidores)
+
+Ideal para desenvolvimento diário. Requer PostgreSQL rodando localmente na porta `5432`.
+
 ```bash
-docker-compose up -d
+# Executar com perfil local
+./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
+
+# Windows
+mvnw.cmd spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
 ```
 
 #### Opção B: Localmente

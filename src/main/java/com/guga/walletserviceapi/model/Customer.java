@@ -5,11 +5,13 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.converter.LocalDateCsvConverter;
 import com.guga.walletserviceapi.model.converter.LocalDateTimeCsvConverter;
 import com.guga.walletserviceapi.model.converter.StatusConverter;
 import com.guga.walletserviceapi.model.enums.Status;
+import com.guga.walletserviceapi.model.serializers.PhoneNumberDeserializer;
 import com.opencsv.bean.CsvCustomBindByName;
 
 import jakarta.persistence.Column;
@@ -86,6 +88,7 @@ public class Customer {
 
     
     @NotNull(message = "Phone number cannot be null")
+    @JsonDeserialize(using = PhoneNumberDeserializer.class)
     @Pattern(regexp = "^\\(\\d{2}\\)\\s*9?\\d{4}-\\d{4}$", message = "Phone number must be in the format")
     @Column(name = "phone_number", nullable = false, length = 20)
     private String phoneNumber;

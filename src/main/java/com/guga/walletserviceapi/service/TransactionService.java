@@ -34,8 +34,8 @@ import com.guga.walletserviceapi.model.enums.StatusTransaction;
 import com.guga.walletserviceapi.repository.DepositSenderRepository;
 import com.guga.walletserviceapi.repository.MovementTransferRepository;
 import com.guga.walletserviceapi.repository.TransactionRepository;
-import com.guga.walletserviceapi.service.common.DataImportService;
-import com.guga.walletserviceapi.service.common.ImportSummary;
+import com.guga.walletserviceapi.service.common.DataPersistenceService;
+import com.guga.walletserviceapi.service.common.PersistenceSummary;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,14 +48,9 @@ public class TransactionService implements IWalletApiService {
     private final MovementTransferRepository movementTransferRepository;
     private final WalletService walletService;
     private final ParamAppService paramAppService;
-    private final DataImportService importService;
-
-    public static final BigDecimal AMOUNT_MIN_TO_DEPOSIT = new BigDecimal(50);
-
-    public static final BigDecimal AMOUNT_MIN_TO_TRANSFER = new BigDecimal(50);
+    private final DataPersistenceService importService;
 
     private static final Logger LOGGER = LogManager.getLogger(TransactionController.class);
-
 
     public Transaction getTransactionById(Long id) {
         return transactionRepository.findById(id)
@@ -73,7 +68,7 @@ public class TransactionService implements IWalletApiService {
         return findResult;
     }
 
-    public Page<Transaction> getLast10Transactions(Long walletId, Pageable pageable) {
+    public Page<Transaction> getTransactionsByLimitMax(Long walletId, Pageable pageable) {
 
         Page<Transaction> findResult = transactionRepository
             .findByWalletId(walletId, pageable);
@@ -107,7 +102,8 @@ public class TransactionService implements IWalletApiService {
     {
         Wallet wallet = walletService.getWalletById(walletId);
 
-        DepositMoney depositMoney = TransactionUtils.generateDepositMoney(wallet, amount);
+        DepositMoney depositMoney = TransactionUtils.generateDepositMoney(wallet, amount, 
+            paramAppService.getMinAmountToDeposit());
 
         DepositMoney depositMoneySaved = transactionRepository.save(depositMoney);
 
@@ -192,7 +188,7 @@ public class TransactionService implements IWalletApiService {
         Wallet walletReceived = walletService.getWalletById(walletIdReceived);
 
         TransferMoneySend transferSend = TransactionUtils.generateTransferMoneySend(walletSend,
-                walletReceived, amount);
+                walletReceived, amount,  paramAppService.getMinAmountToTransfer());
 
         TransferMoneyReceived transferReceived = TransferMoneyReceived.builder()
                 .statusTransaction(StatusTransaction.INVALID)
@@ -281,6 +277,7 @@ public class TransactionService implements IWalletApiService {
                 .build();
     }
 
+
     public DepositMoney generateDepositMoney(Wallet wallet, BigDecimal amount) {
         StatusTransaction processType = checkProcessTypeDeposit(wallet, amount);
 
@@ -303,7 +300,7 @@ public class TransactionService implements IWalletApiService {
         // se as validações gerais foram bem sucessidas, continua para as especificas da transação
         if (processType.equals(StatusTransaction.SUCCESS)) {
             // VALIDA SE O VALOR DA TRANSAÇÃO É MENOR QUE O MÍNIMO DE DEPOSITO
-            if (amount.compareTo(AMOUNT_MIN_TO_DEPOSIT) == CompareBigDecimal.LESS_THAN.getValue()) {
+            if (amount.compareTo(paramAppService.getMinAmountToDeposit()) == CompareBigDecimal.LESS_THAN.getValue()) {
                 processType = StatusTransaction.AMOUNT_DEPOSIT_INSUFFICIENT;
             }
         }
@@ -327,8 +324,8 @@ public class TransactionService implements IWalletApiService {
     }
 
 
-    public ImportSummary importTransactions(MultipartFile file) {
-        return importService.importJson(file, new TypeReference<List<Transaction>>() {}, transactionRepository);
+    public PersistenceSummary importTransactions(MultipartFile file) {
+        return importService.importJsonFromUpload(file, new TypeReference<List<Transaction>>() {}, transactionRepository);
     }
 
 
@@ -354,7 +351,14 @@ public class TransactionService implements IWalletApiService {
         LOGGER.debug("Service: Filtering transactions | walletId={} | operation={}", walletId, operation);
 
         // Chamada ao Repository
-        return transactionRepository.findByWalletIdAndOperationType(walletId, operation, pageable);
+        Page<Transaction> trnResult = transactionRepository.findByWalletIdAndOperationType(walletId, operation, pageable);
+        if (trnResult == null || trnResult.isEmpty()) {
+            String msgTrow = String.format("No transactions found for walletId={%n} and operation={%s}", walletId, operation);
+            LOGGER.debug(msgTrow);
+            throw new ResourceNotFoundException("msgTrow");
+        }
+
+        return trnResult;
     }
 
 

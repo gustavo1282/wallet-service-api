@@ -4,11 +4,8 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
+import com.guga.walletserviceapi.audit.AuditLogger;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.enums.Status;
@@ -36,7 +35,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${controller.path.base}/customers")
+@RequestMapping("/customers")
 @Tag(name = "Customer", description = "Customer domain operations")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
@@ -46,9 +45,6 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final JwtAuthenticatedUserProvider authUserProvider;
-
-    @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;
 
     // =====================================================
     // USER CONTEXT
@@ -66,12 +62,36 @@ public class CustomerController {
         Long customerId = authDetails.getCustomerId();
 
         LOGGER.info(LogMarkers.LOG,
-            "GET_CUSTOMER_ME | customerId={} login={}",
-            customerId, authDetails.getLogin()
+            "GET_CUSTOMER_ME | customerId={} login={}", customerId, authDetails.getLogin()
         );
 
         return ResponseEntity.ok(
             customerService.getCustomerById(customerId)
+        );
+    }
+
+    @Operation(
+        summary = "Update my customer data",
+        description = "Updates the authenticated user's customer data."
+    )
+    @PutMapping("/me")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Customer> updateMyCustomer(
+        @RequestBody @Valid Customer customerUpdate
+    ) {
+        // 1. Extrai o ID do cliente diretamente do contexto de segurança (Token)
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+        Long customerId = auditCtx.getCustomerId();
+
+        LOGGER.info(LogMarkers.LOG, "UPDATE_MY_CUSTOMER | customerId={} user={}",
+            customerId, auditCtx.getUsername()
+        );
+
+        AuditLogger.log("CUSTOMER_UPDATE_ME", auditCtx);
+
+        // 2. Chama o serviço passando o ID extraído do token
+        return ResponseEntity.ok(
+            customerService.updateCustomer(customerId, customerUpdate)
         );
     }
 
@@ -121,14 +141,12 @@ public class CustomerController {
         @RequestBody @Valid Customer customerUpdate
     ) {
 
-        LOGGER.info(LogMarkers.LOG,
-            "UPDATE_CUSTOMER | admin={} customerId={}",
+        LOGGER.info(LogMarkers.LOG, "UPDATE_CUSTOMER | admin={} customerId={}",
             authUserProvider.getLogin(), customerId
         );
 
-        return ResponseEntity.ok(
-            customerService.updateCustomer(customerId, customerUpdate)
-        );
+        return ResponseEntity.ok(customerService.updateCustomer(customerId, customerUpdate));
+
     }
 
     @Operation(
@@ -158,16 +176,10 @@ public class CustomerController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Customer>> listCustomers(
-        @RequestParam(required = false) Status status,
-        @RequestParam(defaultValue = "0") int page
+        @RequestParam(required = false) Status status
+        //@RequestParam(defaultValue = "0") int page
     ) {
-
-        Pageable pageable = PageRequest.of(
-            page,
-            defaultPageSize,
-            Sort.by("createdAt").ascending()
-        );
-
+        Pageable pageable = GlobalHelper.getDefaultPageable();
         return ResponseEntity.ok(
             customerService.filterByStatus(status, pageable)
         );

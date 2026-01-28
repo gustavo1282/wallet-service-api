@@ -55,18 +55,11 @@ o Docker precisa **recriar a imagem** sempre que o código Java é alterado.
 
 ---
 
-### Passo 1: Recompilar o JAR (Maven)
-
-```bash
-./mvnw clean package -DskipTests
-```
-
----
-
-### Passo 2: Atualizar apenas o container da aplicação
+### Atualizar apenas o container da aplicação
 
 Este comando:
-- Rebuilda a imagem
+- **Compila o projeto** (dentro do Docker, via Multistage build)
+- Recria a imagem
 - Reinicia **somente** a aplicação
 - Mantém Postgres, Jaeger e outros serviços ativos
 
@@ -166,11 +159,13 @@ A stack inclui serviços para monitoramento e tracing:
 - **Prometheus** (porta 9090): Métricas em http://localhost:9090
 - **Grafana** (porta 3000): Dashboards em http://localhost:3000 (login: admin/admin)
 - **Jaeger** (porta 16686): Traces em http://localhost:16686
+- **Tempo** (porta 3200): Backend de tracing (acessível via Grafana)
 - **OpenTelemetry Collector** (portas 4317/4318/8889): Recebe traces e gera métricas
+- **Vault** (porta 8200): Gestão de segredos
 
 ### ▶️ Subir apenas observabilidade
 ```bash
-docker-compose up -d prometheus grafana jaeger otel-collector
+docker-compose up -d prometheus grafana jaeger 
 ```
 
 ### 🧹 Limpar apenas observabilidade

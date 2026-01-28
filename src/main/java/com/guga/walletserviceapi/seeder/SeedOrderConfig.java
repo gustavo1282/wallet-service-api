@@ -18,7 +18,7 @@ public class SeedOrderConfig {
 
     public List<SeedDefinition> orderedSeeds() {
 
-        String folder = FileUtils.FOLDER_DEFAULT_FILE_JSON;
+        String folder = FileUtils.SEED_FOLDER_DEFAULT;
 
         return List.of(
             new SeedDefinition(folder + FileUtils.JSON_FILE_PARAMS_APP , ParamApp.class),

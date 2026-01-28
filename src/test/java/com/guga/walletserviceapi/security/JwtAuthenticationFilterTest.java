@@ -6,8 +6,6 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockFilterChain;
@@ -16,11 +14,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 import com.guga.walletserviceapi.security.filter.JwtAuthenticationFilter;
 import com.guga.walletserviceapi.security.jwt.JwtService;
-import com.guga.walletserviceapi.service.LoginAuthService;
 
 @ActiveProfiles("test")
 @WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
@@ -34,17 +30,10 @@ public class JwtAuthenticationFilterTest {
 	@MockitoBean
 	private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	@MockitoBean
-	private LoginAuthService loginAuthService;
-
-	@Autowired
-	private MockMvc mockMvc;
-
 
     @BeforeEach
     public void setUp() {
-        // Inicializa os mocks antes de cada teste
-        MockitoAnnotations.openMocks(this);
+
     }
 
     @Test

@@ -1,0 +1,27 @@
+server:
+  http_listen_port: 3200
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [tempo]
+
+distributor:
+  receivers: [otlp]
+
+compactor:
+  compaction_interval: 1h
+  retention_delete_delay: 1h
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tmp/tempo/traces

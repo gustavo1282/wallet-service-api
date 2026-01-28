@@ -52,7 +52,7 @@ public class LoginAuthService implements UserDetailsService {
         return User.builder()
             .username(loginAuth.getLogin())
             .password(loginAuth.getAccessKey()) // Deve ser a senha JÁ criptografada do banco
-            .roles("USER") // Adicione os papéis/autoridades aqui
+            .roles(loginAuth.getRole().stream().map(r -> r.name()).toArray(String[]::new))
             .build();
     }
 

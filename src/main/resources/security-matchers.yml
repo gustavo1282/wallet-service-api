@@ -6,26 +6,33 @@ security:
     # =====================================================
     public-paths:
       # Autenticação / login / refresh tokens
-      - "/api/auth/**"
-      # Actuator público (health, info, prometheus)
-      - "/actuator/health/**"
-      - "/actuator/info"
-      - "/actuator/prometheus"
-      - "/actuator/metrics/**"
-      - "/v3/api-docs/**"
       - "/swagger-ui/**"
       - "/swagger-ui.html"
       - "/swagger-ui/index.html"
       - "/swagger-resources/**"
-      # Endpoints relacionados a admin 
-      - "/actuator/loggers/**"
-      - "/actuator/env/**"
-      - "/actuator/httpexchanges/**"
-      - "/actuator/threaddump/**"
-      - "/actuator/heapdump/**"
-      - "/actuator/beans/**"
-      # Endpoints relacionados documentation
+      - "/v3/api-docs/**"
       - "/webjars/**"
+      - "/actuator/**"
+      - "/actuator/startup"
+      - "/actuator/health"
+
+    permit-all-paths:
+      - "/api/v1/params/**"
+      - "/api/v1/auth/**"
+      # Endpoints relacionados documentation
+      # Actuator público (health, info, prometheus)
+      - "/actuator/prometheus"
+      - "/actuator/metrics/"
+      # - "/actuator/info"
+      # - "/actuator/loggers/**"
+      # - "/actuator/env/**"
+      # # Endpoints relacionados a admin 
+      # - "/actuator/httpexchanges/**"
+      # - "/actuator/threaddump/**"
+      # - "/actuator/heapdump/**"
+      # - "/actuator/beans/**"
+      
+
     # =====================================================
     # DOCUMENTAÇÃO: Swagger / OpenAPI
     # =====================================================
@@ -45,13 +52,12 @@ security:
     # ADMIN: somente administradores
     # =====================================================
     admin:
-      - "/api/params/**"
 
     # =====================================================
     # API SECURED: endpoints de negócio autenticados
     # =====================================================
     secured:
-      - "/api/customers/**"
-      - "/api/wallets/**"
-      - "/api/transactions/**"
-      - "/api/wallet-operator/**"
+      - "/api/v1/customers/**"
+      - "/api/v1/wallets/**"
+      - "/api/v1/transactions/**"
+      - "/api/v1/wallet-operator/**"

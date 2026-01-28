@@ -1,140 +1,117 @@
+# =========================
+# Vars usadas por placeholders (bootstrapping)
+# =========================
+APP_NAME: wallet-service-api
+PROFILE: test
+ENV: env-test
+
+USER_NAME: wallet_user
+USER_PASS: wallet_pass
+
+# Se sua app usa ${JWT_SECRET} diretamente em algum lugar, isso garante o valor em testes
+JWT_SECRET: mock.jwt_secret_value_8235hu23523h523h57823h58723h823
+
+###############################
+###############################
+###############################
+###############################
+
+
+app:
+  api-prefix: /api/v1
+
 server:
-  protocol-type: http
-  hostname: localhost
-  port: 0   # Porta aleatória para evitar conflito em testes
   servlet:
-    context-path: /wallet-service-api
-
-controller:
-  path:
-    base: "/api"
-
-# Configurações globais do JWT (sobrepostas por profiles)
-jwt:
-  secret: 'JWT_KEY_VAULT_WALLET_SERVICE_API_TRUE_VERSION_2_0_FRASE_LONGA'
-  issuer: wallet-service-api
-  expiration-minutes: 20
-
-wallet-service-api:
-  # Mantido para testes de integração que usem carga inicial
-  seed-path: classpath:./data/seed/
-
-# =========================
-# SpringDoc (desligado em testes)
-# =========================
-springdoc:
-  #packagesToScan: com.guga.walletserviceapi
-  #pathsToMatch: /api/**
-  api-docs:
-    enabled: false
-    #path: /v3/api-docs
-    #version: OPENAPI_3_0
-  swagger-ui:
-    enabled: false
-  #show-actuator: true
-  #writer-with-default-pretty-printer: true
+    context-path: /${APP_NAME}
 
 spring:
-  application:
-    name: wallet-service-api-test
+  autoconfigure:
+    exclude:
+      # --- REDIS
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      # --- REDIS (Evita busca por servidor Redis e criação de Repositories) ---
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+      # --- OBSERVABILIDADE (O "Sonar" das métricas que vimos travar seu log) ---
+      - org.springframework.boot.actuate.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.observation.ObservationAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.tracing.MicrometerTracingAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
+      # --- COUCHBASE (Se ainda estiver no seu pom.xml e causando o "Strict Mode") ---
+      - org.springframework.boot.autoconfigure.data.couchbase.CouchbaseDataAutoConfiguration
+      # --- VAULT
+      - org.springframework.cloud.vault.config.VaultAutoConfiguration
+      - org.springframework.cloud.vault.config.VaultReactiveAutoConfiguration
 
-  # =========================
-  # Import opcional (mantido comentado)
-  # =========================
+  cloud:
+    vault:
+      enabled: false
+    bootstrap:
+      enabled: false
+
   config:
-    import: "optional:classpath:security-matchers.yml"
+    import: 
+      - "optional:classpath:security-matchers.yml"
+      - "optional:vault://"
 
-  # =========================
-  # Pageable (OBRIGATÓRIO – usado pelos controllers)
-  # =========================
-  data:
-    web:
-      pageable:
-        default-page-size: 25
-        max-page-size: 25
-        page-parameter: page
-        size-parameter: size
-
-  # =========================
-  # Datasource (H2 em memória)
-  # =========================
   datasource:
-    url: jdbc:h2:mem:wallet_test_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
     username: sa
     password: ""
-    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
 
   h2:
     console:
       enabled: true
-      path: /h2-console
-      #settings:
-      #  web-allow-others: true
 
-  # =========================
-  # Jackson (igual ao local)
-  # =========================
-  jackson:
-    default-property-inclusion: non_null
-    property-naming-strategy: LOWER_CAMEL_CASE
-    deserialization:
-      fail-on-unknown-properties: false
-
-  # =========================
-  # JPA / Hibernate
-  # =========================
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop   # Sempre recria o schema em testes
-      #use_sql_comments: true
-      #jdbc.batch_size: 1000
-    generate-ddl: true
-    show-sql: false
-    format_sql: false
-
-  # =========================
-  # Security (mínima para subir contexto)
-  # =========================
-  security:
-    user:
-      name: test_user
-      password: test_pass
-      roles:
-        - "MONITOR"
-
-  # =========================
-  # Threads
-  # =========================
-  threads:
-    virtual:
-      enabled: false   # Evita efeitos colaterais em testes
-
-# =========================
-# Management / Observability (desligado)
-# =========================
 management:
   endpoints:
+    enabled-by-default: false
     web:
       exposure:
-        include: health, info
-  endpoint:
-    prometheus:
-      enabled: false
-    metrics:
-      enabled: false
-  tracing:
-    enabled: false
-  #otlp:
-  #  tracing:
-  #    endpoint: http://localhost:4318/v1/traces
+        include: "*"
+        #include: "startup,health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges,env"
+      base-path: /actuator      
+  otlp:
+    logging:
+      export:
+        enabled: false
 
-# =========================
-# Logging (mais silencioso)
-# =========================
 logging:
+  file:
+    name: logs/${APP_NAME:wallet-service-api}-test.log
+  exception-conversion-word: "%wEx{5}"
   level:
-    root: WARN
-    org.springframework: WARN
-    org.hibernate: WARN
-    org.springdoc: OFF
+    root: INFO
+    com.guga.walletserviceapi: DEBUG
+    org.springframework.boot.context.config: TRACE
+    org.springframework.core.env: INFO
+    org.hibernate: INFO
+    #org.hibernate.engine.jdbc.env: INFO
+    org.springframework.cloud.vault: INFO
+    org.springframework.vault: INFO
+    #org.springframework.security: INFO
+    #org.springdoc: INFO
+    org.springframework.web.servlet.handler.AbstractHandlerMapping: DEBUG    
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
+    org.springframework.boot.StartupInfoLogger: DEBUG
+    org.springframework.context.support.PostProcessorRegistrationDelegate: DEBUG
+
+    org.springframework.context.support: DEBUG
+    org.springframework.beans.factory.support: DEBUG
+
+
+  # Recomendado: evita quebrar se APP_NAME não existir por algum motivo
+
+# Se você usa config do tipo jwt.secret no código/config:
+jwt:
+  secret: "${JWT_SECRET}"

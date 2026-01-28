@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.guga.walletserviceapi.config.SecurityMatchers;
 import com.guga.walletserviceapi.logging.LogMarkers;
+import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
 import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
@@ -46,6 +48,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Lazy
     private SecurityMatchers matchers;
 
+    @Value("${server.servlet.context-path:}")
+    private String contextPath;
+
+    @Value("${app.api-prefix:}")
+    private String servletPath;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -54,29 +62,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+        // final String path = Optional.ofNullable(request.getRequestURI())
+        //     .map(p -> contextPath == null ? p : p.replaceAll(contextPath, ""))
+        //     //.map(p ->  servletPath == null ? p : p.replaceAll(servletPath, ""))
+        //     .orElse("");
+
         // Libera se for público ou documentação
         String[] publicArr = matchers.getPublicPaths();
         String[] docArr = matchers.getDocumentation();
+        String[] allPathsPermited = matchers.getPermitAllPaths();
 
         List<String> publicPaths = publicArr == null ? List.of() : Arrays.asList(publicArr);
         List<String> documentationPaths = docArr == null ? List.of() : Arrays.asList(docArr);
+        List<String> allPaths = allPathsPermited == null ? List.of() : Arrays.asList(allPathsPermited);
 
         AntPathMatcher pathMatcher = new AntPathMatcher();
 
-        // Debug temporário: logar path e patterns
-        LOGGER.debug("JwtAuthenticationFilter - request path: {}", path);
-        LOGGER.debug("JwtAuthenticationFilter - public patterns: {}", publicPaths);
-        LOGGER.debug("JwtAuthenticationFilter - documentation patterns: {}", documentationPaths);
-
         boolean isPublic = publicPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
         boolean isDocumentation = documentationPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-
-        if (isPublic || isDocumentation) {
+        boolean isPermitAll = allPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
+        
+        if (isPublic || isDocumentation || isPermitAll) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        LOGGER.info(LogMarkers.LOG, "JwtAutenticationFilter.doFilterInternal - validate Authorization Header");
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith("Bearer ")) {
@@ -94,7 +103,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // ===== Roles → Authorities =====
-        List<String> roles = jwtService.extractRoles(jwt);
+        List<LoginRole> roles = jwtService.extractRoles(jwt).stream()
+            .filter(Objects::nonNull)
+            .map(role -> LoginRole.valueOf(role.trim().toUpperCase()))
+            .toList();
 
         List<GrantedAuthority> authorities = roles.stream()
             .map(role -> new SimpleGrantedAuthority("ROLE_" + role))

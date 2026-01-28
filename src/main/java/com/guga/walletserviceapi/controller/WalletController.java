@@ -4,11 +4,8 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.Status;
@@ -36,7 +34,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${controller.path.base}/wallets")
+@RequestMapping("/wallets")
 @Tag(name = "Wallet", description = "Endpoints for managing wallets")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
@@ -47,9 +45,6 @@ public class WalletController {
     private final WalletService walletService;
 
     private final JwtAuthenticatedUserProvider authUserProvider;
-
-    @Value("${spring.data.web.pageable.default-page-size}")
-    private int defaultPageSize;
 
     // =====================================================
     // USER CONTEXT
@@ -89,7 +84,7 @@ public class WalletController {
     @GetMapping("/me/all")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<Wallet>> getMyWallets(
-        @RequestParam(defaultValue = "0") int page
+        //@RequestParam(defaultValue = "0") int page
     ) {
         // Extrai o contexto do token (onde o customerId já foi validado pelo filtro)
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
@@ -102,11 +97,7 @@ public class WalletController {
         AuditLogger.log("WALLET_GET_MY_LIST", auditCtx);
 
         // Define a paginação padrão para o usuário
-        Pageable pageable = PageRequest.of(
-            page,
-            defaultPageSize,
-            Sort.by(Sort.Order.desc("createdAt"))
-        );
+        Pageable pageable = GlobalHelper.getDefaultPageable();
 
         // Reaproveita o serviço de busca por customerId, mas restrito ao ID do próprio token
         return ResponseEntity.ok(
@@ -212,27 +203,19 @@ public class WalletController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Wallet>> listWallets(
-        @RequestParam(required = false) Status status,
-        @RequestParam(defaultValue = "0") int page
+        @RequestParam(required = false) Status status
+        //@RequestParam(defaultValue = "0") int page
     ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
-        LOGGER.info(LogMarkers.LOG,
-            "LIST_WALLETS | status={} page={} admin={}",
-            status, page, auditCtx.getUsername()
+        LOGGER.info(LogMarkers.LOG,"LIST_WALLETS | status={} admin={}",
+            status, auditCtx.getUsername()
         );
 
         AuditLogger.log("WALLET_LIST", auditCtx);
 
-        Pageable pageable = PageRequest.of(
-            page,
-            defaultPageSize,
-            Sort.by(
-                Sort.Order.asc("status"),
-                Sort.Order.asc("createdAt")
-            )
-        );
+        Pageable pageable = GlobalHelper.getDefaultPageable();
 
         return ResponseEntity.ok(
             walletService.getAllWallets(status, pageable)
@@ -246,8 +229,8 @@ public class WalletController {
     @GetMapping("/by-customer/{customerId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Wallet>> getWalletsByCustomer(
-        @PathVariable Long customerId,
-        @RequestParam(defaultValue = "0") int page
+        @PathVariable Long customerId
+        //@RequestParam(defaultValue = "0") int page
     ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
@@ -259,14 +242,7 @@ public class WalletController {
 
         AuditLogger.log("WALLET_GET_BY_CUSTOMER", auditCtx);
 
-        Pageable pageable = PageRequest.of(
-            page,
-            defaultPageSize,
-            Sort.by(
-                Sort.Order.asc("status"),
-                Sort.Order.asc("createdAt")
-            )
-        );
+        Pageable pageable = GlobalHelper.getDefaultPageable();
 
         return ResponseEntity.ok(
             walletService.getWalletByCustomerId(customerId, pageable)
