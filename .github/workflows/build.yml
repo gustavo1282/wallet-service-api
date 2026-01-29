@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    types: [opened, synchronize, reopened]
+      - develop
+      - feature/v0.2.9-sonar-ci-restore
+  #pull_request:
+  #  types: [opened, synchronize, reopened]
 jobs:
   build:
     name: Build and analyze
