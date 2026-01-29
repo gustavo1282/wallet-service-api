@@ -66,9 +66,7 @@ public class FileUtils {
             System.out.println("Conteúdo salvo com sucesso em: " + parentDir.toAbsolutePath());
             
         } catch (IOException e) {
-            System.err.println("Erro ao salvar o arquivo: " + fileName);
-            e.printStackTrace();
-            
+            System.err.println("Erro ao salvar o arquivo: " + fileName);   
         }
     }
 
