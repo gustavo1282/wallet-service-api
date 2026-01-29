@@ -9,7 +9,7 @@ on:
   #  types: [opened, synchronize, reopened]
 jobs:
   build:
-    name: Wallet Service API - Build and analyze
+    name: Wallet Service API-Build and analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
