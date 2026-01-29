@@ -66,11 +66,11 @@ public class WalletService implements IWalletApiService {
             wallet.setStatus( walletUpdate.getStatus() );
         }
 
-        if (!wallet.getCurrentBalance().equals(walletUpdate.getCurrentBalance())) {
+        if (wallet.getCurrentBalance().compareTo(walletUpdate.getCurrentBalance()) != 0) {
             wallet.setCurrentBalance( walletUpdate.getCurrentBalance() );
         }
 
-        if (!wallet.getPreviousBalance().equals(walletUpdate.getPreviousBalance())) {
+        if (wallet.getPreviousBalance().compareTo(walletUpdate.getPreviousBalance()) != 0) {
             wallet.setPreviousBalance( walletUpdate.getPreviousBalance() );
         }
 

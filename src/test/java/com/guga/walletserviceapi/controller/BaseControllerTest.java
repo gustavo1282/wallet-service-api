@@ -123,26 +123,6 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
             controllerPath).replace("//", "/");
     }
 
-    // protected void deveObterGetMappingDoAuthController() {
-    //     handlerMapping.getHandlerMethods().forEach((info, method) -> {
-
-    //         if (!method.getBeanType().equals(AuthController.class)) return;
-
-    //         var paths = (info.getPathPatternsCondition() != null)
-    //                 ? info.getPathPatternsCondition().getPatternValues()
-    //                 : info.getPatternsCondition().getPatterns();
-
-    //         var httpMethods = info.getMethodsCondition().getMethods();
-
-    //         System.out.println("Controller: " + method.getBeanType().getSimpleName());
-    //         System.out.println("Métodos: " + httpMethods);
-    //         System.out.println("URIs: " + paths);
-    //         System.out.println("Método Java: " + method.getMethod().getName());
-    //         System.out.println("----");
-    //     });
-    // }
-
-
     // =========================================================
     // MÉTODOS UTILITÁRIOS (SETUP)
     // =========================================================
