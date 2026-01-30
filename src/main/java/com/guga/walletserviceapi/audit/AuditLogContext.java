@@ -50,7 +50,6 @@ public class AuditLogContext {
     private final Long customerId;
     private final Long walletId;
     private final String loginType;
-    //private final List<String> roles;
 
     /** ===== Request ===== */
     private String userAgent;

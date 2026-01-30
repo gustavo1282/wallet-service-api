@@ -31,6 +31,7 @@ echo "-- "
   -Dsonar.projectKey=com.gugawallet:wallet-service-api \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.token=${SONAR_LOCAL_TOKEN} \
+  -Dsonar.junit.reportPaths=target/surefire-reports \
   -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
 echo "-- "

@@ -88,8 +88,6 @@ class WalletControllerTests extends BaseControllerTest {
             when(walletService.getWalletById(auth.getWalletId())).thenReturn(mockWallet);
 
             mockMvc.perform(get(URI_API + "/me"))
-                .andDo(result -> System.out.println("Status: " + result.getResponse().getStatus()))
-                .andDo(result -> System.out.println("Body: " + result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.walletId").value(mockWallet.getWalletId()));
         }

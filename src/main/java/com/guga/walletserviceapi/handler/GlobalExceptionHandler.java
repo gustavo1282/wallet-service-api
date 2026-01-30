@@ -56,7 +56,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT) // Retorna 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        //String message = "Data integrity violation: " + ex.getMostSpecificCause().getMessage();
         String message = "Data integrity violation. ";
 
         if (ex.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
@@ -90,44 +89,5 @@ public class GlobalExceptionHandler {
                 "Unexpected error occurred. " + ex.getMessage()
             ));
     }
-
-    /*
-    @ExceptionHandler(InsufficientBalanceException.class)
-    public ResponseEntity<ErrorResponse> handleInsufficientBalance(InsufficientBalanceException ex) {
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Regra de Negócio Violada",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-    */
-
-    /*
-    @ExceptionHandler(WalletException.class)
-    public ResponseEntity<ErrorResponse> handleWallet(WalletException ex) {
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Regra de Negócio Violada",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-    */
-
-    /*
-    @ExceptionHandler(CustomerException.class)
-    public ResponseEntity<ErrorResponse> handleWallet(CustomerException ex) {
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Regra de Negócio Violada",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-     */
-
-    // 💡 DTO Simples para a resposta de erro
-    //record ErrorResponse(int status, String error, String message) {}
 
 }

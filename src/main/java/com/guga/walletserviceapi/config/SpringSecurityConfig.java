@@ -45,7 +45,6 @@ public class SpringSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
 
         MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);
-        //mvc.servletPath(servletPath);
 
         return http
             // =========================

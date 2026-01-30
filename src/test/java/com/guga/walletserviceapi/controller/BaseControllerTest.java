@@ -52,10 +52,8 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
 
     @Autowired
     protected ApplicationContext context;
-
     @Autowired
     protected Environment env;
-
     @Autowired
     protected MockMvc mockMvc;
 

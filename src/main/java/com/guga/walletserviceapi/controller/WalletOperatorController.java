@@ -1,6 +1,5 @@
 package com.guga.walletserviceapi.controller;
 
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
@@ -27,10 +25,7 @@ import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.service.CustomerService;
-import com.guga.walletserviceapi.service.DepositSenderService;
-import com.guga.walletserviceapi.service.MovementTransactionService;
 import com.guga.walletserviceapi.service.TransactionService;
-import com.guga.walletserviceapi.service.WalletService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -46,35 +41,13 @@ public class WalletOperatorController {
 
     private static final Logger LOGGER = LogManager.getLogger(WalletOperatorController.class);
 
-    private final WalletService walletService;
     private final CustomerService customerService;
     private final TransactionService transactionService;
-    private final MovementTransactionService movementTransactionService;
-    private final DepositSenderService depositSenderService;
     private final JwtAuthenticatedUserProvider authUserProvider;
 
     // // =====================================================
     // // ME CONTEXT - CUSTOMER & WALLET
     // // =====================================================
-
-    // @Operation(summary = "Get my personal data (Customer)")
-    // @GetMapping("/me/customer")
-    // @PreAuthorize("hasRole('USER')")
-    // public ResponseEntity<Customer> getMyCustomerData() {
-    //     AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-    //     AuditLogger.log("CUSTOMER_GET_ME", auditCtx);
-    //     // Busca os dados do cliente dono do token
-    //     return ResponseEntity.ok(customerService.getCustomerById(auditCtx.getCustomerId()));
-    // }
-
-    // @Operation(summary = "Get my wallet details and balance")
-    // @GetMapping("/me/wallet")
-    // @PreAuthorize("hasRole('USER')")
-    // public ResponseEntity<Wallet> getMyWalletDetails() {
-    //     AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-    //     AuditLogger.log("WALLET_GET_ME", auditCtx);
-    //     return ResponseEntity.ok(walletService.getWalletById(auditCtx.getWalletId()));
-    // }
 
     // =====================================================
     // ME CONTEXT - TRANSACTION EXTRACTS (LIMIT 100)
@@ -178,7 +151,4 @@ public class WalletOperatorController {
 
     }
 
-    private URI buildLocation(Long transactionId) {
-        return ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(transactionId).toUri();
-    }
 }

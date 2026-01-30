@@ -5,9 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
+import com.guga.walletserviceapi.logging.LogMarkers;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -15,6 +18,9 @@ import lombok.Setter;
 
 @Getter @Setter
 public class SecurityMatchers {
+
+    private static final Logger LOGGER = LogManager.getLogger(SecurityMatchers.class);
+
     @Value("${server.servlet.context-path:}")
     private String contextPath;
 
@@ -79,7 +85,7 @@ public class SecurityMatchers {
             allPublicPatterns.addAll( List.of(getPermitAllPaths()) );
         }
 
-        if (allPublicPatterns == null || allPublicPatterns.size() == 0){
+        if (allPublicPatterns.size() == 0){
             throw new ResourceBadRequestException("Nenhum matcher foi encontrado.");
         }
 
@@ -91,12 +97,12 @@ public class SecurityMatchers {
 
     @PostConstruct
     public void logMatchers() {
-        System.out.println("SecurityMatchers loaded with context-path: " + contextPath);
-        System.out.println("publicPaths: " + Arrays.toString(getPublicPaths()));
-        System.out.println("documentation: " + Arrays.toString(getDocumentation()));
-        System.out.println("monitor: " + Arrays.toString(getMonitor()));
-        System.out.println("secured: " + Arrays.toString(getSecured()));
-        System.out.println("admin: " + Arrays.toString(getAdmin()));
-        System.out.println("permitpaths: " + Arrays.toString(getPermitAllPaths()));
+       LOGGER.info(LogMarkers.LOG, "SecurityMatchers loaded with context-path: " + contextPath);
+       LOGGER.info(LogMarkers.LOG, "publicPaths: " + Arrays.toString(getPublicPaths()));
+       LOGGER.info(LogMarkers.LOG, "documentation: " + Arrays.toString(getDocumentation()));
+       LOGGER.info(LogMarkers.LOG, "monitor: " + Arrays.toString(getMonitor()));
+       LOGGER.info(LogMarkers.LOG, "secured: " + Arrays.toString(getSecured()));
+       LOGGER.info(LogMarkers.LOG, "admin: " + Arrays.toString(getAdmin()));
+       LOGGER.info(LogMarkers.LOG, "permitpaths: " + Arrays.toString(getPermitAllPaths()));
     }
 }

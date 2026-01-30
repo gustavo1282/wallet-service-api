@@ -15,11 +15,20 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.guga.walletserviceapi.logging.LogMarkers;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class FileUtils {
+
+    private static final Logger LOGGER = LogManager.getLogger(FileUtils.class);
 
     public static final String SEED_FOLDER_DEFAULT = "./data/seed/";
 
@@ -32,9 +41,9 @@ public class FileUtils {
     public static final String JSON_FILE_LOGIN_AUTH = "login_auth.json";
 
     // Define o fuso horário do Brasil (ex: America/Sao_Paulo)
-    static ZoneId zoneIdBrazil = ZoneId.of("America/Sao_Paulo");
+    static final ZoneId zoneIdBrazil = ZoneId.of("America/Sao_Paulo");
 
-    static int OLD_MINUTES_CREATED = 10;
+    static final int OLD_MINUTES_CREATED = 10;
 
     /**
      * Escreve uma string de conteúdo em um arquivo no diretório /target/test-data/.
@@ -46,9 +55,6 @@ public class FileUtils {
         try {
             // Cria o diretório de destino se não existir (geralmente em /target/test-data/)
             Path filePath = Paths.get(fileName).normalize();
-
-            // Define o caminho completo do arquivo
-            //Path parentDir = filePath.resolve(fileName);
 
             Path parentDir = filePath.getParent();
             if (parentDir != null && !Files.exists(parentDir)) {
@@ -63,7 +69,7 @@ public class FileUtils {
                 StandardOpenOption.TRUNCATE_EXISTING 
                 );
 
-            System.out.println("Conteúdo salvo com sucesso em: " + parentDir.toAbsolutePath());
+           LOGGER.info(LogMarkers.LOG, "Conteúdo salvo com sucesso em: " + parentDir.toAbsolutePath());
             
         } catch (IOException e) {
             System.err.println("Erro ao salvar o arquivo: " + fileName);   
@@ -98,14 +104,14 @@ public class FileUtils {
 
 
             if (lastModifiedZoned.isBefore(tenMinuteAgoZoned)) {
-                System.out.println("Arquivo criado em: " + lastModifiedZoned);
-                System.out.println(String.format("Corte (%n min atrás): " + tenMinuteAgoZoned, OLD_MINUTES_CREATED));
-                System.out.println(String.format("Resultado: O arquivo é MAIS NOVO ou tem %n minutos.", OLD_MINUTES_CREATED));
+               LOGGER.info(LogMarkers.LOG, "Arquivo criado em: " + lastModifiedZoned);
+               LOGGER.info(LogMarkers.LOG, String.format("Corte (%n min atrás): " + tenMinuteAgoZoned, OLD_MINUTES_CREATED));
+               LOGGER.info(LogMarkers.LOG, String.format("Resultado: O arquivo é MAIS NOVO ou tem %n minutos.", OLD_MINUTES_CREATED));
                 return true;
             } else {
-                System.out.println("Arquivo criado em: " + lastModifiedZoned);
-                System.out.println(String.format("Corte (%n min atrás): " + tenMinuteAgoZoned, OLD_MINUTES_CREATED));
-                System.out.println(String.format("Resultado: O arquivo é MAIS NOVO ou tem %n minutos.", OLD_MINUTES_CREATED));
+               LOGGER.info(LogMarkers.LOG, "Arquivo criado em: " + lastModifiedZoned);
+               LOGGER.info(LogMarkers.LOG, String.format("Corte (%n min atrás): " + tenMinuteAgoZoned, OLD_MINUTES_CREATED));
+               LOGGER.info(LogMarkers.LOG, String.format("Resultado: O arquivo é MAIS NOVO ou tem %n minutos.", OLD_MINUTES_CREATED));
                 return false;
             }
         } catch (IOException e) {
