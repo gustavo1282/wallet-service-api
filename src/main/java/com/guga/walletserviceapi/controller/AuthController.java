@@ -1,6 +1,5 @@
 package com.guga.walletserviceapi.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,17 +31,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private LoginAuthService loginAuthService;
-
-    @Autowired
-    private JwtAuthenticatedUserProvider authUserProvider;    
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final LoginAuthService loginAuthService;
+    private final JwtAuthenticatedUserProvider authUserProvider;    
 
     // DTO simples para login
     public record LoginRequest(
@@ -50,16 +42,18 @@ public class AuthController {
         String password
     ) {} 
 
-    // DTO simples para resposta
-    public static class TokenResponse {
-        public String accessToken;
-        public String refreshToken;
+    // @Data // Gera Getters, Setters, toString, etc.
+    // public static class TokenResponse {
+    //     public String accessToken;
+    //     public String refreshToken;
 
-        public TokenResponse(String accessToken, String refreshToken) {
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
-        }
-    }
+    //     public TokenResponse(String accessToken, String refreshToken) {
+    //         this.accessToken = accessToken;
+    //         this.refreshToken = refreshToken;
+    //     }
+    // }
+
+    public record TokenResponse(String accessToken, String refreshToken) { }
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(
@@ -83,7 +77,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginAuth> register(@Valid @RequestBody LoginRequest request) {
         LoginAuth loginAuth = loginAuthService.register(request.username, request.password);
         return ResponseEntity.ok( loginAuth );
     }

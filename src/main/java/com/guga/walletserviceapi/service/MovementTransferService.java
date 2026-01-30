@@ -1,18 +1,19 @@
 package com.guga.walletserviceapi.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.guga.walletserviceapi.model.MovementTransaction;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.repository.MovementTransferRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class MovementTransferService implements IWalletApiService {
 
-    @Autowired
-    private MovementTransferRepository movementTransferRepository;
-
-    @Autowired
-    private ParamAppService paramAppService;
+    private final MovementTransferRepository movementTransferRepository;
+    private final ParamAppService paramAppService;
 
     public MovementTransaction save(MovementTransaction movementTransaction) {
         movementTransaction.setMovementId(nextIdGenerate());

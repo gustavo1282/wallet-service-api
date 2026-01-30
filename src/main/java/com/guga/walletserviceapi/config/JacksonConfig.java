@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
 
 @Configuration
 public class JacksonConfig {
@@ -16,19 +17,17 @@ public class JacksonConfig {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
         return builder -> builder
-                .simpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+                .simpleDateFormat(GlobalHelper.PATTERN_FORMAT_DATE_TIME)
                 .serializers(new LocalDateTimeSerializer(
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")))
+                        DateTimeFormatter.ofPattern(GlobalHelper.PATTERN_FORMAT_DATE_TIME)))
                 .deserializers(new LocalDateTimeDeserializer(
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")));
+                        DateTimeFormatter.ofPattern(GlobalHelper.PATTERN_FORMAT_DATE_TIME)));
     }
     
     @Bean
     public Hibernate6Module hibernateModule() {
         Hibernate6Module module = new Hibernate6Module();
-        
-        // evita que Jackson tente carregar automaticamente entidades lazy
-        //module.disable(Hibernate6Module.Feature.FORCE_LAZY_LOADING);
+
         module.enable(Hibernate6Module.Feature.FORCE_LAZY_LOADING);
 
         return module;

@@ -260,6 +260,24 @@ services:
       -storage.trace.backend=local
       -storage.trace.local.path=/tmp/tempo/traces
 
+
+  # ======================================================================
+  # SONAR QUBE
+  # ======================================================================
+  sonarqube:
+    image: sonarqube:10-community
+    container_name: cont-wallet-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    networks:
+      - wallet_network
+
+
 # ======================================================================
 # VOLUMES
 # ======================================================================
@@ -271,6 +289,8 @@ volumes:
   pgadmin_data:
   grafana-data:
   loki-data:
+  sonarqube_data:
+  sonarqube_extensions:
 
 # ======================================================================
 # NETWORK

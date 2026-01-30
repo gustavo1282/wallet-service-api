@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,22 +30,21 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LogManager.getLogger(JwtAuthenticationFilter.class);
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
     @Lazy
-    private LoginAuthService loginAuthService;
+    private final LoginAuthService loginAuthService;
 
-    @Autowired
     @Lazy
-    private SecurityMatchers matchers;
+    private final SecurityMatchers matchers;
 
     @Value("${server.servlet.context-path:}")
     private String contextPath;

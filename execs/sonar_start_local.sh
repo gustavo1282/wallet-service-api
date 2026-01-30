@@ -6,19 +6,36 @@
 # Pré-requisito: O container do SonarQube deve estar rodando na porta 9000
 # (por exemplo: docker-compose up sonarqube)
 
-export SONAR_LOCAL_TOKEN="squ_447d86d6d7665f87d5cbdd678a425f675fbffe86"
+echo "-- Iniciando a análise do SonarQube --"
 
-echo "Iniciando a análise do SonarQube para o perfil 'desenv'..."
+export SONAR_LOCAL_TOKEN="squ_ea51cedf0f969507efcbb2a7ce1b985455004a61"
+export PROFILE="test"
 
+echo "-- Variaveis inicializadas --"
+echo "-- PROFILE: ${PROFILE}"
+echo "-- SONAR_LOCAL_TOKEN: *** *** *** ---"
+echo "-- "
 # O comando completo do Maven/Sonar, pegando as configurações
 # de host, login e profile do ambiente local (desenv)
 #  #-Dsonar.login=admin \
 #  #-Dsonar.password=sonar \
-./mvnw clean verify sonar:sonar -DskipTests \
+echo "-- "
+echo "-- maven: clean > verify > jacoco > profile"
+./mvnw clean verify jacoco:report -Dspring.profiles.active=${PROFILE}
+
+echo "-- "
+echo "-- maven: sonar > skip tests > sonar [projectKey, url, token, coverage]"
+echo "-- "
+
+./mvnw sonar:sonar -DskipTests=true \
   -Dsonar.projectKey=com.gugawallet:wallet-service-api \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.token=${SONAR_LOCAL_TOKEN} \
-  -P desenv
+  -Dsonar.junit.reportPaths=target/surefire-reports \
+  -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+echo "-- "
+echo "-- "
 
 # Verifica o código de saída do comando Maven
 if [ $? -eq 0 ]; then

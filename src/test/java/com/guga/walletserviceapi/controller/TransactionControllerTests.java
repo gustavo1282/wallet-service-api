@@ -32,6 +32,7 @@ import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.TransactionUtils;
 import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
+import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
@@ -101,7 +102,7 @@ class TransactionControllerTests extends BaseControllerTest {
                     .andExpect(jsonPath("$.content", hasSize(1)))
                     .andReturn();
 
-            System.out.println(result.getResponse().getContentAsString());
+           LOGGER.info(LogMarkers.LOG, result.getResponse().getContentAsString());
         }
 
         @Test

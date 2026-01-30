@@ -6,9 +6,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ParamAppService {
 
-    @Autowired
-    private ParamAppRepository paramAppRepository;
+    private final ParamAppRepository paramAppRepository;
 
     public ParamApp getNextSequenceId(String paramName) {
         Optional<ParamApp> findParamApp = paramAppRepository.findByName(paramName);
@@ -113,8 +113,12 @@ public class ParamAppService {
     // --- R (READ) ---
 
     // Busca todos os parâmetros
-    public List<ParamApp> findAll() {
-        return paramAppRepository.findAll();
+    public List<ParamApp> findAll(Pageable pageable) {
+        Page<ParamApp> page = paramAppRepository.findAll(pageable);
+        if (page.isEmpty() || page.getContent().isEmpty()) {
+            throw new ResourceNotFoundException("Nenhum parâmetro encontrado para os critérios informados.");
+        }
+        return page.getContent();
     }
 
     // Busca por ID

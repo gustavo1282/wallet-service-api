@@ -3,7 +3,6 @@ package com.guga.walletserviceapi.controller;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,8 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ParamAppController {
 
-    @Autowired
-    private ParamAppService paramAppService;
+    private final ParamAppService paramAppService;
 
     // --- C: CREATE (POST) ---
     @PostMapping
@@ -55,9 +53,7 @@ public class ParamAppController {
 
     // --- R: READ ALL (GET) ---
     @GetMapping("/list")
-    public ResponseEntity<List<ParamApp>> findAll(
-        //@RequestParam(defaultValue = "0") int page
-        ) {
+    public ResponseEntity<List<ParamApp>> findAll() {
 
         Pageable pageable = PageRequest.of(0, 150,
                 Sort.by(
@@ -65,7 +61,7 @@ public class ParamAppController {
                 )
             );
 
-        List<ParamApp> params = paramAppService.findAll();
+        List<ParamApp> params = paramAppService.findAll(pageable);
         
         return new ResponseEntity<>(params, HttpStatus.OK);
     }

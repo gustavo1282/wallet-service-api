@@ -1,6 +1,8 @@
 package com.guga.walletserviceapi.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,20 +11,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.guga.walletserviceapi.model.LoginAuth;
+import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.repository.LoginAuthRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class LoginAuthService implements UserDetailsService {
 
-    @Autowired
-    private LoginAuthRepository loginAuthRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    //@Autowired
-    //private JwtService jwtService;
-
+    private final LoginAuthRepository loginAuthRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginAuth register(String username, String password) {
         // 1. Busque o usuário no seu banco de dados
@@ -52,7 +51,13 @@ public class LoginAuthService implements UserDetailsService {
         return User.builder()
             .username(loginAuth.getLogin())
             .password(loginAuth.getAccessKey()) // Deve ser a senha JÁ criptografada do banco
-            .roles(loginAuth.getRole().stream().map(r -> r.name()).toArray(String[]::new))
+            .roles(
+                Optional.ofNullable(loginAuth.getRole())
+                    .orElse(List.of())
+                    .stream()
+                    .map(LoginRole::name)
+                    .toArray(String[]::new)
+            )            
             .build();
     }
 

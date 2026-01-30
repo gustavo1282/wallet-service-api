@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.LoginAuth;
@@ -141,7 +142,7 @@ class WalletOperatorControllerTests extends BaseControllerTest {
             String endpoint = getEndPointByOperationType(operationType);
 
             ResultActions ra = mockMvc.perform(get(URI_API + endpoint, auth.getWalletId()));
-            System.out.println(ra);
+            LOGGER.info(LogMarkers.LOG, ra);
         }
 
         private String getEndPointByOperationType(OperationType operationType) {
