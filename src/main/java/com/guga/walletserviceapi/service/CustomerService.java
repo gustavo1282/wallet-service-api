@@ -17,6 +17,7 @@ import com.guga.walletserviceapi.model.enums.Status;
 import com.guga.walletserviceapi.repository.CustomerRepository;
 import com.guga.walletserviceapi.service.common.DataPersistenceService;
 import com.guga.walletserviceapi.service.common.PersistenceSummary;
+import com.guga.walletserviceapi.service.outbox.OutboxService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +28,7 @@ public class CustomerService implements IWalletApiService {
     private final CustomerRepository customerRepository;
     private final ParamAppService paramAppService;
     private final DataPersistenceService importService;
+    private final OutboxService outboxService;
 
 
     public Customer getCustomerById(Long id) {
@@ -55,6 +57,8 @@ public class CustomerService implements IWalletApiService {
         if (newCustomer.getCustomerId() == null) {
             throw new ResourceNotFoundException("Error saving customer: " + customer.toString());
         }
+
+        outboxService.registerCustomerRegistered(newCustomer);
 
         return newCustomer;
     }

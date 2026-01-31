@@ -92,6 +92,7 @@ Após subir os serviços com `docker-compose up -d`, acesse:
 
 ```
 wallet-service-api/
+├── wallet-consumer/                           # Novo projeto consumidor Kafka (onboarding)
 ├── src/
 │   ├── main/
 │   │   ├── java/com/guga/walletserviceapi/
@@ -119,6 +120,10 @@ wallet-service-api/
 └── pom.xml                                        # Dependências Maven
 
 ```
+
+## 🔄 Kafka EDA (Outbox + Consumer)
+
+O fluxo assíncrono de cadastro é iniciado pelo wallet-service-api com o padrão **Outbox**. Cada novo Customer é persistido e, na mesma transação, um evento é registrado na tabela `tb_outbox_event`. O projeto `wallet-consumer` consome o tópico `customer.registration.v1` para processar o onboarding e aplicar a política de score.
 
 ## 📦 Dependências Principais
 

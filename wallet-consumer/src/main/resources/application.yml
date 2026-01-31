@@ -1,0 +1,50 @@
+app:
+  name: wallet-consumer
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: ${app.name}
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/wallet_consumer}
+  cloud:
+    function:
+      definition: customerRegistration
+    stream:
+      default-binder: kafka
+      bindings:
+        customerRegistration-in-0:
+          destination: customer.registration.v1
+          group: wallet-consumer
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: always
+  observations:
+    key-values:
+      application: ${app.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+
+logging:
+  level:
+    root: INFO
+    com.gugawallet.walletconsumer: INFO
