@@ -1,4 +1,4 @@
-# Observability
+﻿# Observability
 
 Documentação sobre logs, métricas, health checks e monitoramento do Wallet Service API.
 
@@ -37,6 +37,35 @@ docker-compose up -d prometheus grafana jaeger tempo loki otel-collector
 - Grafana: http://localhost:3000 (admin/admin)
 - Jaeger: http://localhost:16686
 - OTel Collector métricas: http://localhost:8889/metrics
+
+## 💾 Backup de dashboards e `grafana.db`
+
+Script oficial:
+
+- `data/scripts/grafana/backup_grafana.sh`
+
+Execução:
+
+```bash
+bash data/scripts/grafana/backup_grafana.sh
+```
+
+Pré-requisitos:
+- Docker ativo
+- Container `cont-wallet-grafana` em execução
+- `curl` e `jq` (opcional, para export JSON individual de dashboards)
+
+O que o script salva:
+- Backup do SQLite do Grafana (`grafana_<timestamp>.db` + cópia `grafana.db`)
+- Export de dashboards em JSON via API do Grafana (quando disponível)
+
+Diretório de saída esperado:
+- `grafana/backup`
+
+Troubleshooting rápido:
+- Se falhar no `docker cp`: validar container com `docker ps | grep grafana`
+- Se falhar export JSON: validar Grafana em `http://localhost:3000` e credenciais do script
+- Se não houver `curl`/`jq`: script conclui com skip da etapa de export JSON
 
 ## 📊 Dashboards Grafana (catálogo)
 

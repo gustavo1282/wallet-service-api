@@ -1,4 +1,4 @@
-# Contributing
+﻿# Contributing
 
 Guia para contribuição ao projeto Wallet Service API.
 

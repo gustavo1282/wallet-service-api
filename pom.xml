@@ -14,7 +14,7 @@
 
     <groupId>com.gugawallet</groupId>
     <artifactId>wallet-service-api</artifactId>
-    <version>0.2.9-SNAPSHOT</version>
+    <version>0.2.10-SNAPSHOT</version>
     <name>wallet-service-api</name>
     <description>Spring Boot Project for Digital Wallet Features</description>
 
@@ -23,10 +23,12 @@
         <spring-cloud.version>2024.0.0</spring-cloud.version>
         <lombok.version>1.18.30</lombok.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <otel.instr.version>2.24.0-alpha</otel.instr.version>
         
         <sonar.organization>gustavo1282</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>gustavo1282_wallet-service-api</sonar.projectKey>
+        <sonar.projectName>wallet-service-api</sonar.projectName>
         <sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -88,6 +90,19 @@
             <artifactId>micrometer-tracing-bridge-otel</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-otlp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-logs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+            <version>${otel.instr.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
@@ -100,6 +115,10 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -154,6 +173,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-bom-alpha</artifactId>
+                <version>${otel.instr.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
@@ -164,6 +190,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>wallet-service-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -215,6 +242,7 @@
                         <configuration>
                             <formats>
                                 <format>XML</format>
+                                <format>HTML</format>   
                             </formats>
                         </configuration>
                     </execution>

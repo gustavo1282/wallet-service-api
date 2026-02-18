@@ -94,37 +94,26 @@ public class TransactionUtilsMock {
 
             Long walletId = wallet.getWalletId();
             
-            String loginAccess = customer.getFirstName()
-                .concat(wallet.getWalletId().toString())
-                .toLowerCase();
-            
-            String accessKey = "k3Y_".concat(walletId.toString());
+            LoginAuthType loginAuthType = LoginAuthType.fromValue(RandomMock.generateIntNumberByInterval(0, LoginAuthType.lastIndex()));
 
-            List<LoginRole> loginRole = Arrays.asList(LoginRole.fromValue(RandomMock.generateIntNumberByInterval(1, 4)));
-            
-            LoginAuthType loginAuthType = LoginAuthType.fromValue(RandomMock.generateIntNumberByInterval(0, 3));
+            String loginAccess = (customer.getFirstName() + wallet.getWalletId().toString()).toLowerCase(); 
             switch (loginAuthType) {
-                case CPF:
-                    loginAccess = customer.getCpf();
-                    break;
-                case E_MAIL:
-                    loginAccess = customer.getEmail();
-                    break;                    
-                default:
-                    break;
+                case CPF: loginAccess = GlobalHelper.onlyNumbers(customer.getCpf()); break;
+                case E_MAIL: loginAccess = customer.getEmail(); break;                    
+                default: break;
+            }
+            
+            String accessKey = GlobalHelper.APP_WALLET_PASS + "_" + walletId.toString();
+
+            List<LoginRole> loginRole = Arrays.asList(LoginRole.fromValue(RandomMock.generateIntNumberByInterval(1, LoginRole.values().length)));
+            
+            // codigo exclusivo para o cliente da aplicação ( wallet_user )
+            if (customer.getFirstName().toLowerCase().contains(GlobalHelper.APP_WALLET_USER.toLowerCase())) {
+                loginAccess = GlobalHelper.APP_WALLET_USER;
+                accessKey = GlobalHelper.APP_WALLET_PASS;
+                loginRole = Arrays.asList(LoginRole.ADMIN, LoginRole.USER);
             }
 
-            // codigo exclusivo para o cliente da aplicação ( wallet_user )
-            if (customer.getFirstName().toLowerCase().contains(GlobalHelper.APP_USER_NAME.toLowerCase())) {
-                loginAuthType = LoginAuthType.USER_NAME;
-                loginAccess = GlobalHelper.APP_USER_NAME + "_" + walletId.toString();
-                accessKey = GlobalHelper.APP_PASSWORD + "_" + walletId.toString();
-                if (wallet.getStatus().equals(Status.ACTIVE)) {
-                    loginAccess = GlobalHelper.APP_USER_NAME;
-                    accessKey = GlobalHelper.APP_PASSWORD;
-                    loginRole = Arrays.asList(LoginRole.ADMIN, LoginRole.USER);
-                }
-            }
 
             SEQUENCE_LOGIN_AUTH_ID++;
 
@@ -566,8 +555,8 @@ public class TransactionUtilsMock {
 
     public static Customer addCustomerApplication(long nextCustomerId) {
         Customer customer = createCustomerMock(nextCustomerId);
-        customer.setFullName( GlobalHelper.APP_USER_NAME.toUpperCase() + " APPLICATION" );
-        customer.setFirstName( GlobalHelper.APP_USER_NAME.toUpperCase() );
+        customer.setFullName( GlobalHelper.APP_WALLET_USER.toUpperCase() + " APPLICATION" );
+        customer.setFirstName( GlobalHelper.APP_WALLET_USER.toUpperCase() );
         customer.setLastName( "APPLICATION" );
         return customer;        
     }
@@ -582,6 +571,11 @@ public class TransactionUtilsMock {
         String cellPhone = faker.phoneNumber().cellPhone();
         String documentId = faker.idNumber().valid();
         String cpf = faker.cpf().valid();
+        String email = faker.internet().emailAddress( partName[0].concat(".")
+                    .concat( partName[partName.length -1 ] ).concat(".")
+                    .concat( String.valueOf(birthDate.getMonthValue()) )
+                    .concat( String.valueOf(birthDate.getYear()))
+            );
 
         Customer customer = Customer.builder()
             .customerId(nextCustomerId)
@@ -590,11 +584,7 @@ public class TransactionUtilsMock {
             .firstName(partName[0])
             .lastName( partName[partName.length-1] )
             .birthDate(birthDate)
-            .email(faker.internet().emailAddress( partName[0].concat(".")
-                    .concat( partName[partName.length -1 ] ).concat(".")
-                    .concat( String.valueOf(birthDate.getMonthValue()) )
-                    .concat( String.valueOf(birthDate.getYear()) )
-            ))
+            .email(email)
             .phoneNumber(cellPhone)
             .documentId(documentId)
             .cpf(cpf)

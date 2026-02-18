@@ -36,6 +36,11 @@ public class SecurityMatchers {
 
     private String[] addContextPath(String[] paths) {
         return paths;
+        //if (paths == null) return null;
+        //if (contextPath == null || contextPath.isBlank()) return paths;
+        //return Arrays.stream(paths)
+        //    .map(path -> path != null && path.startsWith(contextPath) ? path : contextPath + path)
+        //    .toArray(String[]::new);
     }
 
     public String[] getPublicPaths() {

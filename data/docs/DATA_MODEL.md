@@ -1,4 +1,4 @@
-# Data Model
+﻿# Data Model
 
 Documentação do modelo de dados, schema e relacionamentos do Wallet Service API.
 

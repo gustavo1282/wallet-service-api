@@ -1,19 +1,19 @@
-# Wallet Service API
+﻿# Wallet Service API
 
-Uma API REST robusta construída com **Spring Boot 3.4.10** para gerenciar o ciclo de vida completo de um serviço de carteira digital. Inclui autenticação JWT, operações de transações, gerenciamento de clientes e carteiras, com suporte a múltiplos bancos de dados e integração com Prometheus para observabilidade.
+Uma API REST robusta construida com **Spring Boot 3.4.10** para gerenciar o ciclo de vida completo de um servico de carteira digital. Inclui autenticacao JWT, operacoes de transacoes, gerenciamento de clientes e carteiras, com suporte a multiplos bancos de dados e integracao com Prometheus para observabilidade.
 
 ## 🎯 Visão Geral
 
-O Wallet Service API é um microserviço moderno que fornece:
+O Wallet Service API e um microsservico moderno que fornece:
 
-- **Autenticação e Autorização** via JWT (jjwt 0.12.6)
-- **Gerenciamento de Clientes** com validação e filtros por status
-- **Gerenciamento de Carteiras** com operações de saldo
-- **Transações Financeiras** (Depósito, Saque, Transferência)
+- **Autenticacao e Autorizacao** via JWT (jjwt 0.12.6)
+- **Gerenciamento de Clientes** com validacao e filtros por status
+- **Gerenciamento de Carteiras** com operacoes de saldo
+- **Transacoes Financeiras** (Deposito, Saque, Transferencia)
 - **Upload de Dados** via CSV com processamento em lote
-- **Documentação Interativa** via Swagger/OpenAPI
-- **Gestão de Segredos** com HashiCorp Vault
-- **Observabilidade** com Prometheus e métricas
+- **Documentacao Interativa** via Swagger/OpenAPI
+- **Gestao de Segredos** com HashiCorp Vault
+- **Observabilidade** com Prometheus e metricas
 - **Suporte Multiplataforma** com Docker e Docker Compose
 
 ## 📋 Requisitos do Sistema
@@ -21,8 +21,10 @@ O Wallet Service API é um microserviço moderno que fornece:
 - **Java**: 21 (JDK 21+)
 - **Maven**: 3.9.11+
 - **Banco de Dados**: PostgreSQL 15.3+ ou H2 (desenvolvimento)
-- **Docker**: 20.10+ (opcional, para containerização)
-- **Git**: Para controle de versão
+- **Docker**: 20.10+ (opcional, para containerizacao)
+- **Git**: Para controle de versao
+- **Newman**: 6+ (opcional, para testes E2E da collection Postman)
+- **jq**: 1.6+ (opcional, para script de registro/login automatico)
 
 ## 🚀 Como Começar
 
@@ -46,11 +48,11 @@ mvnw.cmd clean package -DskipTests
 
 ### 3. Executar a Aplicação
 
-O projeto suporta dois modos de execução: **Local** (para desenvolvimento) e **Docker** (para ambientes completos). Utilize os scripts facilitadores na pasta `execs/`.
+O projeto suporta dois modos de execucao: **Local** (para desenvolvimento) e **Docker** (para ambientes completos).
 
 #### 💻 Desenvolvimento Local (Contribuidores)
 
-Ideal para desenvolvimento diário. Requer PostgreSQL rodando localmente na porta `5432`.
+Ideal para desenvolvimento diario. Requer PostgreSQL rodando localmente na porta `5432`.
 
 ```bash
 # Executar com perfil local
@@ -60,131 +62,114 @@ Ideal para desenvolvimento diário. Requer PostgreSQL rodando localmente na port
 mvnw.cmd spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
 ```
 
-#### Opção B: Localmente
-```bash
-# Certifique-se de que PostgreSQL está rodando na porta 5432
-./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-
-# Ou no Windows
-mvnw.cmd spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
-```
-
 ### 4. Acessar a Aplicação
 
-Após subir os serviços com `docker-compose up -d`, acesse:
+Apos subir os servicos com `docker-compose up -d`, acesse:
 
 #### Aplicação Principal
 - **API Principal**: [http://localhost:8080/wallet-service-api/api](http://localhost:8080/wallet-service-api/api)
 - **Swagger UI**: [http://localhost:8080/wallet-service-api/swagger-ui.html](http://localhost:8080/wallet-service-api/swagger-ui.html)
 - **Health Check**: [http://localhost:8080/wallet-service-api/actuator/health](http://localhost:8080/wallet-service-api/actuator/health)
-- **Métricas Prometheus (da app)**: [http://localhost:8080/wallet-service-api/actuator/prometheus](http://localhost:8080/wallet-service-api/actuator/prometheus)
+- **Metricas Prometheus (da app)**: [http://localhost:8080/wallet-service-api/actuator/prometheus](http://localhost:8080/wallet-service-api/actuator/prometheus)
 
 #### Observabilidade
-- **Prometheus**: [http://localhost:9090](http://localhost:9090) (Métricas coletadas)
-- **Grafana**: [http://localhost:3000](http://localhost:3000) (Dashboards visuais; login: admin/admin)
-- **Jaeger**: [http://localhost:16686](http://localhost:16686) (Visualização de traces)
-- **OpenTelemetry Collector**: [http://localhost:8889/metrics](http://localhost:8889/metrics) (Métricas do collector)
+- **Prometheus**: [http://localhost:9090](http://localhost:9090)
+- **Grafana**: [http://localhost:3000](http://localhost:3000) (admin/admin)
+- **Jaeger**: [http://localhost:16686](http://localhost:16686)
+- **OpenTelemetry Collector**: [http://localhost:8889/metrics](http://localhost:8889/metrics)
 
 #### Banco de Dados
-- **PgAdmin**: [http://localhost:5050](http://localhost:5050) (Interface web para PostgreSQL; login: admin@postgres.com / wallet_pass)
+- **PgAdmin**: [http://localhost:5050](http://localhost:5050) (admin@postgres.com / wallet_pass)
 
 ## 🏗️ Estrutura do Projeto
 
-```
+```text
 wallet-service-api/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/guga/walletserviceapi/
 │   │   │   ├── WalletServiceApplication.java      # Entry point
-│   │   │   ├── config/                            # Configurações Spring
+│   │   │   ├── config/                            # Configuracoes Spring
 │   │   │   ├── controller/                        # REST Controllers
 │   │   │   ├── model/                             # Entidades JPA
 │   │   │   ├── repository/                        # Data Access Layer
 │   │   │   ├── service/                           # Business Logic
-│   │   │   ├── security/                          # JWT e Segurança
+│   │   │   ├── security/                          # JWT e Seguranca
 │   │   │   ├── exception/                         # Exception Handling
-│   │   │   └── helpers/                           # Utilitários
+│   │   │   └── helpers/                           # Utilitarios
 │   │   └── resources/
-│   │       ├── application.yml                    # Configuração padrão
-│   │       ├── application-local.yml              # Config local
-│   │       └── static/                            # Assets estáticos
-│   └── test/                                      # Testes unitários
+│   │       ├── application.yml
+│   │       ├── application-local.yml
+│   │       └── static/
+│   └── test/
 ├── data/
-│   ├── docs/                                      # Documentação técnica
-│   ├── schema-*.sql                               # Scripts DDL
-│   └── seed/                                      # Dados de seed
-├── prometheus/                                    # Configurações Prometheus
-├── Dockerfile                                     # Build multi-stage
-├── docker-compose.yml                            # Orquestração
-└── pom.xml                                        # Dependências Maven
-
+│   ├── docs/                                      # Documentacao tecnica
+│   ├── postman/                                   # Collection Postman e templates
+│   ├── scripts/grafana/                           # Backup e utilitarios do Grafana
+│   ├── scripts/newman/                            # Execucao Newman local/docker
+│   │   ├── register_and_run.sh
+│   │   ├── run_newman_docker.sh
+│   │   └── reports/newman/
+│   ├── schema-*.sql
+│   └── seed/
+├── prometheus/
+├── Dockerfile
+├── docker-compose.yml
+└── pom.xml
 ```
 
 ## 📦 Dependências Principais
 
-| Tecnologia | Versão | Propósito |
+| Tecnologia | Versao | Proposito |
 |------------|--------|----------|
 | Spring Boot | 3.4.10 | Framework principal |
-| Spring Security | Latest | Autenticação e autorização |
-| jjwt | 0.12.6 | Geração e validação de JWT |
+| Spring Security | Latest | Autenticacao e autorizacao |
+| jjwt | 0.12.6 | Geracao e validacao de JWT |
 | Spring Data JPA | Latest | ORM e acesso a dados |
-| PostgreSQL | 15.3+ | Banco de dados produção |
-| Springdoc OpenAPI | 2.8.0 | Documentação API |
-| Micrometer/Prometheus | Latest | Métricas e observabilidade |
-| Micrometer Tracing | Latest | Tracing automático via Spring Boot |
-| OpenTelemetry Collector | 0.99.0 | Coleta e processamento de traces/métricas |
-| Jaeger | 1.60 | Visualização de traces distribuídos |
+| PostgreSQL | 15.3+ | Banco de dados producao |
+| Springdoc OpenAPI | 2.8.0 | Documentacao API |
+| Micrometer/Prometheus | Latest | Metricas e observabilidade |
+| Micrometer Tracing | Latest | Tracing automatico via Spring Boot |
+| OpenTelemetry Collector | 0.99.0 | Coleta e processamento de traces/metricas |
+| Jaeger | 1.60 | Visualizacao de traces distribuidos |
 | Grafana | 10.2.3 | Dashboards de monitoramento |
-| Lombok | 1.18.30 | Redução de boilerplate |
+| Lombok | 1.18.30 | Reducao de boilerplate |
 | JaCoCo | 0.8.12 | Cobertura de testes |
-| SonarQube | 3.10.0 | Análise de código |
+| SonarQube | 3.10.0 | Analise de codigo |
 
 ## 🔐 Autenticação
 
-A API utiliza **JWT (JSON Web Tokens)** para autenticação. 
+A API utiliza **JWT (JSON Web Tokens)** para autenticacao.
 
 ### Fluxo de Login
 
 1. **POST** `/api/auth/login`
-   ```json
-   {
-     "username": "usuario",
-     "password": "senha"
-   }
-   ```
-
-2. Resposta com tokens:
-   ```json
-   {
-     "accessToken": "eyJhbGc...",
-     "refreshToken": "eyJhbGc..."
-   }
-   ```
-
-3. Usar `accessToken` no header:
-   ```
-   Authorization: Bearer {accessToken}
-   ```
+2. Recebe `accessToken` e `refreshToken`
+3. Envia no header:
+   `Authorization: Bearer {accessToken}`
 
 ### Endpoints de Autenticação
 
-| Método | Endpoint | Descrição |
+| Metodo | Endpoint | Descricao |
 |--------|----------|-----------|
-| POST | `/api/auth/login` | Autenticar usuário |
-| POST | `/api/auth/register` | Registrar novo usuário |
+| POST | `/api/auth/login` | Autenticar usuario |
+| POST | `/api/auth/register` | Registrar novo usuario |
 | POST | `/api/auth/refresh` | Renovar access token |
 
 ## 📚 Documentação Técnica
 
-Documentação detalhada está disponível em `data/docs/`:
+Documentacao detalhada disponivel em `data/docs/`:
 
-- **[API_REFERENCE.md](data/docs/API_REFERENCE.md)** - Endpoints e exemplos de uso
-- **[ARCHITECTURE_AND_DESIGN.md](data/docs/ARCHITECTURE_AND_DESIGN.md)** - Padrões e arquitetura
-- **[DATA_MODEL.md](data/docs/DATA_MODEL.md)** - Schema e relacionamentos
-- **[BUILD_AND_CI.md](data/docs/BUILD_AND_CI.md)** - Pipeline e deployment
-- **[SECURITY.md](data/docs/SECURITY.md)** - Segurança e compliance
-- **[OBSERVABILITY.md](data/docs/OBSERVABILITY.md)** - Logs, métricas e health checks
-- **[CONTRIBUTING.md](data/docs/CONTRIBUTING.md)** - Guia de contribuição
+- **[API_REFERENCE.md](data/docs/API_REFERENCE.md)**
+- **[ARCHITECTURE_AND_DESIGN.md](data/docs/ARCHITECTURE_AND_DESIGN.md)**
+- **[ARQUITECTURE_DECISIONS-ADR.md](data/docs/ARQUITECTURE_DECISIONS-ADR.md)**
+- **[DATA_MODEL.md](data/docs/DATA_MODEL.md)**
+- **[BUILD_AND_CI.md](data/docs/BUILD_AND_CI.md)**
+- **[GUIDE_DOCKER.md](data/docs/GUIDE_DOCKER.md)**
+- **[SECURITY.md](data/docs/SECURITY.md)**
+- **[OBSERVABILITY.md](data/docs/OBSERVABILITY.md)** - inclui backup do Grafana (`backup_grafana.sh`)
+- **[CONTRIBUTING.md](data/docs/CONTRIBUTING.md)**
+- **[ROADMAP.md](data/docs/ROADMAP.md)**
 
 ## 🧪 Testes
 
@@ -198,7 +183,7 @@ Documentação detalhada está disponível em `data/docs/`:
 
 ```bash
 ./mvnw test jacoco:report
-# Relatório em: target/site/jacoco/index.html
+# Relatorio em: target/site/jacoco/index.html
 ```
 
 ### Análise com SonarQube
@@ -210,88 +195,80 @@ Documentação detalhada está disponível em `data/docs/`:
   -Dsonar.login=wallet-service-api-sonar-token
 ```
 
+### Testes E2E com Newman (Postman Collection)
+
+A automacao E2E usa a collection versionada em:
+
+- `data/postman/postman_wallet_collection.json`
+
+#### Opção A: Execução local (Newman instalado)
+
+```bash
+bash data/scripts/newman/register_and_run.sh http://localhost:8080/wallet-service-api
+```
+
+Esse script:
+- Le credenciais em `data/postman/login_test_credentials.json`
+- Realiza `register` (best effort) e `login`
+- Injeta `accessToken` no Newman
+- Gera relatorio JUnit XML por usuario em `data/scripts/newman/reports/newman`
+
+#### Opção B: Execução via Docker (sem newman local)
+
+```bash
+bash data/scripts/newman/run_newman_docker.sh http://host.docker.internal:8080/wallet-service-api postman_wallet_collection.json
+```
+
+No Linux/Mac, pode usar `http://localhost:8080/wallet-service-api`.
+
 ## 🐳 Docker
 
 ### Build e Deploy
 
 ```bash
-# Build da imagem (automaticamente via docker-compose)
 docker build -t wallet_service:latest .
-
-# Executar container
 docker-compose up -d
-
-# Logs da aplicação
 docker-compose logs -f wallet-service-api
-
-# Parar containers
 docker-compose down
 ```
 
 ### Configurações de Ambiente
 
-As variáveis de ambiente podem ser definidas em `docker-compose.yml`:
+Exemplo em `docker-compose.yml`:
 
 ```yaml
 environment:
-  SPRING_PROFILES_ACTIVE: local  # Perfil: dev, local, cloud
+  SPRING_PROFILES_ACTIVE: local
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
   SPRING_DATASOURCE_USERNAME: wallet_user
   SPRING_DATASOURCE_PASSWORD: wallet_pass
-  SPRING_JPA_HIBERNATE_DDL_AUTO: update  # create-drop, validate, update
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
 ```
 
 ## 📊 Observabilidade
 
 ### Endpoints de Actuator
 
-```
-GET  /actuator/health           # Status da aplicação
-GET  /actuator/info             # Informações da app
-GET  /actuator/metrics          # Lista de métricas
-GET  /actuator/prometheus       # Métricas em formato Prometheus
-```
-
-### Métricas Disponíveis
-
-- `http_requests_total` - Total de requisições HTTP
-- `http_request_duration_seconds` - Duração das requisições
-- `db_connections_active` - Conexões ativas no banco
-- `jvm_memory_used_bytes` - Memória JVM utilizada
-
-### Prometheus
-
-Arquivo de configuração: `prometheus/prometheus.yml`
-
-```bash
-# Acessar Prometheus (se rodando)
-http://localhost:9090
+```text
+GET  /actuator/health
+GET  /actuator/info
+GET  /actuator/metrics
+GET  /actuator/prometheus
 ```
 
 ## 🤝 Contribuindo
 
-Leia [CONTRIBUTING.md](data/docs/CONTRIBUTING.md) para diretrizes de contribuição.
-
-### Processo de Contribuição
-
-1. Crie uma branch feature: `git checkout -b feature/meu-recurso`
-2. Commit suas mudanças: `git commit -am 'Adiciona novo recurso'`
-3. Push para a branch: `git push origin feature/meu-recurso`
-4. Abra um Pull Request
+Leia [CONTRIBUTING.md](data/docs/CONTRIBUTING.md).
 
 ## 📝 Versionamento
 
-Este projeto segue [Semantic Versioning](https://semver.org/):
+Este projeto segue [Semantic Versioning](https://semver.org/).
 
-- **Major** (X.0.0): Mudanças incompatíveis na API
-- **Minor** (0.X.0): Novas funcionalidades compatíveis
-- **Patch** (0.0.X): Correções de bugs
-
-Versão atual: **0.2.4-SNAPSHOT**
+Versao atual: **0.2.4-SNAPSHOT**
 
 ## 📄 Licença
 
-Este projeto está sob licença [MIT](LICENSE). Veja o arquivo LICENSE para detalhes.
+Este projeto esta sob licenca [MIT](LICENSE).
 
 ## 👨‍💻 Autor
 
@@ -300,22 +277,20 @@ Este projeto está sob licença [MIT](LICENSE). Veja o arquivo LICENSE para deta
 
 ## 📞 Suporte
 
-Para problemas, dúvidas ou sugestões:
-
 1. Abra uma [Issue](https://github.com/gustavo1282/wallet-service-api/issues)
-2. Consulte a [Documentação Técnica](data/docs/)
-3. Verifique logs e métricas no Prometheus
+2. Consulte a documentacao em `data/docs/`
+3. Verifique logs e metricas no Prometheus
 
 ## ✅ Changelog
 
-Veja [CHANGELOG.md](CHANGELOG.md) para histórico de versões.
+Veja [CHANGELOG.md](CHANGELOG.md).
 
 ## 🗺️ Roadmap
 
-- [ ] Implementar refresh token com expiração configurável
-- [ ] Autenticação OAuth2 com Google/GitHub
-- [ ] Criptografia de dados sensíveis
-- [ ] Cache distribuído (Redis)
+- [ ] Implementar refresh token com expiracao configuravel
+- [ ] Autenticacao OAuth2 com Google/GitHub
+- [ ] Criptografia de dados sensiveis
+- [ ] Cache distribuido (Redis)
 - [ ] Message broker (RabbitMQ)
-- [ ] Testes de integração E2E
-- [ ] Dashboard de administração
+- [ ] Testes de integracao E2E
+- [ ] Dashboard de administracao

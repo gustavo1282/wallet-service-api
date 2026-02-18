@@ -1,63 +1,33 @@
 security:
   access-levels:
-
-    # =====================================================
-    # PÚBLICO: Essencial para infra e onboarding
-    # =====================================================
+    # CAMADA 1: Acesso Total (Sem Token)
     public-paths:
-      # Autenticação / login / refresh tokens
+      # Negócio (Exceções)
+      - "/api/v1/auth/login"
+      - "/api/v1/params/list"
+      # Observabilidade (Básica)
+      #- "/actuator/health"
+      #- "/actuator/info"
+      #- "/actuator/prometheus"
+      #- "/actuator/metrics"
+      - "/actuator/**"        # Todos os outros dados sensíveis do Actuator
+
+    documentation:
+      # Documentação
       - "/swagger-ui/**"
       - "/swagger-ui.html"
-      - "/swagger-ui/index.html"
-      - "/swagger-resources/**"
       - "/v3/api-docs/**"
+      - "/swagger-resources/**"
       - "/webjars/**"
-      - "/actuator/**"
-      - "/actuator/startup"
-      - "/actuator/health"
 
-    permit-all-paths:
-      - "/api/v1/params/**"
-      - "/api/v1/auth/**"
-      # Endpoints relacionados documentation
-      # Actuator público (health, info, prometheus)
-      - "/actuator/prometheus"
-      - "/actuator/metrics/"
-      # - "/actuator/info"
-      # - "/actuator/loggers/**"
-      # - "/actuator/env/**"
-      # # Endpoints relacionados a admin 
-      # - "/actuator/httpexchanges/**"
-      # - "/actuator/threaddump/**"
-      # - "/actuator/heapdump/**"
-      # - "/actuator/beans/**"
-      
-
-    # =====================================================
-    # DOCUMENTAÇÃO: Swagger / OpenAPI
-    # =====================================================
-    documentation:
- 
-
-    # =====================================================
-    # MONITORAMENTO (opcional: MONITOR / ADMIN)
-    # =====================================================
-    monitor:
-      # Exemplo de endpoints que exigem MONITOR ou ADMIN
-      # Caso queira liberar prometheus como público, não precisa incluir aqui
-      #- "/actuator/metrics/**"
-      #- "/actuator/scheduledtasks/**"
-
-    # =====================================================
-    # ADMIN: somente administradores
-    # =====================================================
-    admin:
-
-    # =====================================================
-    # API SECURED: endpoints de negócio autenticados
-    # =====================================================
+    # CAMADA 2: Autenticado (USER ou ADMIN)
     secured:
       - "/api/v1/customers/**"
       - "/api/v1/wallets/**"
       - "/api/v1/transactions/**"
       - "/api/v1/wallet-operator/**"
+      - "/api/v1/auth/data"
+
+    # CAMADA 3: Restrito (Somente ADMIN)
+    admin:
+      - "/api/v1/params/**"    # Tudo de params EXCETO o /list que já saiu na Camada 1

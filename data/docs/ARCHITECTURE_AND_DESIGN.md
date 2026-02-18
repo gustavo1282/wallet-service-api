@@ -1,4 +1,4 @@
-# Architecture and Design
+﻿# Architecture and Design
 
 Documentação da arquitetura, padrões de design e decisões técnicas do Wallet Service API.
 
@@ -809,3 +809,50 @@ Repository Layer (persistência)
 - Domain-Driven Design (Eric Evans)
 - Microservices Patterns (Sam Newman)
 - Spring Best Practices Documentation
+
+---
+
+## Atualizacao (fev/2026) - Estrutura modular do `src` e suporte operacional em `data/`
+
+### Estrutura principal de codigo (`src/main/java/com/guga/walletserviceapi`)
+
+O projeto evoluiu para uma organizacao mais modular por responsabilidade:
+
+- `audit/publisher`
+- `config` e `config/web`
+- `controller`
+- `exception`
+- `handler`
+- `helpers`
+- `infrastructure/data`
+- `logging`
+- `model` (`converter`, `dto`, `enums`, `request`, `serializers`)
+- `repository`
+- `security` (`auth`, `context`, `filter`, `handler`, `jwt`)
+- `seeder`
+- `service/common`
+
+Essa segmentacao reduz acoplamento entre camadas, melhora rastreabilidade dos fluxos e facilita manutencao incremental de funcionalidades.
+
+### Organizacao de artefatos de apoio (`data/`)
+
+Foi consolidado como padrao de projeto manter artefatos de apoio em `data/`, incluindo:
+
+- `data/docs` (documentacao tecnica)
+- `data/postman` (collections, templates e credenciais de teste)
+- `data/scripts` (scripts utilitarios e automacao)
+- `data/grafana` (dashboards/provisionamento versionado)
+
+Elementos de infraestrutura de runtime permanecem na raiz (ex.: `vault/`, `grafana-tempo/`, `prometheus/`, `docker-compose.yml`), mantendo separacao clara entre codigo de aplicacao, apoio de engenharia e orquestracao.
+
+### Newman na arquitetura de qualidade
+
+A validacao E2E via Newman integra a este desenho como camada de qualidade funcional:
+
+- Collection: `data/postman/postman_wallet_collection.json`
+- Credenciais de teste: `data/postman/login_test_credentials.json`
+- Execucao local: `data/scripts/newman/register_and_run.sh`
+- Execucao via Docker: `data/scripts/newman/run_newman_docker.sh`
+- Relatorios: `data/scripts/newman/reports/newman/*.xml` (JUnit)
+
+Com isso, os testes de API ficam versionados, reproduziveis e prontos para publicacao no CI/CD.

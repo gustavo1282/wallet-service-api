@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="wallet-service-api-automation" tests="8" time="5.074">
+  <testsuite name="api / v1 / 1000-auth / 1-login / login" id="8db785cd-959f-469d-8411-447e0cc274b7" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="1.650"/>
+  <testsuite name="api / v1 / 1000-auth / 2-data / get Data Login" id="7f6b31c1-ba6b-4ab6-8a3a-30ab8547ad00" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="1.393"/>
+  <testsuite name="api / v1 / 1100-customers / {customerId} / Get customer by ID" id="4bcf5c7b-b4a5-412a-802b-ef07e0f59fd0" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="0.589"/>
+  <testsuite name="api / v1 / 1100-customers / {customerId} / Update customer by ID" id="68a5ff4b-c4a8-4d25-bfad-83bc38c7cc1f" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="0.374"/>
+  <testsuite name="api / v1 / 1100-customers / me / Get authenticated customer profile" id="749f8712-4075-4c38-80d1-d7f30b870e35" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="0.414"/>
+  <testsuite name="api / v1 / 1100-customers / me / Update my customer data" id="c17d1764-c8d7-480d-8641-736e71939ce7" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="0.263"/>
+  <testsuite name="api / v1 / 1100-customers / 1110-Create a new customer" id="6cc29007-7bd4-424e-86de-92f43b5cead8" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="0.077"/>
+  <testsuite name="api / v1 / 1100-customers / List customers" id="90a632ca-6394-4df1-891c-a7250b894ff9" timestamp="2026-02-17T15:55:19.042Z" tests="0" failures="0" errors="0" time="0.314"/>
+</testsuites>

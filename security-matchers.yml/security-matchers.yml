@@ -1,0 +1,24 @@
+security:
+  access-levels:
+    public-paths:
+      # Swagger
+      - "/swagger-ui/**"
+      - "/v3/api-docs/**"
+      # Essencial para o Spring Boot Admin ou Monitoramento básico
+      - "/actuator/health"
+      - "/actuator/info"
+      - "/actuator/prometheus"
+
+    permit-all-paths:
+      - "/api/v1/auth/**"
+      - "/api/v1/params/**"
+
+    monitor:
+      # Endpoints sensíveis que SÓ o Admin/Monitor pode ver
+      - "/actuator/**" 
+      - "/actuator/env/**"
+      - "/actuator/loggers/**"
+
+    secured:
+      - "/api/v1/customers/**"
+      - "/api/v1/wallets/**"

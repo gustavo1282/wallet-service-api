@@ -1,3 +1,14 @@
+
+x-configs: &wallet-variables
+  JWT_SECRET: ${JWT_SECRET}
+  APP_NAME: ${APP_NAME}
+  PROFILE: ${PROFILE}
+  ENVIRONMENT: ${ENVIRONMENT}
+  TZ: ${TZ:-America/Sao_Paulo}
+  WALLET_USER: ${WALLET_USER}
+  WALLET_PASS: ${WALLET_PASS}
+  MANAGEMENT_OTLP_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}
+
 services:
   # ======================================================================
   # 1. BANCO DE DADOS (POSTGRESQL)
@@ -7,10 +18,10 @@ services:
     container_name: cont-wallet-postgres
     restart: unless-stopped
     environment:
-      TZ: America/Sao_Paulo
+      <<: *wallet-variables
       POSTGRES_DB: wallet_db
-      POSTGRES_USER: wallet_user
-      POSTGRES_PASSWORD: wallet_pass
+      POSTGRES_USER: ${WALLET_USER}
+      POSTGRES_PASSWORD: ${WALLET_PASS}
     ports:
       - "5432:5432" 
     deploy:
@@ -20,7 +31,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wallet_user -d wallet_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${WALLET_USER} -d wallet_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,8 +46,8 @@ services:
     container_name: cont-wallet-jaeger
     restart: unless-stopped
     environment:
+      <<: *wallet-variables
       COLLECTOR_OTLP_ENABLED: "true"
-      TZ: America/Sao_Paulo
     ports:
       - "16686:16686"
       - "14268:14268"
@@ -51,8 +62,8 @@ services:
     image: grafana/loki:2.9.0
     container_name: cont-wallet-loki
     restart: unless-stopped
-    environment:
-      TZ: America/Sao_Paulo
+    environment: 
+      <<: *wallet-variables
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
@@ -67,6 +78,9 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.95.0
     container_name: cont-wallet-otel-collector
+    environment:
+      <<: *wallet-variables
+      APP_NAME: ${APP_NAME}
     restart: unless-stopped
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
@@ -75,13 +89,6 @@ services:
       - "4317:4317"
       - "4318:4318"
       - "8889:8889"
-    depends_on:
-      jaeger:
-        condition: service_started
-      loki:
-        condition: service_started
-      tempo:
-        condition: service_started
     networks:
       - wallet_network
 
@@ -89,42 +96,39 @@ services:
   # 4. MONITORAMENTO (PROMETHEUS E GRAFANA)
   # ======================================================================
   prometheus:
-    image: prom/prometheus:v2.51.0
+    image: prom/prometheus
     container_name: cont-wallet-prometheus
-    restart: unless-stopped
-    environment:
-      PROM_PROFILE: local # use homolog/prod conforme o ambiente
     volumes:
-      #- ./prometheus/prometheus-${PROM_PROFILE:-local}.yml:/etc/prometheus/prometheus.yml:ro
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./prometheus/rules:/etc/prometheus/rules:ro
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/rules:/etc/prometheus/rules
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
     ports:
       - "9090:9090"
-    depends_on:
-      otel-collector:
-        condition: service_started
     networks:
       - wallet_network
+    #Use o código com cuidado.
+    #
+    #Dica: Ao rodar docker-compose up -d, você pode verificar se o arquivo foi gerado corretamente com o comando:
+    #docker exec prometheus cat /etc/prometheus/prometheus.yml
+    #Deseja que eu valide mais algum ponto da integração com o Grafana ou OpenTelemetry?
+
 
   grafana:
     image: grafana/grafana:10.2.3
     container_name: cont-wallet-grafana
-    restart: unless-stopped
-    user: "472"
     environment:
-      TZ: America/Sao_Paulo
+      <<: *wallet-variables
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
     ports:
       - "3000:3000"
     volumes:
-      - grafana-data:/var/lib/grafana
+      - ./grafana/data:/var/lib/grafana 
       - ./grafana/provisioning:/etc/grafana/provisioning
-    depends_on:
-      prometheus:
-        condition: service_started
-      loki:
-        condition: service_started
+    command: >
+      sh -lc "chmod 640 /var/lib/grafana/grafana.db 2>/dev/null || true;
+              chown -R 640:640 /var/lib/grafana 2>/dev/null || true;
+              /run.sh"
     networks:
       - wallet_network
 
@@ -132,34 +136,35 @@ services:
   # 5. APLICAÇÃO WALLET SERVICE
   # ======================================================================
   wallet-service-api:
-    image: wallet-service-api:latest
+    image: ${APP_NAME}:latest
     build: .
-    container_name: cont-wallet-service-api
+    container_name: cont-${APP_NAME}
     restart: unless-stopped
     environment:
-      TZ: America/Sao_Paulo
-      SPRING_PROFILES_ACTIVE: homolog
+      <<: *wallet-variables
+      #PROFILE: ${PROFILE}
+      #APP_NAME: ${APP_NAME}
+      #TZ: ${TZ:-America/Sao_Paulo}
       SPRING_CLOUD_VAULT_ENABLED: "true"
       SPRING_CLOUD_VAULT_URI: http://vault:8200
       SPRING_CLOUD_VAULT_TOKEN: root
       SPRING_CLOUD_VAULT_KV_ENABLED: "true"
       SPRING_CLOUD_VAULT_KV_BACKEND: secret
-      SPRING_CLOUD_VAULT_KV_APPLICATION_NAME: wallet-service-api
-      SPRING_CLOUD_VAULT_KV_PROFILES: homolog
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318/v1/traces
-      MANAGEMENT_OTLP_LOGGING_ENDPOINT: http://otel-collector:4318/v1/logs
-      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-collector:4318/v1/traces
+      SPRING_CLOUD_VAULT_KV_APPLICATION_NAME: ${APP_NAME}
+      SPRING_CLOUD_VAULT_KV_PROFILES: ${PROFILE}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}/traces
+      MANAGEMENT_OTLP_LOGGING_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}/logs
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}/traces
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges" 
     ports:
       - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-      vault:
-        condition: service_healthy
+    healthcheck:
+      # Verifica se a API subiu antes do Newman atacar
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - wallet_service_data:/app/data
       - ./data/seed:/app/data/seed
@@ -179,10 +184,11 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     environment:
+      TZ: ${TZ:-America/Sao_Paulo}
       PGADMIN_DEFAULT_EMAIL: admin@postgres.com
-      PGADMIN_DEFAULT_PASSWORD: wallet_pass
-    depends_on:
-      - postgres
+      PGADMIN_DEFAULT_PASSWORD: ${WALLET_PASS}
+    #depends_on:
+    #  - postgres
     networks:
       - wallet_network
 
@@ -199,48 +205,49 @@ services:
 
   # Para habilitar essas métricas no seu Grafana, você deve adicionar o cAdvisor
   cadvisor:
-      image: gcr.io/cadvisor/cadvisor:v0.47.0
-      container_name: cont-wallet-cadvisor
-      restart: unless-stopped
-      privileged: true
-      volumes:
-        - /:/rootfs:ro
-        - /var/run:/var/run:ro
-        - /sys:/sys:ro
-        - /var/lib/docker/:/var/lib/docker:ro
-        - /dev/disk/:/dev/disk:ro
-      ports:
-        - "8085:8080"
-      networks:
-        - wallet_network
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cont-wallet-cadvisor
+    privileged: true
+    logging:
+      driver: "none"
+    ports:
+      - "8085:8080"
+    command:
+      - "-docker_only=true"
+      - "-housekeeping_interval=15s"
+      - "-disable_metrics=disk,diskIO,process"
+    volumes:
+      - /:/rootfs:ro'
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - wallet_network
 
+
+
+  # VAULT - GERENCIAMENTO DE SEGREDOS
   vault:
     image: hashicorp/vault:1.15
     container_name: cont-wallet-vault
     restart: unless-stopped
     ports:
       - "8200:8200"
-    environment:
-      VAULT_ADDR: "http://0.0.0.0:8200"
-      VAULT_API_ADDR: "http://0.0.0.0:8200"
-      VAULT_DEV_ROOT_TOKEN_ID: "root"
-      VAULT_TOKEN: "root"
     cap_add:
       - IPC_LOCK
-    healthcheck:
-      test: ["CMD-SHELL", "vault kv get secret/wallet-service-api/homolog || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    command: >
-      sh -c '
-      vault server -dev -dev-listen-address="0.0.0.0:8200" &
-      sleep 5;
-      vault kv put secret/wallet-service-api/homolog spring.datasource.url="jdbc:postgresql://postgres:5432/wallet_db" spring.datasource.username="wallet_user" spring.datasource.password="wallet_pass" jwt.secret="mock-key-super-secret-jwt.2J8320JRF329FJ23JF9239FHF2F923HF9823HF98238F";
-      wait
-      '
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+    command: ["vault", "server", "-dev", "-dev-listen-address=0.0.0.0:8200", "-dev-root-token-id=root"]
     networks:
       - wallet_network
+    healthcheck:
+      test: ["CMD-SHELL", "export VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=root && vault status >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   # ======================================================================
   # 7. TEMPO - TRACING BACKEND
@@ -251,14 +258,15 @@ services:
     restart: unless-stopped
     ports:
       - "3200:3200"
-      #- "4317" # OTLP gRPC
-      #- "4318" # OTLP HTTP
     networks:
       - wallet_network
     command: >
+      -config.file=/etc/tempo.yaml
       -target=all
       -storage.trace.backend=local
       -storage.trace.local.path=/tmp/tempo/traces
+    volumes:
+      - ./grafana-tempo/tempo.yaml:/etc/tempo.yaml:ro
 
 
   # ======================================================================
@@ -270,6 +278,7 @@ services:
     ports:
       - "9000:9000"
     environment:
+      TZ: ${TZ:-America/Sao_Paulo}
       SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
     volumes:
       - sonarqube_data:/opt/sonarqube/data
@@ -297,4 +306,6 @@ volumes:
 # ======================================================================
 networks:
   wallet_network:
+    external: true
+    name: wallet_network
     driver: bridge

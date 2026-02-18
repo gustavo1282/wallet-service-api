@@ -58,44 +58,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+                
+        boolean validationMatcher = validationMatcher(request);
+            
+        LOGGER.debug(LogMarkers.LOG, "JwtAuthFilter - {} {} | validationMatcher={}",
+            request.getMethod(), request.getRequestURI(), validationMatcher);
 
-        // final String path = Optional.ofNullable(request.getRequestURI())
-        //     .map(p -> contextPath == null ? p : p.replaceAll(contextPath, ""))
-        //     //.map(p ->  servletPath == null ? p : p.replaceAll(servletPath, ""))
-        //     .orElse("");
-
-        // Libera se for público ou documentação
-        String[] publicArr = matchers.getPublicPaths();
-        String[] docArr = matchers.getDocumentation();
-        String[] allPathsPermited = matchers.getPermitAllPaths();
-
-        List<String> publicPaths = publicArr == null ? List.of() : Arrays.asList(publicArr);
-        List<String> documentationPaths = docArr == null ? List.of() : Arrays.asList(docArr);
-        List<String> allPaths = allPathsPermited == null ? List.of() : Arrays.asList(allPathsPermited);
-
-        AntPathMatcher pathMatcher = new AntPathMatcher();
-
-        boolean isPublic = publicPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-        boolean isDocumentation = documentationPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-        boolean isPermitAll = allPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-        
-        if (isPublic || isDocumentation || isPermitAll) {
+        if (validationMatcher) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith("Bearer ")) {
+            LOGGER.warn(LogMarkers.LOG, "JwtAuthFilter - sem Authorization Bearer");
             filterChain.doFilter(request, response);
             return;
         }
 
         final String jwt = authHeader.substring(7);
 
-        LOGGER.info(LogMarkers.LOG, "JwtAutenticationFilter.doFilterInternal - Jwt generated with success");
+        LOGGER.debug(LogMarkers.LOG, "JwtAuthFilter - JWT recebido (len={})", jwt.length());
 
         if (!jwtService.validateToken(jwt)) {
+            LOGGER.warn(LogMarkers.LOG, "JwtAuthFilter - JWT invalido");
             filterChain.doFilter(request, response);
             return;
         }
@@ -135,6 +121,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
+    }
+
+    private List<String> getMatchersSession(String[] value) {
+        if (value == null || value.length == 0) return List.of();
+        return Arrays.asList(value);
+    }
+
+    private boolean validationMatcher(HttpServletRequest request) {
+
+        String path = request.getRequestURI();
+
+        List<String> publicPaths = getMatchersSession(matchers.getPublicPaths());
+        List<String> documentationPaths = getMatchersSession(matchers.getDocumentation());
+        List<String> adminPaths = getMatchersSession(matchers.getAdmin());
+        List<String> securedPaths = getMatchersSession(matchers.getSecured());
+        
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+
+        boolean isPublic = publicPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
+        boolean isDocumentation = documentationPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
+        boolean isAdmin = adminPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
+        boolean isSecured = securedPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
+        //boolean isPermitAll = allPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
+
+        return (isPublic || isDocumentation || isAdmin || isSecured);
+        
     }
 
 

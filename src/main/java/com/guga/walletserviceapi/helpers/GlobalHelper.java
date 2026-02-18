@@ -24,11 +24,11 @@ public class GlobalHelper {
     public static final String PATTERN_FORMAT_DATE = "yyyy-MM-dd";
     public static final String PATTERN_FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss.SSSSSSSSS";
 
-    @Value("${USER_NAME}")
-    public static final String APP_USER_NAME = "wallet_user";
+    @Value("${WALLET_USER}")
+    public static final String APP_WALLET_USER = "wallet_user";
 
-    @Value("${USER_PASS}")
-    public static final String APP_PASSWORD = "wallet_pass";
+    @Value("${WALLET_PASS}")
+    public static final String APP_WALLET_PASS = "wallet_pass";
 
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     public static int BATCH_SIZE;
@@ -85,6 +85,13 @@ public class GlobalHelper {
                 }            
             );
         }
+    }
+
+    /***
+     * Remove tudo que não for número de uma string, útil para limpar CPF, CNPJ, Telefone, etc
+     */
+    public static String onlyNumbers(String texto) {
+        return texto.replaceAll("\\D", "");
     }
 
 }

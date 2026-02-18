@@ -1,4 +1,4 @@
-# Security
+﻿# Security
 
 Documentação de segurança, autenticação, autorização e boas práticas de proteção do Wallet Service API.
 

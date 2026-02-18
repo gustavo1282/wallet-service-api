@@ -7,7 +7,8 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 processors:
-  batch:
+  batch: {}
+
   memory_limiter:
     check_interval: 5s
     limit_mib: 500
@@ -43,7 +44,7 @@ connectors:
 exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
-  
+
   otlphttp/jaeger:
     endpoint: "http://jaeger:4318"
     tls:
@@ -51,30 +52,41 @@ exporters:
 
   loki:
     endpoint: "http://cont-wallet-loki:3100/loki/api/v1/push"
-    # Esta é a forma padrão e segura de garantir que o Loki indexe as labels
-    # Sem este bloco, os dados chegam mas não viram variáveis no Grafana
     default_labels_enabled:
       exporter: true
       job: true
       instance: true
 
-  logging: 
+  logging:
     verbosity: detailed
 
-  otlp/tempo:
-    endpoint: "tempo:4317"
+  # Exporta traces pro Tempo via OTLP gRPC na rede Docker.
+  # Use o NOME DO SERVIÇO/CONTAINER que está na mesma network do collector.
+  otlphttp/tempo:
+    endpoint: http://cont-wallet-tempo:4318
     tls:
       insecure: true
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+
+  #otlp/tempo:
+  #  endpoint: tempo:4317
+  #  tls:
+  #    insecure: true
 
 service:
   telemetry:
     metrics:
       address: 0.0.0.0:8888
+
   pipelines:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [spanmetrics, otlphttp/jaeger, logging]
+      exporters: [spanmetrics, otlphttp/tempo, otlphttp/jaeger, logging]
 
     metrics:
       receivers: [spanmetrics, otlp]
@@ -85,3 +97,4 @@ service:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
       exporters: [loki, logging]
+

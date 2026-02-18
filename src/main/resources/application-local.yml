@@ -1,19 +1,38 @@
 spring:
+  config:
+    import: 
+      - "optional:classpath:security-matchers.yml"
+      - "optional:vault://secret/${APP_NAME}/${PROFILE}"
   cloud:
     vault:
-      enabled: false
-      uri: http://localhost:8200
+      enabled: true
+      uri: http://vault:8200
       token: root
+      kv:
+        enabled: true
+        backend: secret
+        version: 2
+        default-context: wallet-service-api
+        profiles: ${PROFILE:local}
     bootstrap:
       enabled: false
       
-  datasource:
-    driver-class-name: org.postgresql.Driver
+  #datasource:
+  #  url: jdbc:postgresql://cont-wallet-postgres:5432/wallet_db
+  #  driver-class-name: org.postgresql.Driver
+  #  username: wallet_user
+  #  password: wallet_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
 
   security:
     user:
-      name: ${USER_NAME:wallet_user}
-      password: ${USER_PASSWORD:wallet_pass}
+      name: ${WALLET_USER:wallet_user}
+      password: ${WALLET_PASS:wallet_pass}
       roles:
         - ADMIN
         - USER

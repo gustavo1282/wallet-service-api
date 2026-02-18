@@ -3,9 +3,6 @@
 # =========================
 APP_NAME: wallet-service-api
 
-USER_NAME: wallet_user
-USER_PASS: wallet_pass
-
 ###############################
 ###############################
 ###############################
@@ -15,6 +12,8 @@ app:
   api-prefix: /api/v1
 
 server:
+  address: 0.0.0.0
+  port: 8080
   servlet:
     context-path: /${APP_NAME}
 
@@ -24,18 +23,19 @@ spring:
   config:
     import: 
       - "optional:classpath:security-matchers.yml"
-      - "optional:vault://"
+      - "optional:vault://secret/${APP_NAME}/${PROFILE}"
   cloud:
     bootstrap:
       enabled: false  # Desativa o carregamento do bootstrap.yml
     vault:
       enabled: false
-      authentication: TOKEN
-      kv:
-        enabled: true
-        backend: secret
-        default-context: ${APP_NAME}
-        profile-separator: /
+      #authentication: TOKEN
+      #kv:
+      #  enabled: true
+      #  backend: secret
+      #  version: 2
+      #  default-context: ${APP_NAME}
+      #  profiles: ${PROFILE:local}
   data:
     web:
       pageable:
@@ -127,11 +127,11 @@ management:
         enabled: true
   otlp:
     logging:
-      endpoint: ${MANAGEMENT_OTLP_LOGGING_ENDPOINT:http://localhost:4318/v1/logs}
-      timeout: 10s
+      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/logs
+      timeout: 90s
     tracing:
-      endpoint: ${MANAGEMENT_OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
-      timeout: 10s
+      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/traces
+      timeout: 90s
     metrics:
       export:
         enabled: false
@@ -156,19 +156,14 @@ logging:
   exception-conversion-word: "%wEx{5}"
   level:
     root: INFO
-    com.guga.walletserviceapi: TRACE
-    org.springframework.boot.context.config: TRACE
-    org.springframework.core.env: TRACE
+    com.guga.walletserviceapi: INFO
+    #org.springframework.boot.context.config: INFO
+    org.springframework.core.env: DEBUG
     org.hibernate: INFO
-    org.hibernate.engine.jdbc.env: DEBUG
+    #org.hibernate.engine.jdbc.env: INFO
     org.springframework.cloud.vault: DEBUG
     org.springframework.vault: DEBUG
-    org.springframework.security: TRACE
-    org.springdoc: INFO
-
-    #root: DEBUG
-    #org.hibernate: INFO
-    #org.hibernate.engine.jdbc.env: DEBUG
-    #org.springframework: INFO
-    #org.springframework.core.env: TRACE
-    #org.springframework.boot.context.config: TRACE
+    org.springframework.security: DEBUG
+    #org.springdoc: DEBUG
+    #org.springframework.web.client.RestTemplate: DEBUG
+    #org.springframework.context.annotation

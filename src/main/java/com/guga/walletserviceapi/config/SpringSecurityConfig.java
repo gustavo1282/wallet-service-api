@@ -2,6 +2,8 @@ package com.guga.walletserviceapi.config;
 
 import java.util.Arrays;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
+
+    private static final Logger LOGGER = LogManager.getLogger(SpringSecurityConfig.class);
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
@@ -69,14 +73,20 @@ public class SpringSecurityConfig {
             // Autorização
             // =========================
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(mvcMatchers(mvc, matchers.getPermitAllPaths())).permitAll()
+                // 1. Libera o que é Público primeiro (Regra mais genérica)
                 .requestMatchers(mvcMatchers(mvc, matchers.getPublicPaths())).permitAll()
-                .requestMatchers(mvcMatchers(mvc, matchers.getAdmin())).authenticated()
-                .requestMatchers(mvcMatchers(mvc, matchers.getSecured())).authenticated()
                 .requestMatchers(mvcMatchers(mvc, matchers.getDocumentation())).permitAll()
-                .requestMatchers(mvcMatchers(mvc, matchers.getMonitor())).authenticated()
-                
-                // 3. Bloqueio residual
+
+                // 2. NEGÓCIO (USER e ADMIN)
+                // hasAnyRole já valida que está autenticado E tem o perfil
+                .requestMatchers(mvcMatchers(mvc, matchers.getSecured())).hasAnyRole("USER", "ADMIN")
+
+                // 3. RESTRITO (Apenas ADMIN)
+                // Aqui entrará o /actuator/metrics e o resto do /api/v1/params/**
+                .requestMatchers(mvcMatchers(mvc, matchers.getAdmin())).hasRole("ADMIN")
+
+                // 4. BLOQUEIO TOTAL
+                // Tudo que não foi listado acima é sumariamente negado
                 .anyRequest().denyAll()
             )
 
@@ -94,6 +104,9 @@ public class SpringSecurityConfig {
             )
 
             .build();
+
+
+            
     }
 
     @Bean
