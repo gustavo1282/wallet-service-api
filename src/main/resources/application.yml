@@ -44,7 +44,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     generate-ddl: true
     show-sql: true
     open-in-view: true
@@ -68,6 +68,7 @@ springdoc:
     path: /v3/api-docs
   info:
     title: Wallet Service API
+    version: '@project.version@' # Pega a versão do pom.xml automaticamente
     description: |
       Documentação da API de Carteira de Clientes.
 
@@ -116,8 +117,17 @@ management:
       show-details: always
     prometheus:
       enabled: true
+    info:
+      enabled: true
     metrics:
       enabled: true
+  info:
+    build:
+      enabled: true # Expõe versão, artifactId, time do build
+    git:
+      mode: full    # Expõe commit hash, branch, mensagem
+    env:
+      enabled: true # Expõe variáveis de ambiente seguras (opcional)
   observations:
     key-values:
       application: ${APP_NAME}
@@ -163,7 +173,14 @@ logging:
     #org.hibernate.engine.jdbc.env: INFO
     org.springframework.cloud.vault: DEBUG
     org.springframework.vault: DEBUG
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
     #org.springdoc: DEBUG
     #org.springframework.web.client.RestTemplate: DEBUG
     #org.springframework.context.annotation
+    # Silencia o debug do filtro do Spring Security (o que remove o "Securing GET /actuator/prometheus")
+    logging.level.org.springframework.security.web.FilterChainProxy: INFO
+    logging.level.org.springframework.security.web.authentication.AnonymousAuthenticationFilter: INFO
+
+    # Silencia o SEU filtro customizado (JwtAuthenticationFilter)
+    # Substitua o pacote pelo caminho real da sua classe
+    logging.level.com.github.w.s.f.JwtAuthenticationFilter: ERROR

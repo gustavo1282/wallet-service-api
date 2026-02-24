@@ -1,10 +1,20 @@
-# Normaliza fim de linha automaticamente
+# Define o comportamento padrão para todos os arquivos (auto detecção)
 * text=auto
 
-# Força LF em arquivos de código
-*.java text eol=lf
-*.yml  text eol=lf
-*.yaml text eol=lf
-*.properties text eol=lf
-*.md text eol=lf
+# Arquivos de texto comuns
+*.java text
+*.md text
+*.xml text
+*.yml text
+*.yaml text
+*.json text
+*.properties text
+
+# Scripts Shell DEVEM ser LF (Linux) para rodar no Docker/Bash
 *.sh text eol=lf
+mvnw text eol=lf
+
+# Scripts Windows DEVEM ser CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+mvnw.cmd text eol=crlf

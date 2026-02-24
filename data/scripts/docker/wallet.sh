@@ -54,6 +54,26 @@ fi
 
 case "$CMD" in
   up)
+    # ---------------------------------------------------------
+    # 1. Extração Dinâmica da Versão (SemVer)
+    # ---------------------------------------------------------
+    PROJECT_ROOT="$SCRIPT_DIR/../../.."
+    APP_VERSION="latest"
+
+    if [ -f "$PROJECT_ROOT/pom.xml" ]; then
+        echo "[Wallet] 🔍 Extraindo versão do pom.xml..."
+        # Tenta extrair a versão via Maven Wrapper. O 'tr -d \r' limpa quebras de linha do Windows.
+        # O '|| true' impede que o script pare se o Java/Maven não estiver instalado (fallback para latest).
+        DETECTED=$("$PROJECT_ROOT/mvnw" help:evaluate -Dexpression=project.version -q -DforceStdout -f "$PROJECT_ROOT/pom.xml" 2>/dev/null | tr -d '\r' || true)
+        
+        if [ -n "$DETECTED" ] && [[ ! "$DETECTED" == *"["* ]]; then
+            APP_VERSION="$DETECTED"
+            echo "[Wallet] ✅ Versão detectada: $APP_VERSION"
+        else
+            echo "[Wallet] ⚠️  Não foi possível extrair versão (usando fallback: $APP_VERSION)"
+        fi
+    fi
+
     echo "[Debug] Validando variaveis para o Docker..."
     # Esse comando passa as variaveis diretamente para o sub-shell do script up.sh
     PROFILE="$PROFILE" \
@@ -62,6 +82,7 @@ case "$CMD" in
     ENVIRONMENT="$ENVIRONMENT" \
     NAMESPACE="$NAMESPACE" \
     APP_NAME="$APP_NAME" \
+    APP_VERSION="$APP_VERSION" \
     APPLICATION_NAME="$APPLICATION_NAME" \
     SERVICE_NAME="$SERVICE_NAME" \
     WALLET_USER="$WALLET_USER" \

@@ -1,4 +1,4 @@
-﻿# Docker Guide
+﻿﻿# Docker Guide
 
 Guia prático para operação do ambiente local com Docker Compose e scripts utilitários do projeto.
 
@@ -140,6 +140,14 @@ Esse entrypoint coordena:
 - parada/remoção por grupos
 - provisionamento do Vault
 - build/start da API com fluxo Maven integrado
+
+### Versionamento Automático
+
+Ao executar o comando `up`, o script:
+1. Lê a versão definida no `pom.xml` (ex: `0.2.10-SNAPSHOT`).
+2. Realiza o build do artefato `.jar`.
+3. Constrói a imagem Docker com a tag específica (ex: `wallet-service-api:0.2.10-SNAPSHOT`).
+4. Sobe o container utilizando essa versão, garantindo rastreabilidade.
 
 ### Estrutura dos scripts
 

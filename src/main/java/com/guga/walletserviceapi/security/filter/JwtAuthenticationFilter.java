@@ -61,8 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 
         boolean validationMatcher = validationMatcher(request);
             
-        LOGGER.debug(LogMarkers.LOG, "JwtAuthFilter - {} {} | validationMatcher={}",
-            request.getMethod(), request.getRequestURI(), validationMatcher);
+        //LOGGER.debug(LogMarkers.LOG, "JwtAuthFilter - {} {} | validationMatcher={}",
+        //    request.getMethod(), request.getRequestURI(), validationMatcher);
 
         if (validationMatcher) {
             filterChain.doFilter(request, response);
@@ -130,7 +130,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean validationMatcher(HttpServletRequest request) {
 
-        String path = request.getRequestURI();
+        String path = request.getRequestURI()
+            .replace(contextPath, "")
+            .replace(servletPath, "");
+
+        // Se for o Prometheus, passa direto sem logar o WARN
+        if (path.startsWith("/actuator/prometheus") ||
+            path.startsWith("/h2-console")
+            ) 
+        {
+            return true;
+        }
 
         List<String> publicPaths = getMatchersSession(matchers.getPublicPaths());
         List<String> documentationPaths = getMatchersSession(matchers.getDocumentation());

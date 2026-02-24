@@ -1,4 +1,4 @@
-﻿# Wallet Service API
+﻿﻿# Wallet Service API
 
 Uma API REST robusta construida com **Spring Boot 3.4.10** para gerenciar o ciclo de vida completo de um servico de carteira digital. Inclui autenticacao JWT, operacoes de transacoes, gerenciamento de clientes e carteiras, com suporte a multiplos bancos de dados e integracao com Prometheus para observabilidade.
 
@@ -264,7 +264,9 @@ Leia [CONTRIBUTING.md](data/docs/CONTRIBUTING.md).
 
 Este projeto segue [Semantic Versioning](https://semver.org/).
 
-Versao atual: **0.2.4-SNAPSHOT**
+1. Na imagem Docker (via `wallet.sh`)
+2. Na documentação OpenAPI/Swagger
+3. Nos endpoints de Actuator (`/actuator/info`)
 
 ## 📄 Licença
 

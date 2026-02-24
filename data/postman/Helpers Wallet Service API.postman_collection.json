@@ -1,0 +1,1017 @@
+{
+  "info": {
+    "_postman_id": "57c73a4b-3289-4b2e-a81b-c6bdeb9277e0",
+    "name": "Helpers Wallet Service API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47458903",
+    "_collection_link": "https://go.postman.co/collection/47458903-57c73a4b-3289-4b2e-a81b-c6bdeb9277e0?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "/actuator/**",
+      "item": [
+        {
+          "name": "/v3/api-docs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v3",
+                "api-docs"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "/actuator/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "/actuator/metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "metrics"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "/actuator/info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "info"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "/actuator/loggers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/loggers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "loggers"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "/actuator/prometheus",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/prometheus",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "prometheus"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "/actuator/env",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/env",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "env"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "/actuator/caches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/caches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "caches"
+              ]
+            },
+            "description": "Generated from cURL: curl -i http://localhost:8080/wallet-service-api/actuator/health"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "vault",
+      "item": [
+        {
+          "name": "v1/secret/data/wallet-service-api/homolog",
+          "item": [
+            {
+              "name": "Listar Chaves",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/homolog",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "homolog"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar Versão",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:8200/v1/secret/metadata/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8200",
+                  "path": [
+                    "v1",
+                    "secret",
+                    "metadata",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Criar/Atualizar",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "root"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-key-super-secret-jwt.HOMOLOG.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://host.docker.internal:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"squ_ea51cedf0f969507efcbb2a7ce1b985455004a61\"\r\n  }\r\n}"
+                },
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/homolog",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "homolog"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Ler Segredo",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/homolog",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "homolog"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "v1/secret/data/wallet-service-api/local",
+          "item": [
+            {
+              "name": "Listar Chaves",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/local",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "local"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar Versão",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/metadata/",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "metadata",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Criar/Atualizar",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "root"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-key-super-secret-jwt.LOCAL.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://localhost:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"squ_ea51cedf0f969507efcbb2a7ce1b985455004a61\"\r\n  }\r\n}"
+                },
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/local",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "local"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Ler Segredo",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/local",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "local"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "v1/secret/data/wallet-service-api/dev",
+          "item": [
+            {
+              "name": "Listar Chaves",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/dev",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "dev"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar Versão",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/dev",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "dev"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Criar/Atualizar",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "root"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-jwt.profile.DEV.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://localhost:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"squ_ea51cedf0f969507efcbb2a7ce1b985455004a61\"\r\n  }\r\n}"
+                },
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/dev",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "dev"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Ler Segredo",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/dev",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "data",
+                    "wallet-service-api",
+                    "dev"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "v1/sys/",
+          "item": [
+            {
+              "name": "/v1/sys/health",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/sys/health",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "sys",
+                    "health"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "/v1/sys/mounts",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/sys/mounts",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "sys",
+                    "mounts"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "/v1/sys/auth",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/sys/auth",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "sys",
+                    "auth"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "/v1/secret/metadata/",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/metadata/homolog",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "metadata",
+                    "homolog"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "/v1/secret/jwt/data/jwt",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Vault-Token",
+                    "value": "{{X-Vault-Token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{vault_url}}/v1/secret/jwt/data/jwt",
+                  "host": [
+                    "{{vault_url}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "secret",
+                    "jwt",
+                    "data",
+                    "jwt"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "loki",
+      "item": [
+        {
+          "name": "http://cont-wallet-loki:3100/loki/api/v1/push",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"streams\": [\r\n    {\r\n      \"stream\": { \"job\": \"manual-test\" },\r\n      \"values\": [ [ \"1700000000000000000\", \"hello loki\" ] ]\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{loki_url}}/loki/api/v1/push",
+              "host": [
+                "{{loki_url}}"
+              ],
+              "path": [
+                "loki",
+                "api",
+                "v1",
+                "push"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loki/ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{loki_url}}/ready",
+              "host": [
+                "{{loki_url}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loki/api/v1/labels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{loki_url}}/loki/api/v1/labels",
+              "host": [
+                "{{loki_url}}"
+              ],
+              "path": [
+                "loki",
+                "api",
+                "v1",
+                "labels"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/loki/api/v1/label/:label/values",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{loki_url}}/loki/api/v1/label/:label/values",
+              "host": [
+                "{{loki_url}}"
+              ],
+              "path": [
+                "loki",
+                "api",
+                "v1",
+                "label",
+                ":label",
+                "values"
+              ],
+              "variable": [
+                {
+                  "key": "label",
+                  "value": "job"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loki/api/v1/query?query={job=\"wallet-service-api\"}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{loki_url}}/loki/api/v1/query?query={job=\"wallet-service-api\"}&limit=2",
+              "host": [
+                "{{loki_url}}"
+              ],
+              "path": [
+                "loki",
+                "api",
+                "v1",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "{job=\"wallet-service-api\"}"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loky/metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{loki_url}}/metrics",
+              "host": [
+                "{{loki_url}}"
+              ],
+              "path": [
+                "metrics"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/loki/api/v1/series?match={job=\"wallet-service-api\"}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{loki_url}}/loki/api/v1/series?match={job=\"wallet-service-api\"}",
+              "host": [
+                "{{loki_url}}"
+              ],
+              "path": [
+                "loki",
+                "api",
+                "v1",
+                "series"
+              ],
+              "query": [
+                {
+                  "key": "match",
+                  "value": "{job=\"wallet-service-api\"}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "tempo/grafana",
+      "item": [
+        {
+          "name": "/metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3200/metrics",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3200",
+              "path": [
+                "metrics"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3200/ready",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3200",
+              "path": [
+                "ready"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3200/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3200",
+              "path": [
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/api/search",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "type": "text",
+                  "key": "q",
+                  "value": "{duration < 100ms}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3200/api/search?q={duration > 100ms}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3200",
+              "path": [
+                "api",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{duration > 100ms}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "otel-collector",
+      "item": [
+        {
+          "name": "/v1/traces",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4318/v1/traces",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4318",
+              "path": [
+                "v1",
+                "traces"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "X-Vault-Token",
+      "value": ""
+    },
+    {
+      "key": "vault_url",
+      "value": ""
+    },
+    {
+      "key": "loki_url",
+      "value": ""
+    }
+  ]
+}

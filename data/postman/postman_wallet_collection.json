@@ -1,10 +1,11 @@
 {
   "info": {
-    "_postman_id": "a1b66c4b-815f-423f-91f4-4ac391c8ce6b",
-    "name": "wallet-service-api-automation",
+    "_postman_id": "4f432aa0-52a2-4eb7-aae3-842d8faaeda1",
+    "name": "Wallet Service API - v0.2.10-SNAPSHOT",
+    "description": "Documentação da API de Carteira de Clientes.\n\n---\n\n### 🔑 Autenticação (A partir da v0.2.4)\n\nA autenticação agora utiliza **JSON Web Tokens (JWT)**. Para acessar os endpoints protegidos, siga os passos abaixo:\n\n1.  **Obter o Token:**\n    * Execute o endpoint de login: **`POST /api/auth/login`**.\n    * Use suas credenciais de usuário e senha no corpo da requisição (Request Body).\n\n2.  **Autorizar o Swagger (OpenAPI):**\n    * Copie o **token JWT** retornado no campo `access_token`.\n    * Clique no botão **\"Authorize\"** (Autorizar) no topo da página.\n    * Cole o token no campo de autenticação (Geralmente no formato **`Bearer SeuTokenAqui`**).\n\n3.  **Executar Métodos:**\n    * Com o token configurado no Swagger, você pode executar todos os métodos protegidos.\n\n---\n\n**Credenciais de Teste:**\n* **Usuário:** `wallet_user`\n* **Senha:** `wallet_pass`\n",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "47458903",
-    "_collection_link": "https://go.postman.co/collection/47458903-a1b66c4b-815f-423f-91f4-4ac391c8ce6b?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/47458903-4f432aa0-52a2-4eb7-aae3-842d8faaeda1?source=collection_link"
   },
   "item": [
     {
@@ -14,10 +15,10 @@
           "name": "v1",
           "item": [
             {
-              "name": "1000-auth",
+              "name": "auth",
               "item": [
                 {
-                  "name": "1-login",
+                  "name": "login",
                   "item": [
                     {
                       "name": "login",
@@ -87,7 +88,7 @@
                         ],
                         "body": {
                           "mode": "raw",
-                          "raw": "{ \"username\": \"08261038807\",  \"password\": \"wallet_pass_2003\" }",
+                          "raw": "{ \"username\": \"wallet_user\",  \"password\": \"wallet_pass\" }",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -310,7 +311,7 @@
                   ]
                 },
                 {
-                  "name": "2-data",
+                  "name": "data",
                   "item": [
                     {
                       "name": "get Data Login",
@@ -539,7 +540,7 @@
                   ]
                 },
                 {
-                  "name": "1098-register",
+                  "name": "register",
                   "item": [
                     {
                       "name": "register",
@@ -780,7 +781,7 @@
                   ]
                 },
                 {
-                  "name": "1098-refresh",
+                  "name": "refresh",
                   "item": [
                     {
                       "name": "refresh",
@@ -983,7 +984,7 @@
               ]
             },
             {
-              "name": "1100-customers",
+              "name": "customers",
               "item": [
                 {
                   "name": "{customerId}",
@@ -996,7 +997,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -1217,13 +1218,35 @@
                     },
                     {
                       "name": "Update customer by ID",
+                      "event": [
+                        {
+                          "listen": "prerequest",
+                          "script": {
+                            "exec": [
+                              "const email = \"\"; //\"updateMail.{{$randomInt}}@email.com\";\r",
+                              "pm.collectionVariables.set(\"email\", email);\r",
+                              "\r",
+                              "const gerarTelefone  = eval(pm.collectionVariables.get(\"fn_gerarTelefone\"));\r",
+                              "const telefone = gerarTelefone();\r",
+                              "pm.collectionVariables.set(\"phoneNumber\", telefone);\r",
+                              "\r",
+                              "const random_status = eval(pm.collectionVariables.get(\"fn_random_status\"));\r",
+                              "pm.variables.set(\"status\", random_status.randomFromEnum(random_status.ENUMS.status));\r",
+                              ""
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
                       "request": {
                         "auth": {
                           "type": "bearer",
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -1241,7 +1264,7 @@
                         ],
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(79)  \\n       91968-0124\",\n  \"customerId\": 3833,\n  \"status\": \"REVIEW\",\n  \"cpf\": \"205.142.028-85\",\n  \"birthDate\": \"2011-03-18\",\n  \"email\": \"string\",\n  \"createdAt\": \"1989-03-22T18:28:33.489Z\",\n  \"updatedAt\": \"1981-04-11T10:23:04.895Z\",\n  \"loginAuthId\": 5373\n}",
+                          "raw": "{\n  \"phoneNumber\": \"{{phoneNumber}}\",\n  \"status\": \"{{status}}\",\n  \"email\": \"{{email}}\"\n}\n",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -1518,203 +1541,6 @@
                   "name": "me",
                   "item": [
                     {
-                      "name": "Get authenticated customer profile",
-                      "request": {
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                            {
-                              "key": "token",
-                              "value": "{{bearerToken}}",
-                              "type": "string"
-                            }
-                          ]
-                        },
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/customers/me",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "customers",
-                            "me"
-                          ]
-                        },
-                        "description": "Returns customer data associated with the authenticated user (JWT context)."
-                      },
-                      "response": [
-                        {
-                          "name": "OK",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(79)  \\n       91968-0124\",\n  \"customerId\": 3833,\n  \"status\": \"REVIEW\",\n  \"cpf\": \"205.142.028-85\",\n  \"birthDate\": \"2011-03-18\",\n  \"email\": \"string\",\n  \"createdAt\": \"1989-03-22T18:28:33.489Z\",\n  \"updatedAt\": \"1981-04-11T10:23:04.895Z\",\n  \"loginAuthId\": 5373\n}"
-                        },
-                        {
-                          "name": "Bad Request",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "Bad Request",
-                          "code": 400,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Not Found",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "Not Found",
-                          "code": 404,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Conflict",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "Conflict",
-                          "code": 409,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        }
-                      ]
-                    },
-                    {
                       "name": "Update my customer data",
                       "event": [
                         {
@@ -1727,7 +1553,6 @@
                               "const gerarTelefone  = eval(pm.collectionVariables.get(\"fn_gerarTelefone\"));\r",
                               "const telefone = gerarTelefone();\r",
                               "pm.collectionVariables.set(\"phoneNumber\", telefone);\r",
-                              "\r",
                               "\r",
                               "const random_status = eval(pm.collectionVariables.get(\"fn_random_status\"));\r",
                               "pm.variables.set(\"status\", random_status.randomFromEnum(random_status.ENUMS.status));\r",
@@ -1745,7 +1570,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -1763,7 +1588,7 @@
                         ],
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"phoneNumber\": \"{{phoneNumber}}\",\n  \"status\": \"{{status}}\",\n  \"email\": \"{{email}}\",\n  \"updatedAt\": \"{{$timestamp}}\"\n}",
+                          "raw": "{\n  \"phoneNumber\": \"{{phoneNumber}}\",\n  \"status\": \"{{status}}\",\n  \"email\": \"{{email}}\"\n}",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -2003,11 +1828,458 @@
                           "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
                         }
                       ]
+                    },
+                    {
+                      "name": "Get authenticated customer profile",
+                      "event": [
+                        {
+                          "listen": "prerequest",
+                          "script": {
+                            "exec": [
+                              ""
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{accessToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/customers/me",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "customers",
+                            "me"
+                          ]
+                        },
+                        "description": "Returns customer data associated with the authenticated user (JWT context)."
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(79)  \\n       91968-0124\",\n  \"customerId\": 3833,\n  \"status\": \"REVIEW\",\n  \"cpf\": \"205.142.028-85\",\n  \"birthDate\": \"2011-03-18\",\n  \"email\": \"string\",\n  \"createdAt\": \"1989-03-22T18:28:33.489Z\",\n  \"updatedAt\": \"1981-04-11T10:23:04.895Z\",\n  \"loginAuthId\": 5373\n}"
+                        },
+                        {
+                          "name": "Bad Request",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Not Found",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "Not Found",
+                          "code": 404,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Conflict",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "Conflict",
+                          "code": 409,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        }
+                      ]
                     }
                   ]
                 },
                 {
-                  "name": "1110-Create a new customer",
+                  "name": "List customers",
+                  "event": [
+                    {
+                      "listen": "prerequest",
+                      "script": {
+                        "exec": [
+                          "const random_status = eval(pm.collectionVariables.get(\"fn_random_status\"));\r",
+                          "pm.variables.set(\"status\", random_status.randomFromEnum(random_status.ENUMS.status));"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    },
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          ""
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "*/*"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/v1/customers?status=ACTIVE",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "customers"
+                      ],
+                      "query": [
+                        {
+                          "key": "status",
+                          "value": "ACTIVE"
+                        }
+                      ]
+                    },
+                    "description": "Returns a paginated list of customers. Admin-only operation."
+                  },
+                  "response": [
+                    {
+                      "name": "OK",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "customers"
+                          ],
+                          "query": [
+                            {
+                              "key": "status",
+                              "value": "INACTIVE"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"content\": [\n    \"\",\n    \"\"\n  ],\n  \"page\": {\n    \"size\": 3700,\n    \"number\": 7628,\n    \"totalElements\": 2478,\n    \"totalPages\": 173\n  }\n}"
+                    },
+                    {
+                      "name": "Bad Request",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "customers"
+                          ],
+                          "query": [
+                            {
+                              "key": "status",
+                              "value": "INACTIVE"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Bad Request",
+                      "code": 400,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                    },
+                    {
+                      "name": "Not Found",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "customers"
+                          ],
+                          "query": [
+                            {
+                              "key": "status",
+                              "value": "INACTIVE"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Not Found",
+                      "code": 404,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                    },
+                    {
+                      "name": "Conflict",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "customers"
+                          ],
+                          "query": [
+                            {
+                              "key": "status",
+                              "value": "INACTIVE"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Conflict",
+                      "code": 409,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "Create a new customer",
                   "event": [
                     {
                       "listen": "test",
@@ -2073,7 +2345,7 @@
                       "bearer": [
                         {
                           "key": "token",
-                          "value": "{{bearerToken}}",
+                          "value": "{{accessToken}}",
                           "type": "string"
                         }
                       ]
@@ -2326,233 +2598,11 @@
                       "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
                     }
                   ]
-                },
-                {
-                  "name": "List customers",
-                  "request": {
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearerToken}}",
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    "method": "GET",
-                    "header": [
-                      {
-                        "key": "Accept",
-                        "value": "*/*"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/v1/customers?status=ACTIVE",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "v1",
-                        "customers"
-                      ],
-                      "query": [
-                        {
-                          "key": "status",
-                          "value": "ACTIVE"
-                        }
-                      ]
-                    },
-                    "description": "Returns a paginated list of customers. Admin-only operation."
-                  },
-                  "response": [
-                    {
-                      "name": "OK",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "customers"
-                          ],
-                          "query": [
-                            {
-                              "key": "status",
-                              "value": "INACTIVE"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"content\": [\n    \"\",\n    \"\"\n  ],\n  \"page\": {\n    \"size\": 3700,\n    \"number\": 7628,\n    \"totalElements\": 2478,\n    \"totalPages\": 173\n  }\n}"
-                    },
-                    {
-                      "name": "Bad Request",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "customers"
-                          ],
-                          "query": [
-                            {
-                              "key": "status",
-                              "value": "INACTIVE"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Bad Request",
-                      "code": 400,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                    },
-                    {
-                      "name": "Not Found",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "customers"
-                          ],
-                          "query": [
-                            {
-                              "key": "status",
-                              "value": "INACTIVE"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                    },
-                    {
-                      "name": "Conflict",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/customers?status=INACTIVE",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "customers"
-                          ],
-                          "query": [
-                            {
-                              "key": "status",
-                              "value": "INACTIVE"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "Conflict",
-                      "code": 409,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                    }
-                  ]
                 }
               ]
             },
             {
-              "name": "1200-wallets",
+              "name": "wallets",
               "item": [
                 {
                   "name": "{walletId}",
@@ -2565,7 +2615,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -2591,7 +2641,7 @@
                           "variable": [
                             {
                               "key": "walletId",
-                              "value": "8317"
+                              "value": "{{customerId}}"
                             }
                           ]
                         },
@@ -2792,7 +2842,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -3097,7 +3147,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -3301,7 +3351,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -3506,7 +3556,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -3742,7 +3792,7 @@
                       "bearer": [
                         {
                           "key": "token",
-                          "value": "{{bearerToken}}",
+                          "value": "{{accessToken}}",
                           "type": "string"
                         }
                       ]
@@ -3755,7 +3805,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "{{baseUrl}}/api/v1/wallets?status=INACTIVE",
+                      "raw": "{{baseUrl}}/api/v1/wallets?status=ACTIVE",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -3767,7 +3817,7 @@
                       "query": [
                         {
                           "key": "status",
-                          "value": "INACTIVE"
+                          "value": "ACTIVE"
                         }
                       ]
                     },
@@ -3964,7 +4014,7 @@
                       "bearer": [
                         {
                           "key": "token",
-                          "value": "{{bearerToken}}",
+                          "value": "{{accessToken}}",
                           "type": "string"
                         }
                       ]
@@ -4221,7 +4271,7 @@
               ]
             },
             {
-              "name": "1300-transactions",
+              "name": "transactions",
               "item": [
                 {
                   "name": "withdraw",
@@ -4234,7 +4284,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -4246,6 +4296,16 @@
                             "value": "*/*"
                           }
                         ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"amount\": \"<number>\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
                         "url": {
                           "raw": "{{baseUrl}}/api/v1/transactions/withdraw?amount=9613.642406110006",
                           "host": [
@@ -4311,7 +4371,7 @@
                             }
                           ],
                           "cookie": [],
-                          "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎ ᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
+                          "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
                         },
                         {
                           "name": "Bad Request",
@@ -4466,7 +4526,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -4478,6 +4538,16 @@
                             "value": "*/*"
                           }
                         ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"amount\": \"<number>\",\n  \"walletIdReceived\": \"<long>\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
                         "url": {
                           "raw": "{{baseUrl}}/api/v1/transactions/transfer?walletIdReceived=8317&amount=9613.642406110006",
                           "host": [
@@ -4718,7 +4788,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -4730,6 +4800,16 @@
                             "value": "*/*"
                           }
                         ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"amount\": \"<number>\",\n  \"cpfSender\": \"<string>\",\n  \"senderName\": \"<string>\",\n  \"terminalId\": \"<string>\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
                         "url": {
                           "raw": "{{baseUrl}}/api/v1/transactions/deposit?amount=9613.642406110006&cpfSender=string&terminalId=string&senderName=string",
                           "host": [
@@ -4819,7 +4899,7 @@
                             }
                           ],
                           "cookie": [],
-                          "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎ ᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
+                          "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
                         },
                         {
                           "name": "Bad Request",
@@ -5010,7 +5090,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -5087,7 +5167,7 @@
                             }
                           ],
                           "cookie": [],
-                          "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎ ᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
+                          "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
                         },
                         {
                           "name": "Bad Request",
@@ -5245,7 +5325,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -5323,7 +5403,7 @@
                                 }
                               ],
                               "cookie": [],
-                              "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎ ᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
+                              "body": "{\n  \"walletId\": 468,\n  \"transactionId\": 5321,\n  \"operationType\": \"WITHDRAW\",\n  \"login\": \"string\",\n  \"previousBalance\": 2334.266445185449,\n  \"amount\": 286.72269779068006,\n  \"currentBalance\": 3831.460534401849,\n  \"statusTransaction\": \"WALLET_INVALID\",\n  \"createdAt\": \"2025-08-25T22:23:08.604Z\",\n  \"wallet\": {\n    \"customerId\": 7536,\n    \"walletId\": 2836,\n    \"status\": \"BLOCKED\",\n    \"lastOperationType\": \"TRANSFER_SEND\",\n    \"previousBalance\": 5045.834146160215,\n    \"currentBalance\": 6848.794195416727,\n    \"createdAt\": \"1966-01-23T23:37:09.544Z\",\n    \"updatedAt\": \"1962-04-23T10:16:12.755Z\",\n    \"customer\": {\n      \"documentId\": \"string\",\n      \"firstName\": \"string\",\n      \"fullName\": \"string\",\n      \"lastName\": \"string\",\n      \"phoneNumber\": \"(94) ᠎᠎　    93685-2240\",\n      \"customerId\": 9452,\n      \"status\": \"BLOCKED\",\n      \"cpf\": \"301.875.717-67\",\n      \"birthDate\": \"1961-01-23\",\n      \"email\": \"string\",\n      \"createdAt\": \"1995-01-09T13:24:07.544Z\",\n      \"updatedAt\": \"1946-12-29T18:27:55.371Z\",\n      \"loginAuthId\": 9998\n    }\n  },\n  \"movementTransaction\": {\n    \"movementId\": 8602,\n    \"createdAt\": \"2024-04-01T04:29:42.800Z\",\n    \"operationType\": \"DEPOSIT\",\n    \"amount\": 5.26331076412756,\n    \"statusTransaction\": \"AMOUNT_DEPOSIT_INSUFFICIENT\",\n    \"transactionId\": 4293,\n    \"walletId\": 6105,\n    \"transactionReferenceId\": 9310,\n    \"walletReferenceId\": 6521\n  },\n  \"depositSender\": {\n    \"terminalId\": \"string\",\n    \"fullName\": \"string\",\n    \"cpf\": \"string\",\n    \"amount\": 9587.47758597046,\n    \"createdAt\": \"1962-01-02T14:46:26.109Z\",\n    \"senderId\": 6011\n  }\n}"
                             },
                             {
                               "name": "Bad Request",
@@ -5481,7 +5561,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -5687,7 +5767,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -5893,7 +5973,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -6099,7 +6179,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -6302,7 +6382,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -6537,7 +6617,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -6798,7 +6878,7 @@
               ]
             },
             {
-              "name": "1400-wallet-operator",
+              "name": "wallet-operator",
               "item": [
                 {
                   "name": "uploads",
@@ -6814,7 +6894,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -7090,7 +7170,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -7374,7 +7454,7 @@
                                   "bearer": [
                                     {
                                       "key": "token",
-                                      "value": "{{bearerToken}}",
+                                      "value": "{{accessToken}}",
                                       "type": "string"
                                     }
                                   ]
@@ -7585,7 +7665,7 @@
                                   "bearer": [
                                     {
                                       "key": "token",
-                                      "value": "{{bearerToken}}",
+                                      "value": "{{accessToken}}",
                                       "type": "string"
                                     }
                                   ]
@@ -7796,7 +7876,7 @@
                                   "bearer": [
                                     {
                                       "key": "token",
-                                      "value": "{{bearerToken}}",
+                                      "value": "{{accessToken}}",
                                       "type": "string"
                                     }
                                   ]
@@ -8007,7 +8087,7 @@
                                   "bearer": [
                                     {
                                       "key": "token",
-                                      "value": "{{bearerToken}}",
+                                      "value": "{{accessToken}}",
                                       "type": "string"
                                     }
                                   ]
@@ -8268,7 +8348,7 @@
                                   "bearer": [
                                     {
                                       "key": "token",
-                                      "value": "{{bearerToken}}",
+                                      "value": "{{accessToken}}",
                                       "type": "string"
                                     }
                                   ]
@@ -8476,7 +8556,7 @@
                               "bearer": [
                                 {
                                   "key": "token",
-                                  "value": "{{bearerToken}}",
+                                  "value": "{{accessToken}}",
                                   "type": "string"
                                 }
                               ]
@@ -8676,274 +8756,319 @@
               ]
             },
             {
-              "name": "1500-params",
+              "name": "params",
               "item": [
                 {
                   "name": "update",
                   "item": [
                     {
-                      "name": "update Param",
-                      "request": {
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
+                      "name": "{paramName}",
+                      "item": [
+                        {
+                          "name": "update Param",
+                          "request": {
+                            "auth": {
+                              "type": "bearer",
+                              "bearer": [
+                                {
+                                  "key": "token",
+                                  "value": "{{accessToken}}",
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "update",
+                                ":paramName"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "paramName",
+                                  "value": "<string>",
+                                  "description": "(Required) "
+                                }
+                              ]
+                            }
+                          },
+                          "response": [
                             {
-                              "key": "token",
-                              "value": "{{bearerToken}}",
-                              "type": "string"
+                              "name": "OK",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"id\": \"<long>\",\n  \"name\": \"<string>\",\n  \"description\": \"<string>\",\n  \"valueString\": \"<string>\",\n  \"valueLong\": \"<long>\",\n  \"valueInteger\": \"<integer>\",\n  \"valueBigDecimal\": \"<number>\",\n  \"valueDate\": \"<date>\",\n  \"valueDateTime\": \"<dateTime>\",\n  \"valueBoolean\": \"<boolean>\"\n}"
+                            },
+                            {
+                              "name": "Bad Request",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+                            },
+                            {
+                              "name": "Not Found",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+                            },
+                            {
+                              "name": "Conflict",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Conflict",
+                              "code": 409,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
                             }
                           ]
-                        },
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          },
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params/update",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params",
-                            "update"
-                          ]
-                        }
-                      },
-                      "response": [
-                        {
-                          "name": "OK",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                              },
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                              "options": {
-                                "raw": {
-                                  "headerFamily": "json",
-                                  "language": "json"
-                                }
-                              }
-                            },
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/update",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "update"
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}"
-                        },
-                        {
-                          "name": "Bad Request",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                              },
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                              "options": {
-                                "raw": {
-                                  "headerFamily": "json",
-                                  "language": "json"
-                                }
-                              }
-                            },
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/update",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "update"
-                              ]
-                            }
-                          },
-                          "status": "Bad Request",
-                          "code": 400,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Not Found",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                              },
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                              "options": {
-                                "raw": {
-                                  "headerFamily": "json",
-                                  "language": "json"
-                                }
-                              }
-                            },
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/update",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "update"
-                              ]
-                            }
-                          },
-                          "status": "Not Found",
-                          "code": 404,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Conflict",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                              },
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                              "options": {
-                                "raw": {
-                                  "headerFamily": "json",
-                                  "language": "json"
-                                }
-                              }
-                            },
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/update",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "update"
-                              ]
-                            }
-                          },
-                          "status": "Conflict",
-                          "code": 409,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
                         }
                       ]
                     }
@@ -8960,7 +9085,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -9211,7 +9336,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -9437,7 +9562,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -9668,7 +9793,7 @@
                           "bearer": [
                             {
                               "key": "token",
-                              "value": "{{bearerToken}}",
+                              "value": "{{accessToken}}",
                               "type": "string"
                             }
                           ]
@@ -9866,7 +9991,7 @@
                       "bearer": [
                         {
                           "key": "token",
-                          "value": "{{bearerToken}}",
+                          "value": "{{accessToken}}",
                           "type": "string"
                         }
                       ]
@@ -10122,8 +10247,36 @@
               ]
             },
             {
-              "name": "9999-Cleanup",
-              "item": []
+              "name": "__START__",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "https://postman-echo.com/get",
+                  "protocol": "https",
+                  "host": [
+                    "postman-echo",
+                    "com"
+                  ],
+                  "path": [
+                    "get"
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         }
@@ -10148,33 +10301,108 @@
         "packages": {},
         "requests": {},
         "exec": [
+          "/**\r",
+          " * Runner control por folder (dinâmico) — Newman friendly\r",
+          " *\r",
+          " * Como usar:\r",
+          " * - Default: allowlist (executa só o que estiver em RUN_FOLDERS)\r",
+          " * - Você pode trocar via env var:\r",
+          " *   --env-var run_mode=allow\r",
+          " *   --env-var run_mode=skip\r",
+          " * - Você pode passar folders via env var:\r",
+          " *   --env-var run_folders=\"/api/v1/auth,/api/v1/customers\"\r",
+          " *\r",
+          " * Observação:\r",
+          " * - Esse script não depende de numeração.\r",
+          " * - Ele usa o \"path\" de execução: pm.execution.location\r",
+          " */\r",
           "\r",
-          "// 1. Lista de nomes (Pastas ou Requests) para pular\r",
-          "const skipList = [\r",
-          "    \"1098-register\",\r",
-          "    \"1098-refresh\",\r",
-          "   // \"1100-customers\",       \r",
-          "    \"1200-wallets\",\r",
-          "    \"1300-transactions\",\r",
-          "    \"1400-wallet-operator\",\r",
-          "    \"1500-params\",\r",
-          "    \"9999-Cleanup\"\r",
-          "];\r",
           "const loc = pm.execution.location || [];\r",
-          "const requestName = pm.info.requestName;\r",
+          "// Exemplo de loc: [\"Collection Name\", \"api\", \"v1\", \"auth\", \"Login\"]\r",
+          "const fullPath = loc.slice(1).join(\" > \");       // \"api > v1 > auth > Login\"\r",
+          "const folderPath = loc.slice(1, -1).join(\" > \"); // \"api > v1 > auth\"\r",
           "\r",
-          "// Junta todo o path (sem a collection)\r",
-          "const fullPath = loc.slice(1).join(\" > \"); \r",
-          "// Ex: api > v1 > 1100-customers > 2-data > get Data Login\r",
+          "// ---------- CONFIG ----------\r",
+          "const runMode = (pm.environment.get(\"run_mode\") || \"allow\").toLowerCase();\r",
           "\r",
-          "// Verifica se qualquer item da skipList está contido no caminho completo\r",
-          "const shouldSkip = skipList.some(item => fullPath.includes(item));\r",
+          "/**\r",
+          " * Você pode definir RUN_FOLDERS de duas formas:\r",
+          " * 1) hardcoded aqui (bom p/ início)\r",
+          " * 2) via env var run_folders (melhor p/ CI/Newman)\r",
+          " */\r",
+          "const hardcodedRunFolders = [\r",
+          "  \"/api/v1/__START__\",\r",
+          "  \"/api/v1/auth\",\r",
+          "  \"/api/v1/customers\",\r",
+          "  // \"/api/v1/wallets\",\r",
+          "  // \"/api/v1/transactions\",\r",
+          "];\r",
           "\r",
-          "//console.log(`🔎 Path Completo: ${fullPath}`);\r",
-          "//console.log(`⛔ shouldSkip: ${shouldSkip}`);\r",
+          "const envFoldersRaw = pm.environment.get(\"run_folders\"); // \"/api/v1/auth,/api/v1/customers\"\r",
+          "const RUN_FOLDERS = (envFoldersRaw ? envFoldersRaw.split(\",\") : hardcodedRunFolders)\r",
+          "  .map(s => s.trim())\r",
+          "  .filter(Boolean);\r",
           "\r",
+          "// Caso você ainda queira manter uma lista de skip (denylist)\r",
+          "const SKIP_FOLDERS = [\r",
+          "  \"/api/v1/auth/register\",\r",
+          "  \"/api/v1/auth/refresh\",\r",
+          "  \"/api/v1/params\",\r",
+          "  \"/api/v1/wallet-operator\",\r",
+          "  \"/api/v1/transactions\",\r",
+          "  \"/api/v1/wallets\"\r",
+          "];\r",
+          "\r",
+          "// ---------- NORMALIZAÇÃO ----------\r",
+          "function normalizeFolder(s) {\r",
+          "  // Transforma \"/api/v1/auth\" -> \"api > v1 > auth\"\r",
+          "  // e também aceita já no formato \"api > v1 > auth\"\r",
+          "  let x = (s || \"\").trim();\r",
+          "  if (!x) return \"\";\r",
+          "  if (x.includes(\">\")) return x.split(\">\").map(p => p.trim()).join(\" > \");\r",
+          "  x = x.replace(/^\\/+/, \"\");        // remove \"/\" do começo\r",
+          "  x = x.replace(/\\/+$/, \"\");        // remove \"/\" do fim\r",
+          "  x = x.replace(/\\/+/g, \" / \");     // separador temporário\r",
+          "  x = x.split(\" / \").map(p => p.trim()).filter(Boolean).join(\" > \");\r",
+          "  return x;\r",
+          "}\r",
+          "\r",
+          "const runFoldersNorm = RUN_FOLDERS.map(normalizeFolder).filter(Boolean);\r",
+          "const skipFoldersNorm = SKIP_FOLDERS.map(normalizeFolder).filter(Boolean);\r",
+          "\r",
+          "// ---------- DECISÃO ----------\r",
+          "let shouldSkip = false;\r",
+          "\r",
+          "if (runMode === \"allow\") {\r",
+          "  // executa SOMENTE se o folderPath começar com algum folder permitido\r",
+          "  // (assim \"api > v1 > auth > subfolder\" também entra)\r",
+          "  const isAllowed = runFoldersNorm.length === 0\r",
+          "    ? true\r",
+          "    : runFoldersNorm.some(f => folderPath === f || folderPath.startsWith(f + \" > \"));\r",
+          "\r",
+          "  // Verifica se a PASTA está bloqueada OU se o ENDPOINT específico está bloqueado\r",
+          "  const isBlocked = skipFoldersNorm.some(f => \r",
+          "    folderPath === f || \r",
+          "    folderPath.startsWith(f + \" > \") || \r",
+          "    fullPath === f\r",
+          "  );\r",
+          "  shouldSkip = !isAllowed || isBlocked;\r",
+          "} else if (runMode === \"skip\") {\r",
+          "  // pula se estiver dentro de algum folder bloqueado ou for o endpoint exato\r",
+          "  const blocked = skipFoldersNorm.some(f => \r",
+          "    folderPath === f || \r",
+          "    folderPath.startsWith(f + \" > \") || \r",
+          "    fullPath === f\r",
+          "  );\r",
+          "  shouldSkip = blocked;\r",
+          "} else {\r",
+          "  // modo desconhecido: não filtra\r",
+          "  shouldSkip = false;\r",
+          "}\r",
+          "\r",
+          "// ---------- AÇÃO ----------\r",
           "if (shouldSkip) {\r",
-          "  console.log(`⏭️ [SKIP] para: ${fullPath}`);\r",
+          "  console.log(`⏭️ [SKIP:${runMode}] ${fullPath}`);\r",
           "  pm.execution.skipRequest();\r",
           "}\r",
           "else {\r",
@@ -10278,7 +10506,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://host.docker.internal:8080/wallet-service-api"
+      "value": "http://localhost:8080/wallet-service-api"
     },
     {
       "key": "accessToken",
@@ -10370,6 +10598,10 @@
     },
     {
       "key": "fn_random_status",
+      "value": ""
+    },
+    {
+      "key": "flow_step",
       "value": ""
     }
   ]

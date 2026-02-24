@@ -20,6 +20,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
+import com.guga.walletserviceapi.dto.wallet.WalletCreateDTO;
+import com.guga.walletserviceapi.dto.wallet.WalletResponseDTO;
+import com.guga.walletserviceapi.dto.wallet.WalletUpdateDTO;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Wallet;
@@ -56,7 +59,7 @@ public class WalletController {
     )
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Wallet> getMyWallet() {
+    public ResponseEntity<WalletResponseDTO> getMyWallet() {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Long walletId = auditCtx.getWalletId();
@@ -69,7 +72,7 @@ public class WalletController {
         AuditLogger.log("WALLET_GET_ME", auditCtx);
 
         return ResponseEntity.ok(
-            walletService.getWalletById(walletId)
+            toDto(walletService.getWalletById(walletId))
         );
     }
 
@@ -83,7 +86,7 @@ public class WalletController {
     )
     @GetMapping("/me/all")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Wallet>> getMyWallets(
+    public ResponseEntity<Page<WalletResponseDTO>> getMyWallets(
         //@RequestParam(defaultValue = "0") int page
     ) {
         // Extrai o contexto do token (onde o customerId já foi validado pelo filtro)
@@ -101,7 +104,7 @@ public class WalletController {
 
         // Reaproveita o serviço de busca por customerId, mas restrito ao ID do próprio token
         return ResponseEntity.ok(
-            walletService.getWalletByCustomerId(customerId, pageable)
+            walletService.getWalletByCustomerId(customerId, pageable).map(this::toDto)
         );
     }
 
@@ -115,8 +118,8 @@ public class WalletController {
     )
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Wallet> createWallet(
-        @RequestBody @Valid Wallet wallet
+    public ResponseEntity<WalletResponseDTO> createWallet(
+        @RequestBody @Valid WalletCreateDTO dto
     ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
@@ -128,6 +131,7 @@ public class WalletController {
 
         AuditLogger.log("WALLET_CREATE [START]", auditCtx);
 
+        Wallet wallet = toEntity(dto);
         Wallet createdWallet = walletService.saveWallet(wallet);
 
         URI location = ServletUriComponentsBuilder
@@ -138,7 +142,7 @@ public class WalletController {
 
         AuditLogger.log("WALLET_CREATE [SUCCESS]", auditCtx);
 
-        return ResponseEntity.created(location).body(createdWallet);
+        return ResponseEntity.created(location).body(toDto(createdWallet));
     }
 
     // =====================================================
@@ -151,7 +155,7 @@ public class WalletController {
     )
     @GetMapping("/{walletId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Wallet> getWalletById(
+    public ResponseEntity<WalletResponseDTO> getWalletById(
         @PathVariable Long walletId
     ) {
 
@@ -165,7 +169,7 @@ public class WalletController {
         AuditLogger.log("WALLET_GET_BY_ID", auditCtx);
 
         return ResponseEntity.ok(
-            walletService.getWalletById(walletId)
+            toDto(walletService.getWalletById(walletId))
         );
     }
 
@@ -175,9 +179,9 @@ public class WalletController {
     )
     @PutMapping("/{walletId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Wallet> updateWallet(
+    public ResponseEntity<WalletResponseDTO> updateWallet(
         @PathVariable Long walletId,
-        @RequestBody @Valid Wallet walletUpdate
+        @RequestBody @Valid WalletUpdateDTO dto
     ) {
 
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
@@ -189,11 +193,12 @@ public class WalletController {
 
         AuditLogger.log("WALLET_UPDATE [START]", auditCtx);
 
+        Wallet walletUpdate = toEntity(dto);
         Wallet wallet = walletService.updateWallet(walletId, walletUpdate);
 
         AuditLogger.log("WALLET_UPDATE [SUCCESS]", auditCtx);
 
-        return ResponseEntity.ok(wallet);
+        return ResponseEntity.ok(toDto(wallet));
     }
 
     @Operation(
@@ -202,7 +207,7 @@ public class WalletController {
     )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Wallet>> listWallets(
+    public ResponseEntity<Page<WalletResponseDTO>> listWallets(
         @RequestParam(required = false) Status status
         //@RequestParam(defaultValue = "0") int page
     ) {
@@ -218,7 +223,7 @@ public class WalletController {
         Pageable pageable = GlobalHelper.getDefaultPageable();
 
         return ResponseEntity.ok(
-            walletService.getAllWallets(status, pageable)
+            walletService.getAllWallets(status, pageable).map(this::toDto)
         );
     }
 
@@ -228,7 +233,7 @@ public class WalletController {
     )
     @GetMapping("/by-customer/{customerId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Wallet>> getWalletsByCustomer(
+    public ResponseEntity<Page<WalletResponseDTO>> getWalletsByCustomer(
         @PathVariable Long customerId
         //@RequestParam(defaultValue = "0") int page
     ) {
@@ -245,7 +250,44 @@ public class WalletController {
         Pageable pageable = GlobalHelper.getDefaultPageable();
 
         return ResponseEntity.ok(
-            walletService.getWalletByCustomerId(customerId, pageable)
+            walletService.getWalletByCustomerId(customerId, pageable).map(this::toDto)
         );
+    }
+
+    // =====================================================
+    // MAPPERS (PRIVATE)
+    // =====================================================
+
+    private WalletResponseDTO toDto(Wallet entity) {
+        if (entity == null) return null;
+        return new WalletResponseDTO(
+            entity.getWalletId(),
+            entity.getCustomerId(),
+            entity.getLastOperationType(),
+            entity.getPreviousBalance(),
+            entity.getCurrentBalance(),
+            entity.getStatus(),
+            entity.getCreatedAt(),
+            entity.getUpdatedAt()
+        );
+    }
+    
+    private Wallet toEntity(WalletCreateDTO dto) {
+        Wallet wallet = new Wallet();
+        wallet.setWalletId(dto.customerId());
+        wallet.setCustomerId(dto.customerId());
+        wallet.setLastOperationType(dto.lastOperationType());
+        wallet.setPreviousBalance(dto.previousBalance());
+        wallet.setCurrentBalance(dto.currentBalance()); 
+        wallet.setStatus(dto.status());
+        wallet.setCreatedAt(dto.createdAt());
+        wallet.setUpdatedAt(dto.updatedAt());
+        return wallet;
+    }
+
+    private Wallet toEntity(WalletUpdateDTO dto) {
+        Wallet wallet = new Wallet();
+        wallet.setStatus(dto.status());
+        return wallet;
     }
 }

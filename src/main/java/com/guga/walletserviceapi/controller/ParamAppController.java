@@ -19,11 +19,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.guga.walletserviceapi.dto.params.ParamAppCreateDTO;
+import com.guga.walletserviceapi.dto.params.ParamAppResponseDTO;
+import com.guga.walletserviceapi.dto.params.ParamAppUpdateDTO;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.service.ParamAppService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -37,8 +41,9 @@ public class ParamAppController {
 
     // --- C: CREATE (POST) ---
     @PostMapping
-    public ResponseEntity<ParamApp> createParam(@RequestBody ParamApp paramAppInput) {
+    public ResponseEntity<ParamAppResponseDTO> createParam(@RequestBody @Valid ParamAppCreateDTO dto) {
 
+        ParamApp paramAppInput = toEntity(dto);
         ParamApp savedParam = paramAppService.save(paramAppInput);
         
         URI location = ServletUriComponentsBuilder
@@ -47,13 +52,13 @@ public class ParamAppController {
                 .buildAndExpand(savedParam.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(savedParam);
+        return ResponseEntity.created(location).body(toDto(savedParam));
     }
 
 
     // --- R: READ ALL (GET) ---
     @GetMapping("/list")
-    public ResponseEntity<List<ParamApp>> findAll() {
+    public ResponseEntity<List<ParamAppResponseDTO>> findAll() {
 
         Pageable pageable = PageRequest.of(0, 150,
                 Sort.by(
@@ -62,40 +67,42 @@ public class ParamAppController {
             );
 
         List<ParamApp> params = paramAppService.findAll(pageable);
+        List<ParamAppResponseDTO> response = params.stream().map(this::toDto).toList();
         
-        return new ResponseEntity<>(params, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     // --- R: READ BY ID (GET {id}) ---
     @GetMapping("/{id}")
-    public ResponseEntity<ParamApp> findParamById(@PathVariable Long id) {
+    public ResponseEntity<ParamAppResponseDTO> findParamById(@PathVariable Long id) {
 
         ParamApp paramResult = paramAppService.findById(id);
-        return new ResponseEntity<>(paramResult, HttpStatus.OK);
+        return new ResponseEntity<>(toDto(paramResult), HttpStatus.OK);
 
     }
 
 
     // --- U: UPDATE (PUT/PATCH) - Busca por ID ---
-    @PutMapping("/update")
-    public ResponseEntity<ParamApp> updateParam(
+    @PutMapping("/update/{paramName}")
+    public ResponseEntity<ParamAppResponseDTO> updateParam(
         @PathVariable String paramName, 
-        @RequestBody ParamApp inputParamApp) {
+        @RequestBody @Valid ParamAppUpdateDTO dto) {
 
+        ParamApp inputParamApp = toEntity(paramName, dto);
         ParamApp updatedParam = paramAppService.updateByName(paramName, inputParamApp);
-        return new ResponseEntity<>(updatedParam, HttpStatus.OK);
+        return new ResponseEntity<>(toDto(updatedParam), HttpStatus.OK);
         
     }
 
 
     @PutMapping("/adjust")
-    public ResponseEntity<ParamApp> adjustSequenceParam(
+    public ResponseEntity<ParamAppResponseDTO> adjustSequenceParam(
         @RequestParam String paramName, 
         @RequestParam Long value) {
 
         ParamApp updatedParam = paramAppService.adjstSequenceId(paramName, value);
-        return new ResponseEntity<>(updatedParam, HttpStatus.OK);
+        return new ResponseEntity<>(toDto(updatedParam), HttpStatus.OK);
         
     }
 
@@ -105,6 +112,34 @@ public class ParamAppController {
     public ResponseEntity<Integer> deleteParam(@PathVariable Long id) {
         paramAppService.deleteById(id);
         return new ResponseEntity<>(0, HttpStatus.NO_CONTENT);
+    }
+
+    // =====================================================
+    // MAPPERS (PRIVATE)
+    // =====================================================
+
+    private ParamAppResponseDTO toDto(ParamApp entity) {
+        if (entity == null) return null;
+        return new ParamAppResponseDTO(
+                entity.getId(),
+                entity.getName(),
+                entity.getDescription(),
+                entity.getValueString(),
+                entity.getValueLong(),
+                entity.getValueInteger(),
+                entity.getValueBigDecimal(),
+                entity.getValueDate(),
+                entity.getValueDateTime(),
+                entity.isValueBoolean()
+        );
+    }
+
+    private ParamApp toEntity(ParamAppCreateDTO dto) {
+        return ParamApp.newParam(dto.name(), dto.description(), dto.description());
+    }
+
+    private ParamApp toEntity(String paramName, ParamAppUpdateDTO dto) {
+        return ParamApp.newParam(paramName, dto.description(), dto.description());
     }
     
 }

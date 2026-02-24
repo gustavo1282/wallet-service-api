@@ -20,8 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
+import com.guga.walletserviceapi.dto.transaction.TransactionResponseDTO;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.TransferMoneyReceived;
+import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.service.CustomerService;
@@ -56,48 +60,48 @@ public class WalletOperatorController {
     @Operation(summary = "Get my last 50 transactions (All types)")
     @GetMapping("/me/transactions")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> getMyRecentTransactions() {
+    public ResponseEntity<Page<TransactionResponseDTO>> getMyRecentTransactions() {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         AuditLogger.log("TRANSACTION_LIST_ALL_ME", auditCtx);
                 
         Pageable pageable = GlobalHelper.getDefaultPageable();
 
         Page<Transaction> trnResult = transactionService.getTransactionsByLimitMax(auditCtx.getWalletId(), pageable);
-        return (trnResult != null) ? ResponseEntity.ok(trnResult) : ResponseEntity.ok(Page.empty());
+        return (trnResult != null) ? ResponseEntity.ok(trnResult.map(this::toDto)) : ResponseEntity.ok(Page.empty());
     }
 
     @Operation(summary = "List my last 100 deposits")
     @GetMapping("/me/transactions/deposits")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyDeposits() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyDeposits() {
         return listMyTransactionsByOperation(OperationType.DEPOSIT);
     }
 
     @Operation(summary = "List my last 100 withdraws")
     @GetMapping("/me/transactions/withdraws")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyWithdraws() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyWithdraws() {
         return listMyTransactionsByOperation(OperationType.WITHDRAW);
     }
 
     @Operation(summary = "List my last 100 transfers sent")
     @GetMapping("/me/transactions/transfers-sent")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyTransfersSent() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyTransfersSent() {
         return listMyTransactionsByOperation(OperationType.TRANSFER_SEND);
     }
 
     @Operation(summary = "List my last 100 transfers received")
     @GetMapping("/me/transactions/transfers-received")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyTransfersReceived() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyTransfersReceived() {
         return listMyTransactionsByOperation(OperationType.TRANSFER_RECEIVED);
     }
 
     @Operation(summary = "Search my transactions by period")
     @GetMapping("/me/transactions/period")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> searchMyTransactionsByPeriod(
+    public ResponseEntity<Page<TransactionResponseDTO>> searchMyTransactionsByPeriod(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
         //@RequestParam(defaultValue = "0") int page
@@ -109,7 +113,9 @@ public class WalletOperatorController {
         Pageable pageable = GlobalHelper.getDefaultPageable();
         
         AuditLogger.log("TRANSACTION_LIST_PERIOD_ME", auditCtx);
-        return ResponseEntity.ok(transactionService.findByWalletIdAndCreatedAtBetween(auditCtx.getWalletId(), start, end, pageable));
+        return ResponseEntity.ok(
+            transactionService.findByWalletIdAndCreatedAtBetween(auditCtx.getWalletId(), start, end, pageable).map(this::toDto)
+        );
     }
 
     // =====================================================
@@ -138,7 +144,7 @@ public class WalletOperatorController {
     // PRIVATE HELPERS
     // =====================================================
 
-    private ResponseEntity<Page<Transaction>> listMyTransactionsByOperation(OperationType operation) {
+    private ResponseEntity<Page<TransactionResponseDTO>> listMyTransactionsByOperation(OperationType operation) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         AuditLogger.log("TRANSACTION_LIST_" + operation.name() + "_ME", auditCtx);
         
@@ -147,8 +153,30 @@ public class WalletOperatorController {
         Page<Transaction> trnResult = transactionService.filterTransactionByWalletIdAndOperationType(
             auditCtx.getWalletId(), operation, pageable);
 
-        return (trnResult != null) ? ResponseEntity.ok(trnResult) : ResponseEntity.ok(Page.empty());
+        return (trnResult != null) ? ResponseEntity.ok(trnResult.map(this::toDto)) : ResponseEntity.ok(Page.empty());
 
     }
 
+    private TransactionResponseDTO toDto(Transaction entity) {
+        if (entity == null) return null;
+        
+        String senderName = null;
+        String cpfSender = null;
+
+        if (entity instanceof DepositMoney d && d.getDepositSender() != null) {
+            senderName = d.getDepositSender().getFullName();
+            cpfSender = d.getDepositSender().getCpf();
+        }
+        
+        Long relatedWalletId = null;
+        // Lógica simplificada para manter consistência com TransactionController
+        if (entity instanceof TransferMoneySend t) relatedWalletId = t.getWalletId();
+        else if (entity instanceof TransferMoneyReceived r) relatedWalletId = r.getWalletId();
+
+        return new TransactionResponseDTO(
+            entity.getTransactionId(), entity.getWalletId(), entity.getAmount(),
+            entity.getOperationType(), entity.getStatusTransaction(), entity.getCreatedAt(),
+            senderName, cpfSender, relatedWalletId
+        );
+    }
 }

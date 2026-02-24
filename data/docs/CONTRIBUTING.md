@@ -1,4 +1,4 @@
-﻿# Contributing
+﻿﻿# Contributing
 
 Guia para contribuição ao projeto Wallet Service API.
 
@@ -373,6 +373,11 @@ git push origin feature/meu-recurso
 
 1. **Versionar** (`vX.Y.Z`):
 ```bash
+# 1. Atualizar versão no pom.xml
+mvn versions:set -DnewVersion=0.2.4
+
+# 2. Commit e Tag
+git commit -am "chore(release): bump version to 0.2.4"
 git tag -a v0.2.4 -m "Release versão 0.2.4"
 git push origin v0.2.4
 ```

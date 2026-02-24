@@ -3,6 +3,8 @@ security:
     # CAMADA 1: Acesso Total (Sem Token)
     public-paths:
       # Negócio (Exceções)
+      - "/h2-console"
+      - "/h2-console/**"
       - "/api/v1/auth/login"
       - "/api/v1/params/list"
       # Observabilidade (Básica)

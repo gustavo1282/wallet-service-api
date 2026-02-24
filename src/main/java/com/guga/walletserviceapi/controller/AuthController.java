@@ -47,6 +47,11 @@ public class AuthController {
         ) 
     {
 
+        LoginAuth loginAuth = loginAuthService.findByLogin(request.username);
+
+        String accessToken = jwtService.generateAccessToken(loginAuth);
+        String refreshToken = jwtService.generateRefreshToken(loginAuth);
+
         // Usa o Spring Security AuthenticationManager para validar o usuário/senha
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.username, request.password)
@@ -54,10 +59,6 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        LoginAuth loginAuth = loginAuthService.findByLogin(request.username);
-
-        String accessToken = jwtService.generateAccessToken(loginAuth);
-        String refreshToken = jwtService.generateRefreshToken(loginAuth);
 
         return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
     }
@@ -99,13 +100,13 @@ public class AuthController {
         return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
  
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/login/dinamic")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-     public ResponseEntity<JwtAuthenticationDetails> getDinamicLogin() 
-    {
-        JwtAuthenticationDetails authDetails = authUserProvider.get();
-        return new ResponseEntity<>(authDetails, HttpStatus.OK);
-    }
+    //@SecurityRequirement(name = "bearerAuth")
+    //@GetMapping("/login/dinamic")
+    //@PreAuthorize("hasAnyRole('ADMIN')")
+    // public ResponseEntity<JwtAuthenticationDetails> getDinamicLogin() 
+    //{
+    //    JwtAuthenticationDetails authDetails = authUserProvider.get();
+    //    return new ResponseEntity<>(authDetails, HttpStatus.OK);
+    //}
 
 }

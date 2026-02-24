@@ -136,7 +136,7 @@ services:
   # 5. APLICAÇÃO WALLET SERVICE
   # ======================================================================
   wallet-service-api:
-    image: ${APP_NAME}:latest
+    image: ${APP_NAME}:${APP_VERSION:-latest}
     build: .
     container_name: cont-${APP_NAME}
     restart: unless-stopped
@@ -209,7 +209,9 @@ services:
     container_name: cont-wallet-cadvisor
     privileged: true
     logging:
-      driver: "none"
+      driver: "json-file"
+      options:
+        max-size: "10m"
     ports:
       - "8085:8080"
     command:

@@ -52,3 +52,9 @@ data/seed/
 
 # Windows
 Thumbs.db
+
+#artefatos do projeto
+data/postman/postman_wallet_download.json
+data/postman/postman_merged_final__v*.json
+data/postman/reports/
+grafana/data/grafana.db

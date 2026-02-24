@@ -94,4 +94,11 @@ public class GlobalHelper {
         return texto.replaceAll("\\D", "");
     }
 
+    public static String blankToNull(String value) {
+        if (value == null || value.trim().isEmpty() || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
+    }
+
 }

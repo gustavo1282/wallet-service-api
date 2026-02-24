@@ -20,6 +20,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
+import com.guga.walletserviceapi.dto.customer.CustomerCreateDTO;
+import com.guga.walletserviceapi.dto.customer.CustomerResponseDTO;
+import com.guga.walletserviceapi.dto.customer.CustomerUpdateDTO;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
@@ -56,7 +59,7 @@ public class CustomerController {
     )
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Customer> getMyCustomer() {
+    public ResponseEntity<CustomerResponseDTO> getMyCustomer() {
 
         JwtAuthenticationDetails authDetails = authUserProvider.get();
         Long customerId = authDetails.getCustomerId();
@@ -66,7 +69,7 @@ public class CustomerController {
         );
 
         return ResponseEntity.ok(
-            customerService.getCustomerById(customerId)
+            toDto(customerService.getCustomerById(customerId))
         );
     }
 
@@ -76,8 +79,8 @@ public class CustomerController {
     )
     @PutMapping("/me")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Customer> updateMyCustomer(
-        @RequestBody @Valid Customer customerUpdate
+    public ResponseEntity<CustomerResponseDTO> updateMyCustomer(
+        @RequestBody @Valid CustomerUpdateDTO dto
     ) {
         // 1. Extrai o ID do cliente diretamente do contexto de segurança (Token)
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
@@ -89,9 +92,11 @@ public class CustomerController {
 
         AuditLogger.log("CUSTOMER_UPDATE_ME", auditCtx);
 
+        Customer customerUpdate = toEntity(dto);
+
         // 2. Chama o serviço passando o ID extraído do token
         return ResponseEntity.ok(
-            customerService.updateCustomer(customerId, customerUpdate)
+            toDto(customerService.updateCustomer(customerId, customerUpdate))
         );
     }
 
@@ -105,8 +110,8 @@ public class CustomerController {
     )
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Customer> createCustomer(
-        @RequestBody @Valid Customer customer
+    public ResponseEntity<CustomerResponseDTO> createCustomer(
+        @RequestBody @Valid CustomerCreateDTO dto
     ) {
 
         AuditLogContext auditContext = AuditLogContext.from(authUserProvider.get());
@@ -116,6 +121,7 @@ public class CustomerController {
             auditContext.getUsername()
         );
 
+        Customer customer = toEntity(dto);
         Customer createdCustomer = customerService.saveCustomer(customer);
 
         URI location = ServletUriComponentsBuilder
@@ -127,7 +133,7 @@ public class CustomerController {
         return ResponseEntity
             .created(location)
             .header("X-Trace-Id", auditContext.getTraceId())
-            .body(createdCustomer);
+            .body(toDto(createdCustomer));
     }
 
     @Operation(
@@ -136,16 +142,17 @@ public class CustomerController {
     )
     @PutMapping("/{customerId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Customer> updateCustomer(
+    public ResponseEntity<CustomerResponseDTO> updateCustomer(
         @PathVariable Long customerId,
-        @RequestBody @Valid Customer customerUpdate
+        @RequestBody @Valid CustomerUpdateDTO dto
     ) {
 
         LOGGER.info(LogMarkers.LOG, "UPDATE_CUSTOMER | admin={} customerId={}",
             authUserProvider.getLogin(), customerId
         );
 
-        return ResponseEntity.ok(customerService.updateCustomer(customerId, customerUpdate));
+        Customer customerUpdate = toEntity(dto);
+        return ResponseEntity.ok(toDto(customerService.updateCustomer(customerId, customerUpdate)));
 
     }
 
@@ -155,7 +162,7 @@ public class CustomerController {
     )
     @GetMapping("/{customerId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Customer> getCustomerById(
+    public ResponseEntity<CustomerResponseDTO> getCustomerById(
         @PathVariable Long customerId
     ) {
 
@@ -165,7 +172,7 @@ public class CustomerController {
         );
 
         return ResponseEntity.ok(
-            customerService.getCustomerById(customerId)
+            toDto(customerService.getCustomerById(customerId))
         );
     }
 
@@ -175,13 +182,57 @@ public class CustomerController {
     )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Customer>> listCustomers(
+    public ResponseEntity<Page<CustomerResponseDTO>> listCustomers(
         @RequestParam(required = false) Status status
         //@RequestParam(defaultValue = "0") int page
     ) {
         Pageable pageable = GlobalHelper.getDefaultPageable();
         return ResponseEntity.ok(
-            customerService.filterByStatus(status, pageable)
+            customerService.filterByStatus(status, pageable).map(this::toDto)
         );
+    }
+
+    // =====================================================
+    // MAPPERS (PRIVATE)
+    // =====================================================
+
+    private CustomerResponseDTO toDto(Customer entity) {
+        if (entity == null) return null;
+        return new CustomerResponseDTO(
+            entity.getCustomerId(),
+            entity.getFirstName(),
+            entity.getLastName(),
+            entity.getFullName(), // FullName derived
+            entity.getEmail(),
+            entity.getCpf(),
+            entity.getPhoneNumber(),
+            entity.getDocumentId(),
+            entity.getBirthDate(),
+            entity.getStatus()
+        );
+    }
+
+    private Customer toEntity(CustomerCreateDTO dto) {
+        Customer customer = new Customer();
+        customer.setFirstName(dto.firstName());
+        customer.setLastName(dto.lastName());
+        customer.setEmail(dto.email());
+        customer.setCpf(dto.cpf());
+        customer.setPhoneNumber(dto.phoneNumber());
+        customer.setDocumentId(dto.documentId());
+        customer.setBirthDate(dto.birthDate());
+        return customer;
+    }
+
+    private Customer toEntity(CustomerUpdateDTO dto) {
+        Customer customer = new Customer();
+        customer.setStatus(dto.status());
+        customer.setPhoneNumber(dto.phoneNumber());
+        customer.setEmail(dto.email());
+        // customer.setDocumentId(dto.documentId());
+        // customer.setFirstName(dto.firstName());
+        // customer.setLastName(dto.lastName());
+        // customer.setBirthDate(dto.birthDate());
+        return customer;
     }
 }

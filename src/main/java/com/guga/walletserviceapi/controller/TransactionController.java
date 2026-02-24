@@ -1,6 +1,5 @@
 package com.guga.walletserviceapi.controller;
 
-import java.math.BigDecimal;
 import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,11 +21,16 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
+import com.guga.walletserviceapi.dto.transaction.TransactionDepositDTO;
+import com.guga.walletserviceapi.dto.transaction.TransactionResponseDTO;
+import com.guga.walletserviceapi.dto.transaction.TransactionTransferDTO;
+import com.guga.walletserviceapi.dto.transaction.TransactionWithdrawDTO;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.Transaction;
+import com.guga.walletserviceapi.model.TransferMoneyReceived;
 import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.enums.OperationType;
 import com.guga.walletserviceapi.model.enums.StatusTransaction;
@@ -35,6 +40,7 @@ import com.guga.walletserviceapi.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -59,20 +65,17 @@ public class TransactionController {
     )
     @PostMapping("/deposit")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<DepositMoney> createDeposit(
-        @RequestParam BigDecimal amount,
-        @RequestParam String cpfSender,
-        @RequestParam String terminalId,
-        @RequestParam String senderName
+    public ResponseEntity<TransactionResponseDTO> createDeposit(
+        @RequestBody @Valid TransactionDepositDTO dto
     ) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Long walletId = auditCtx.getWalletId();
 
-        LOGGER.info(LogMarkers.LOG, "DEPOSIT | walletId={} amount={}", walletId, amount);
+        LOGGER.info(LogMarkers.LOG, "DEPOSIT | walletId={} amount={}", walletId, dto.amount());
         AuditLogger.log("TRANSACTION_DEPOSIT [START]", auditCtx);
 
         DepositMoney deposit = transactionService.saveDepositMoney(
-            walletId, amount, cpfSender, terminalId, senderName
+            walletId, dto.amount(), dto.cpfSender(), dto.terminalId(), dto.senderName()
         );
 
         URI location = ServletUriComponentsBuilder
@@ -82,7 +85,7 @@ public class TransactionController {
             .toUri();
 
         AuditLogger.log("TRANSACTION_DEPOSIT [SUCCESS]", auditCtx);
-        return ResponseEntity.created(location).body(deposit);
+        return ResponseEntity.created(location).body(toDto(deposit));
     }
 
     @Operation(
@@ -91,19 +94,19 @@ public class TransactionController {
     )
     @PostMapping("/withdraw")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Transaction> createWithdraw(
-        @RequestParam BigDecimal amount
+    public ResponseEntity<TransactionResponseDTO> createWithdraw(
+        @RequestBody @Valid TransactionWithdrawDTO dto
     ) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Long walletId = auditCtx.getWalletId();
 
-        LOGGER.info(LogMarkers.LOG, "WITHDRAW | walletId={} amount={}", walletId, amount);
+        LOGGER.info(LogMarkers.LOG, "WITHDRAW | walletId={} amount={}", walletId, dto.amount());
         AuditLogger.log("TRANSACTION_WITHDRAW [START]", auditCtx);
 
-        Transaction transaction = transactionService.saveWithdrawMoney(walletId, amount);
+        Transaction transaction = transactionService.saveWithdrawMoney(walletId, dto.amount());
 
         AuditLogger.log("TRANSACTION_WITHDRAW [SUCCESS]", auditCtx);
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.ok(toDto(transaction));
     }
 
     @Operation(
@@ -112,20 +115,19 @@ public class TransactionController {
     )
     @PostMapping("/transfer")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<TransferMoneySend> createTransfer(
-        @RequestParam Long walletIdReceived,
-        @RequestParam BigDecimal amount
+    public ResponseEntity<TransactionResponseDTO> createTransfer(
+        @RequestBody @Valid TransactionTransferDTO dto
     ) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Long walletIdSend = auditCtx.getWalletId();
 
-        LOGGER.info(LogMarkers.LOG, "TRANSFER | fromWallet={} toWallet={} amount={}", walletIdSend, walletIdReceived, amount);
+        LOGGER.info(LogMarkers.LOG, "TRANSFER | fromWallet={} toWallet={} amount={}", walletIdSend, dto.walletIdReceived(), dto.amount());
         AuditLogger.log("TRANSACTION_TRANSFER [START]", auditCtx);
 
-        TransferMoneySend transfer = transactionService.saveTransferMoneySend(walletIdSend, walletIdReceived, amount);
+        TransferMoneySend transfer = transactionService.saveTransferMoneySend(walletIdSend, dto.walletIdReceived(), dto.amount());
 
         AuditLogger.log("TRANSACTION_TRANSFER [SUCCESS]", auditCtx);
-        return ResponseEntity.ok(transfer);
+        return ResponseEntity.ok(toDto(transfer));
     }
 
     // =====================================================
@@ -135,7 +137,7 @@ public class TransactionController {
     @Operation(summary = "Get details of my own transaction")
     @GetMapping("/me/{transactionId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Transaction> getMyTransactionById(@PathVariable Long transactionId) {
+    public ResponseEntity<TransactionResponseDTO> getMyTransactionById(@PathVariable Long transactionId) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Transaction transaction = transactionService.getTransactionById(transactionId);
 
@@ -147,7 +149,7 @@ public class TransactionController {
         }
 
         AuditLogger.log("TRANSACTION_GET_BY_ID_ME", auditCtx);
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.ok(toDto(transaction));
     }
 
     @Operation(
@@ -156,7 +158,7 @@ public class TransactionController {
     )
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyTransactions(
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyTransactions(
         @RequestParam(required = false) StatusTransaction status
         //@RequestParam(defaultValue = "0") int page
     ) {
@@ -166,38 +168,40 @@ public class TransactionController {
         Pageable pageable = GlobalHelper.getDefaultPageable();
 
         AuditLogger.log("TRANSACTION_LIST_ME", auditCtx);
-        return ResponseEntity.ok(transactionService.filterTransactionByWalletIdAndProcessType(walletId, status, pageable));
+        return ResponseEntity.ok(
+            transactionService.filterTransactionByWalletIdAndProcessType(walletId, status, pageable).map(this::toDto)
+        );
     }
 
     @Operation(summary = "List my last 150 deposits")
     @GetMapping("/me/deposits")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyDeposits() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyDeposits() {
         return listMyTransactionsByOperation(OperationType.DEPOSIT);
     }
 
     @Operation(summary = "List my last 150 withdraws")
     @GetMapping("/me/withdraws")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyWithdraws() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyWithdraws() {
         return listMyTransactionsByOperation(OperationType.WITHDRAW);
     }
 
     @Operation(summary = "List my last 150 sent transfers")
     @GetMapping("/me/transfers-send")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyTransfersSent() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyTransfersSent() {
         return listMyTransactionsByOperation(OperationType.TRANSFER_SEND);
     }
 
     @Operation(summary = "List my last 150 received transfers")
     @GetMapping("/me/transfers-received")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Transaction>> listMyTransfersReceived() {
+    public ResponseEntity<Page<TransactionResponseDTO>> listMyTransfersReceived() {
         return listMyTransactionsByOperation(OperationType.TRANSFER_RECEIVED);
     }
 
-    private ResponseEntity<Page<Transaction>> listMyTransactionsByOperation(OperationType operation) {
+    private ResponseEntity<Page<TransactionResponseDTO>> listMyTransactionsByOperation(OperationType operation) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Long walletId = auditCtx.getWalletId();
 
@@ -207,7 +211,9 @@ public class TransactionController {
         String auditTag = "TRANSACTION_LIST_" + operation.name() + "_ME";
         AuditLogger.log(auditTag, auditCtx);
 
-        return ResponseEntity.ok(transactionService.filterTransactionByWalletIdAndOperationType(walletId, operation, limitPageable));
+        return ResponseEntity.ok(
+            transactionService.filterTransactionByWalletIdAndOperationType(walletId, operation, limitPageable).map(this::toDto)
+        );
     }
 
     // =====================================================
@@ -220,8 +226,8 @@ public class TransactionController {
     )
     @GetMapping("/{transactionId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long transactionId) {
-        return ResponseEntity.ok(transactionService.getTransactionById(transactionId));
+    public ResponseEntity<TransactionResponseDTO> getTransactionById(@PathVariable Long transactionId) {
+        return ResponseEntity.ok(toDto(transactionService.getTransactionById(transactionId)));
     }
 
     @Operation(
@@ -230,13 +236,45 @@ public class TransactionController {
     )
     @GetMapping("/by-wallet/{walletId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Transaction>> listTransactionsByWallet(
+    public ResponseEntity<Page<TransactionResponseDTO>> listTransactionsByWallet(
         @PathVariable Long walletId,
         @RequestParam(required = false) StatusTransaction type
         //@RequestParam(defaultValue = "0") int page
     ) {
         Pageable pageable = GlobalHelper.getDefaultPageable();
 
-        return ResponseEntity.ok(transactionService.filterTransactionByWalletIdAndProcessType(walletId, type, pageable));
+        return ResponseEntity.ok(
+            transactionService.filterTransactionByWalletIdAndProcessType(walletId, type, pageable).map(this::toDto)
+        );
+    }
+
+    // =====================================================
+    // MAPPERS (PRIVATE)
+    // =====================================================
+
+    private TransactionResponseDTO toDto(Transaction entity) {
+        if (entity == null) return null;
+        
+        String senderName = null;
+        String cpfSender = null;
+
+        if (entity instanceof DepositMoney d) {
+            if (d.getDepositSender() == null) return null;
+            senderName = d.getDepositSender().getFullName();
+            cpfSender = d.getDepositSender().getCpf();
+        }
+        
+        Long relatedWalletId = null;
+        if (entity instanceof TransferMoneySend t) {
+            relatedWalletId = t.getWalletId(); // .getWalletIdReceived();
+        } else if (entity instanceof TransferMoneyReceived r) {
+            relatedWalletId = r.getWalletId();
+        }
+
+        return new TransactionResponseDTO(
+            entity.getTransactionId(), entity.getWalletId(), entity.getAmount(),
+            entity.getOperationType(), entity.getStatusTransaction(), entity.getCreatedAt(),
+            senderName, cpfSender, relatedWalletId
+        );
     }
 }
