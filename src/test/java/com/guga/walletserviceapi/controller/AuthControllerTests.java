@@ -76,12 +76,12 @@ class AuthControllerTests extends BaseControllerTest {
         @DisplayName("Deve realizar login com sucesso e retornar tokens")
         void login_ok() throws Exception {
             // 1. Arrange
-            LoginRequest request = new LoginRequest(MOCK_USER_NAME, MOCK_USER_PASS);
+            LoginRequest request = new LoginRequest(MOCK_WALLET_USER, MOCK_WALLET_PASS);
             LoginAuth loginAuthMock = createLoginAuthMock();
 
             // Simula autenticação bem sucedida pelo Spring Security
             Authentication auth = new UsernamePasswordAuthenticationToken(
-                MOCK_USER_NAME, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                MOCK_WALLET_USER, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
             );
 
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
@@ -106,7 +106,7 @@ class AuthControllerTests extends BaseControllerTest {
         @DisplayName("Deve registrar novo usuário e retornar dados do LoginAuth")
         void register_ok() throws Exception {
             // 1. Arrange
-            LoginRequest request = new LoginRequest(MOCK_USER_NAME, MOCK_USER_PASS);
+            LoginRequest request = new LoginRequest(MOCK_WALLET_USER, MOCK_WALLET_PASS);
             LoginAuth createdAuth = createLoginAuthMock();
             
             when(loginAuthService.register(request.username(), request.password()))
@@ -119,7 +119,7 @@ class AuthControllerTests extends BaseControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.login").value(MOCK_USER_NAME))
+                    .andExpect(jsonPath("$.login").value(MOCK_WALLET_USER))
                     .andExpect(jsonPath("$.accessKey").exists());
         }
 
@@ -132,8 +132,8 @@ class AuthControllerTests extends BaseControllerTest {
             LoginAuth loginAuthMock = createLoginAuthMock();
 
             when(jwtService.validateToken(oldRefreshToken)).thenReturn(true);
-            when(jwtService.extractLogin(oldRefreshToken)).thenReturn(MOCK_USER_NAME);
-            when(loginAuthService.findByLogin(MOCK_USER_NAME)).thenReturn(loginAuthMock);
+            when(jwtService.extractLogin(oldRefreshToken)).thenReturn(MOCK_WALLET_USER);
+            when(loginAuthService.findByLogin(MOCK_WALLET_USER)).thenReturn(loginAuthMock);
             when(jwtService.generateAccessToken(loginAuthMock)).thenReturn(newAccessToken);
 
             // 2. Act & Assert
@@ -169,7 +169,7 @@ class AuthControllerTests extends BaseControllerTest {
         void getDataLogin_ok() throws Exception {
             // 1. Arrange
             JwtAuthenticationDetails details = JwtAuthenticationDetails.builder()
-                .login(MOCK_USER_NAME)
+                .login(MOCK_WALLET_USER)
                 .customerId(100L)
                 .roles(List.of(LoginRole.USER))
                 .build();
@@ -179,7 +179,7 @@ class AuthControllerTests extends BaseControllerTest {
             // 2. Act & Assert
             mockMvc.perform(get(URI_API + "/data"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.login").value(MOCK_USER_NAME))
+                    .andExpect(jsonPath("$.login").value(MOCK_WALLET_USER))
                     .andExpect(jsonPath("$.customerId").value(100));
         }
     }
@@ -192,7 +192,7 @@ class AuthControllerTests extends BaseControllerTest {
         return LoginAuth.builder()
             .id(1L)
             .customerId(100L)
-            .login(MOCK_USER_NAME)
+            .login(MOCK_WALLET_USER)
             .accessKey(UUID.randomUUID().toString()) // Simula senha criptografada
             .loginAuthType(LoginAuthType.USER_NAME)
             .createdAt(LocalDateTime.now())

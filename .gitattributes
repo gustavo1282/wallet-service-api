@@ -1,10 +1,28 @@
-# Normaliza fim de linha automaticamente
-* text=auto
+# Padroniza texto em LF no repositório (recomendado)
+* text=auto eol=lf
 
-# Força LF em arquivos de código
-*.java text eol=lf
-*.yml  text eol=lf
-*.yaml text eol=lf
-*.properties text eol=lf
-*.md text eol=lf
+# Scripts sempre em LF (evita quebrar bash)
 *.sh text eol=lf
+
+# Docs e configs
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+
+# Java
+*.java text eol=lf
+
+# Windows-only (se algum dia você tiver)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binários (não mexer)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.jar binary
+*.exe binary
+*.db binary

@@ -1,4 +1,4 @@
-# Roadmap Técnico — Wallet Service API
+﻿# Roadmap Técnico — Wallet Service API
 
 Este documento descreve a direção técnica do projeto, prioridades e ciclos de entrega.
 O foco é evoluir o sistema por entregas integradas, bem testadas, documentadas e persistidas no repositório.

@@ -78,7 +78,6 @@ public class JwtService {
                         .atZone(ZoneId.of("America/Sao_Paulo"))
                         .toInstant();
                         
-
         return Jwts.builder()            
             .subject(loginAuth.getLogin())
             .claim("loginId", loginAuth.getId())

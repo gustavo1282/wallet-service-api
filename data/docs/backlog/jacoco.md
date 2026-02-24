@@ -1,4 +1,4 @@
-
+﻿
 Boa — dá pra extrair **um plano de melhoria bem objetivo** só olhando essa tabela. Vou te ensinar como “ler” isso como dev de mercado e onde atacar primeiro.
 
 ## 1) O que cada coluna significa (na prática)

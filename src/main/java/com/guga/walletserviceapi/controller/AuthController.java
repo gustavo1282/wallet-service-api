@@ -37,21 +37,7 @@ public class AuthController {
     private final JwtAuthenticatedUserProvider authUserProvider;    
 
     // DTO simples para login
-    public record LoginRequest(
-        String username,
-        String password
-    ) {} 
-
-    // @Data // Gera Getters, Setters, toString, etc.
-    // public static class TokenResponse {
-    //     public String accessToken;
-    //     public String refreshToken;
-
-    //     public TokenResponse(String accessToken, String refreshToken) {
-    //         this.accessToken = accessToken;
-    //         this.refreshToken = refreshToken;
-    //     }
-    // }
+    public record LoginRequest(String username, String password) {} 
 
     public record TokenResponse(String accessToken, String refreshToken) { }
 
@@ -61,6 +47,11 @@ public class AuthController {
         ) 
     {
 
+        LoginAuth loginAuth = loginAuthService.findByLogin(request.username);
+
+        String accessToken = jwtService.generateAccessToken(loginAuth);
+        String refreshToken = jwtService.generateRefreshToken(loginAuth);
+
         // Usa o Spring Security AuthenticationManager para validar o usuário/senha
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.username, request.password)
@@ -68,10 +59,6 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        LoginAuth loginAuth = loginAuthService.findByLogin(request.username);
-
-        String accessToken = jwtService.generateAccessToken(loginAuth);
-        String refreshToken = jwtService.generateRefreshToken(loginAuth);
 
         return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
     }
@@ -106,11 +93,20 @@ public class AuthController {
 
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/data")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
      public ResponseEntity<JwtAuthenticationDetails> getDataLogin() 
     {
         JwtAuthenticationDetails authDetails = authUserProvider.get();
         return new ResponseEntity<>(authDetails, HttpStatus.OK);
     }
  
+    //@SecurityRequirement(name = "bearerAuth")
+    //@GetMapping("/login/dinamic")
+    //@PreAuthorize("hasAnyRole('ADMIN')")
+    // public ResponseEntity<JwtAuthenticationDetails> getDinamicLogin() 
+    //{
+    //    JwtAuthenticationDetails authDetails = authUserProvider.get();
+    //    return new ResponseEntity<>(authDetails, HttpStatus.OK);
+    //}
+
 }

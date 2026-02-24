@@ -17,6 +17,15 @@ public class OpenApiConfig implements WebMvcConfigurer {
     @Value("${app.api-prefix:}")
     private String servletPath;
 
+    @Value("${springdoc.info.title:Wallet Service API}")
+    private String apiTitle;
+
+    @Value("${springdoc.info.description:Descrição da API}")
+    private String apiDescription;
+
+    @Value("${springdoc.info.version:1.0.0}")
+    private String apiVersion;
+
     private String packageController = "com.guga.walletserviceapi.controller";
 
 
@@ -29,6 +38,10 @@ public class OpenApiConfig implements WebMvcConfigurer {
     @Bean
     public OpenAPI walletOpenAPI() {
         return new OpenAPI()
+            .info(new io.swagger.v3.oas.models.info.Info()
+                .title(apiTitle)
+                .description(apiDescription)
+                .version(apiVersion))
             .components(
                 new Components().addSecuritySchemes("bearerAuth",
                     new SecurityScheme().name("bearerAuth")

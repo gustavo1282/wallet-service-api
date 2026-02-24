@@ -97,11 +97,11 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
     @Value("${jwt.secret:mock_jwt_secret}.refresh")
     protected String MOCK_JWT_SECRET_REFRESH = MOCK_JWT_SECRET + ".refresh";
     
-    @Value("${USER_NAME:wallet_user}")
-    protected String MOCK_USER_NAME;
+    @Value("${WALLET_USER:wallet_user}")
+    protected String MOCK_WALLET_USER;
     
-    @Value("${USER_PASS:wallet_pass}")
-    protected String MOCK_USER_PASS;
+    @Value("${WALLET_USER:wallet_pass}")
+    protected String MOCK_WALLET_PASS;
 
     protected String URI_API;
 

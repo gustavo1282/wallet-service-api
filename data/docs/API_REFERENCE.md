@@ -1,4 +1,4 @@
-# API Reference
+﻿# API Reference
 
 Documentação completa de todos os endpoints disponíveis no Wallet Service API.
 

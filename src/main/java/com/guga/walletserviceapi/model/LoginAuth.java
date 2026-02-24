@@ -1,7 +1,6 @@
 package com.guga.walletserviceapi.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -16,11 +15,9 @@ import com.guga.walletserviceapi.model.enums.Status;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -95,10 +92,10 @@ public class LoginAuth {
     //@Column(name = "role", length = 180)
     //private List<LoginRole> role;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    //@ElementCollection(fetch = FetchType.EAGER)
     //@CollectionTable(name = "tb_login_auth_roles", joinColumns = @JoinColumn(name = "login_auth_id_fk"))
     @Column(name = "role", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
-    private List<LoginRole> role = new ArrayList<>();
+    private List<LoginRole> role;
 
 }

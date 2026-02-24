@@ -1,38 +1,30 @@
-# 🐳 Guia Prático – Docker Compose (2025)
+﻿﻿# Docker Guide
 
-Este guia reúne os **comandos essenciais do Docker Compose** para manipular seu ambiente consolidado de desenvolvimento em **2025**, facilitando o dia a dia do time.
+Guia prático para operação do ambiente local com Docker Compose e scripts utilitários do projeto.
 
 ---
 
-## 1️⃣ Como iniciar ou parar o ambiente
+## 1. Operação básica com Docker Compose
 
-O comando `up` lê o arquivo `docker-compose.yml` e sobe todos os serviços definidos.
-
-### ▶️ Subir tudo (em segundo plano)
+### Subir ambiente completo
 
 ```bash
 docker-compose up -d
 ```
 
----
-
-### ⏸️ Parar tudo (mantendo os dados dos volumes)
+### Parar ambiente (mantém volumes)
 
 ```bash
 docker-compose stop
 ```
 
----
-
-### ▶️ Subir novamente (após um `stop`)
+### Subir novamente após `stop`
 
 ```bash
 docker-compose start
 ```
 
----
-
-### 🧨 Derrubar tudo (remove containers, mantém volumes)
+### Derrubar ambiente (mantém volumes)
 
 ```bash
 docker-compose down
@@ -40,28 +32,9 @@ docker-compose down
 
 ---
 
-## 2️⃣ Alteração no código – Como atualizar a aplicação?
+## 2. Atualizar somente a aplicação
 
-Como o projeto utiliza:
-
-```yaml
-build:
-  context: .
-```
-
-o Docker precisa **recriar a imagem** sempre que o código Java é alterado.
-
-> ⚠️ Importante: **não é necessário derrubar o banco de dados** para atualizar apenas a aplicação.
-
----
-
-### Atualizar apenas o container da aplicação
-
-Este comando:
-- **Compila o projeto** (dentro do Docker, via Multistage build)
-- Recria a imagem
-- Reinicia **somente** a aplicação
-- Mantém Postgres, Jaeger e outros serviços ativos
+Quando houver mudança no código Java, rebuild da imagem da API é necessário.
 
 ```bash
 docker-compose up -d --build wallet-service-api
@@ -69,82 +42,43 @@ docker-compose up -d --build wallet-service-api
 
 ---
 
-## 3️⃣ Como remover tudo (Containers + Imagens + Volumes)
+## 3. Limpeza de ambiente
 
-Use estes comandos quando quiser **limpar completamente o ambiente**.
-
----
-
-### 🧹 Remover containers e volumes (apaga dados do banco)
+### Remover containers e volumes
 
 ```bash
 docker-compose down -v
 ```
 
----
-
-### 🔥 Remover tudo, inclusive as imagens
+### Remover containers, volumes e imagens
 
 ```bash
 docker-compose down -v --rmi all
 ```
 
----
-
-### 🧼 Limpeza profunda (cache + imagens órfãs)
+### Limpeza geral do Docker host
 
 ```bash
 docker system prune -a
 ```
 
-> ⚠️ Atenção: este comando remove **todas as imagens não utilizadas** no Docker.
-
 ---
 
-## 4️⃣ Comandos de manipulação e inspeção (`docker exec`)
+## 4. Inspeção e troubleshooting
 
-Para interagir diretamente com containers em execução.
-
----
-
-### 📄 Ver logs em tempo real
-
-Fundamental para depuração de **OpenTelemetry**, **Spring Boot** e falhas de integração.
+### Logs da aplicação
 
 ```bash
 docker-compose logs -f wallet-service-api
 ```
 
----
-
-### 🐚 Entrar dentro do container (Shell)
-
-Útil para:
-- Navegar em diretórios
-- Inspecionar arquivos
-- Validar variáveis de ambiente
+### Entrar no container da aplicação
 
 ```bash
 docker exec -it cont-wallet-service-api /bin/sh
 ```
 
-Ou, no caso do runner ACT:
-
-```bash
-docker exec -it cont-wallet-runner-act /bin/bash
-```
-
----
-
-### 📂 Ler um arquivo dentro do container (sem entrar nele)
-
-```bash
-docker exec cont-wallet-service-api cat /var/lib/wallet_service/data/log-especifico.txt
-```
-
----
-
-### 📊 Ver consumo de CPU e memória (Docker Stats – 2025)
+### Ver consumo de recursos
 
 ```bash
 docker stats
@@ -152,61 +86,143 @@ docker stats
 
 ---
 
-## 4️⃣ Serviços de Observabilidade
+## 5. Stack de observabilidade
 
-A stack inclui serviços para monitoramento e tracing:
+Serviços principais:
+- Prometheus (`9090`)
+- Grafana (`3000`)
+- Jaeger (`16686`)
+- Tempo (`3200`)
+- OpenTelemetry Collector (`4317`, `4318`, `8889`)
+- Vault (`8200`)
 
-- **Prometheus** (porta 9090): Métricas em http://localhost:9090
-- **Grafana** (porta 3000): Dashboards em http://localhost:3000 (login: admin/admin)
-- **Jaeger** (porta 16686): Traces em http://localhost:16686
-- **Tempo** (porta 3200): Backend de tracing (acessível via Grafana)
-- **OpenTelemetry Collector** (portas 4317/4318/8889): Recebe traces e gera métricas
-- **Vault** (porta 8200): Gestão de segredos
+### Subir observabilidade
 
-### ▶️ Subir apenas observabilidade
 ```bash
-docker-compose up -d prometheus grafana jaeger 
+docker-compose up -d prometheus grafana jaeger otel-collector tempo loki
 ```
 
-### 🧹 Limpar apenas observabilidade
+### Parar observabilidade
+
 ```bash
-docker-compose down prometheus grafana jaeger otel-collector
+docker-compose stop prometheus grafana jaeger otel-collector tempo loki
+```
+
+### Backup do Grafana
+
+Comando rápido:
+
+```bash
+bash data/scripts/grafana/backup_grafana.sh
+```
+
+Validação de resultado:
+- Arquivo `.db` com timestamp em `grafana/backup`
+- Arquivo `grafana/backup/grafana.db` (latest)
+- Pasta `dashboards_<timestamp>` (quando export JSON estiver habilitado)
+
+Restore manual básico (SQLite):
+1. Parar Grafana: `docker-compose stop grafana`
+2. Copiar backup para `grafana/data/grafana.db`
+3. Subir Grafana: `docker-compose up -d grafana`
+4. Validar login e dashboards em `http://localhost:3000`
+
+---
+
+## 6. Script oficial de orquestração (`wallet.sh`)
+
+Para setup padronizado de contribuidores, use:
+
+- `data/scripts/docker/wallet.sh`
+
+Esse entrypoint coordena:
+- subida por grupos de serviço
+- parada/remoção por grupos
+- provisionamento do Vault
+- build/start da API com fluxo Maven integrado
+
+### Versionamento Automático
+
+Ao executar o comando `up`, o script:
+1. Lê a versão definida no `pom.xml` (ex: `0.2.10-SNAPSHOT`).
+2. Realiza o build do artefato `.jar`.
+3. Constrói a imagem Docker com a tag específica (ex: `wallet-service-api:0.2.10-SNAPSHOT`).
+4. Sobe o container utilizando essa versão, garantindo rastreabilidade.
+
+### Estrutura dos scripts
+
+- `data/scripts/docker/wallet.sh`
+- `data/scripts/docker/common.sh`
+- `data/scripts/docker/up.sh`
+- `data/scripts/docker/down.sh`
+- `data/scripts/docker/vault.sh`
+
+### Comandos principais
+
+```bash
+# Subir tudo
+./data/scripts/docker/wallet.sh up all
+
+# Subir por grupos
+./data/scripts/docker/wallet.sh up base
+./data/scripts/docker/wallet.sh up vault
+./data/scripts/docker/wallet.sh up obs
+./data/scripts/docker/wallet.sh up app
+./data/scripts/docker/wallet.sh up quality
+
+# Subir serviço específico
+./data/scripts/docker/wallet.sh up wallet-service-api
+./data/scripts/docker/wallet.sh up <service>
+
+# Parar
+./data/scripts/docker/wallet.sh stop all
+./data/scripts/docker/wallet.sh stop base|obs|app|quality
+./data/scripts/docker/wallet.sh stop <service>
+
+# Remover
+./data/scripts/docker/wallet.sh rm all
+./data/scripts/docker/wallet.sh rm base|obs|app|quality
+./data/scripts/docker/wallet.sh rm <service>
+
+# Vault
+./data/scripts/docker/wallet.sh vault wait
+./data/scripts/docker/wallet.sh vault provision
+./data/scripts/docker/wallet.sh vault all
+```
+
+### Build Maven no fluxo `up`
+
+Ao subir `app`, `wallet-service-api` ou `all`, o script executa Maven antes do build da API.
+
+Para pular temporariamente:
+
+```bash
+SKIP_VERIFY=true ./data/scripts/docker/wallet.sh up app
+```
+
+### Variáveis relevantes
+
+Definidas com default em `data/scripts/docker/common.sh`:
+
+- `PROFILE`
+- `APP_NAME`
+- `ENVIRONMENT`
+- `WALLET_USER`
+- `WALLET_PASS`
+- `VAULT_TOKEN`
+- `VAULT_ADDR`
+- `JWT_SECRET`
+- `MANAGEMENT_OTLP_ENDPOINT`
+
+Exemplo:
+
+```bash
+PROFILE=local APP_NAME=wallet-service-api ./data/scripts/docker/wallet.sh up all
 ```
 
 ---
 
-## 💡 Dica de Ouro (2025)
+## Referências
 
-Sempre que ocorrer:
-
-- ❌ Erro **403 no Swagger**
-- ❌ Falha no **OpenTelemetry**
-- ❌ Problemas de tracing
-
-👉 **Use imediatamente:**
-
-```bash
-docker-compose logs -f wallet-service-api
-```
-
-Se aparecer:
-
-```
-Connection refused
-```
-
-para o Jaeger:
-
-1. Execute:
-   ```bash
-   docker ps
-   ```
-2. Verifique se o container `cont-wallet-jaeger` está com status **Up**
-
----
-
-## 📚 Referência Oficial
-
-Para documentação completa e sempre atualizada, consulte:
-
-👉 **Guia oficia
+- Docker Compose: https://docs.docker.com/compose/
+- Docker CLI: https://docs.docker.com/reference/cli/docker/

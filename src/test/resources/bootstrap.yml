@@ -1,8 +1,15 @@
 spring:
-  cloud:
-    vault:
-      enabled: false
   config:
     import: 
       - "optional:classpath:security-matchers.yml"
-      - "optional:vault://"
+      - "optional:vault://secret/${APP_NAME}/${PROFILE}"
+  cloud:
+    vault:
+      enabled: true
+      uri: http://vault:8200
+      token: root
+      kv:
+        enabled: true
+        backend: secret
+        default-context: ${APP_NAME}
+        profiles: ${PROFILE:local}

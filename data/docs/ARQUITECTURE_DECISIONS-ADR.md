@@ -1,4 +1,4 @@
-# Architecture Decisions (ADR) — Wallet Service API
+﻿﻿# Architecture Decisions (ADR) — Wallet Service API
 
 Este documento registra decisões técnicas relevantes tomadas ao longo da evolução do projeto.
 Objetivo: preservar contexto, alternativas e trade-offs para manter coerência arquitetural e facilitar manutenção.
@@ -266,3 +266,23 @@ Trabalhar por **ciclos de 3 dias**, concluindo cada ciclo com:
 ### Consequências
 - Requer escopo bem controlado por ciclo
 - Exige priorização clara e corte do “nice to have”
+
+---
+
+## ADR-010 — Versionamento: Integração SemVer entre Maven, Git e Docker
+
+**Data:** 2026-02-22
+**Status:** Aceita
+
+### Contexto
+Necessidade de garantir que a versão do código (Java) seja a mesma da imagem (Docker) e da documentação (OpenAPI), evitando desincronia e facilitando rastreabilidade em produção.
+
+### Decisão
+Centralizar a versão no `pom.xml` e propagá-la automaticamente:
+- **Build:** Script `wallet.sh` extrai versão do Maven e injeta como tag Docker.
+- **Runtime:** Spring Boot injeta `@project.version@` no `application.yml` para uso no Swagger e Actuator.
+- **Git:** Plugin `git-commit-id` gera metadados do commit no artefato.
+
+### Consequências
+- `pom.xml` torna-se a fonte única da verdade para versão.
+- Imagens Docker de desenvolvimento deixam de ser apenas `latest`, facilitando rollback e debug.

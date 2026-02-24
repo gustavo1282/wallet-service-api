@@ -64,15 +64,15 @@ public class CustomerService implements IWalletApiService {
 
         Customer customer = getCustomerById(id);
 
-        customer.setCpf(customerUpdate.getCpf());
-        customer.setUpdatedAt(LocalDateTime.now());
+        customer.setStatus(customerUpdate.getStatus());
         customer.setPhoneNumber(customerUpdate.getPhoneNumber());
         customer.setEmail(customerUpdate.getEmail());
-        customer.setFirstName(customerUpdate.getFirstName());
-        customer.setLastName(customerUpdate.getLastName());
         customer.setBirthDate(customerUpdate.getBirthDate());
-        customer.setDocumentId(customerUpdate.getDocumentId());
-        customer.setStatus(customerUpdate.getStatus());
+        customer.setUpdatedAt(LocalDateTime.now());
+        //customer.setCpf(customerUpdate.getCpf());
+        //customer.setFirstName(customerUpdate.getFirstName());
+        //customer.setLastName(customerUpdate.getLastName());
+        //customer.setDocumentId(customerUpdate.getDocumentId());
 
         return customerRepository.save(customer);
     }

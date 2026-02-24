@@ -1,7 +1,7 @@
 spring:
   cloud:
     vault:
-      enabled: false
+      enabled: true
       uri: http://vault:8200
       token: root
     bootstrap:
@@ -11,4 +11,4 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update

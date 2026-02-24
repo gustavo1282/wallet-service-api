@@ -1,4 +1,4 @@
-# Build and CI/CD
+﻿# Build and CI/CD
 
 Documentação sobre o processo de build, testes e integração contínua do Wallet Service API.
 
@@ -159,6 +159,83 @@ target/site/jacoco/index.html
     </executions>
 </plugin>
 ```
+
+### Testes E2E com Newman
+
+#### Visão Geral
+
+A suíte E2E utiliza a collection Postman versionada no repositório para validar fluxos críticos da API.
+
+**Arquivos envolvidos:**
+- `data/postman/postman_wallet_collection.json`
+- `data/postman/login_test_credentials.json`
+- `data/scripts/newman/register_and_run.sh`
+- `data/scripts/newman/run_newman_docker.sh`
+
+#### Execução local (Newman instalado)
+
+```bash
+bash data/scripts/newman/register_and_run.sh http://localhost:8080/wallet-service-api
+```
+
+Esse script:
+- Lê credenciais de `data/postman/login_test_credentials.json`
+- Realiza `register` (best effort) e `login`
+- Injeta `accessToken` na collection
+- Gera relatórios JUnit XML por usuário em `data/scripts/newman/reports/newman`
+
+#### Execução via Docker (sem instalar Newman local)
+
+```bash
+bash data/scripts/newman/run_newman_docker.sh \
+  http://host.docker.internal:8080/wallet-service-api \
+  postman_wallet_collection.json
+```
+
+No Linux/Mac, pode-se usar `http://localhost:8080/wallet-service-api`.
+
+#### Relatórios
+
+- Diretório: `data/scripts/newman/reports/newman`
+- Formato: `JUnit XML`
+- Exemplo: `result_<usuario>.xml`
+
+### Script de Qualidade (`wallet_quality.sh`)
+
+Automação para validação completa local de qualidade (build, testes, cobertura e análise estática).
+
+**Arquivo:**
+- `data/scripts/quality/wallet_quality.sh`
+
+**Fluxo executado:**
+1. `mvn -B clean verify` (build + testes + JaCoCo)
+2. `mvn -B sonar:sonar` (quando `SKIP_SONAR=false`)
+3. Abertura do relatório HTML do JaCoCo (se disponível)
+
+**Uso básico:**
+
+```bash
+SONAR_TOKEN=xxxx bash data/scripts/quality/wallet_quality.sh
+```
+
+**Opções úteis:**
+
+```bash
+# Alterar host do Sonar
+SONAR_HOST_URL=http://localhost:9000 SONAR_TOKEN=xxxx bash data/scripts/quality/wallet_quality.sh
+
+# Rodar sem envio ao Sonar
+SKIP_SONAR=true bash data/scripts/quality/wallet_quality.sh
+```
+
+**Entradas de ambiente:**
+- `SONAR_HOST_URL` (default: `http://localhost:9000`)
+- `SONAR_TOKEN` (obrigatório quando `SKIP_SONAR=false`)
+- `SKIP_SONAR` (default: `false`)
+
+**Saídas esperadas:**
+- `target/site/jacoco/jacoco.xml`
+- `target/site/jacoco/index.html`
 
 ## 🐳 Docker & Docker Compose
 
@@ -345,6 +422,33 @@ jobs:
         -Dsonar.projectKey=com.gugawallet:wallet-service-api \
         -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Install Newman + jq
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq
+        npm install -g newman
+
+    - name: Start services
+      run: docker compose up -d postgres wallet-service-api
+
+    - name: Wait API health
+      run: |
+        for i in {1..30}; do
+          curl -fsS http://localhost:8080/actuator/health && exit 0
+          sleep 5
+        done
+        exit 1
+
+    - name: Run Newman E2E
+      run: bash data/scripts/newman/register_and_run.sh http://localhost:8080/wallet-service-api
+
+    - name: Upload Newman reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: newman-reports
+        path: data/scripts/newman/reports/newman/*.xml
 ```
 
 ### Jenkins Pipeline (Exemplo)
