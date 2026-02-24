@@ -1,20 +1,28 @@
-# Define o comportamento padrão para todos os arquivos (auto detecção)
-* text=auto
+# Padroniza texto em LF no repositório (recomendado)
+* text=auto eol=lf
 
-# Arquivos de texto comuns
-*.java text
-*.md text
-*.xml text
-*.yml text
-*.yaml text
-*.json text
-*.properties text
-
-# Scripts Shell DEVEM ser LF (Linux) para rodar no Docker/Bash
+# Scripts sempre em LF (evita quebrar bash)
 *.sh text eol=lf
-mvnw text eol=lf
 
-# Scripts Windows DEVEM ser CRLF
-*.cmd text eol=crlf
+# Docs e configs
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+
+# Java
+*.java text eol=lf
+
+# Windows-only (se algum dia você tiver)
 *.bat text eol=crlf
-mvnw.cmd text eol=crlf
+*.cmd text eol=crlf
+
+# Binários (não mexer)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.jar binary
+*.exe binary
+*.db binary
