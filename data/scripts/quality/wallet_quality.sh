@@ -5,7 +5,7 @@ set -euo pipefail
 # wallet_quality.sh  -- >> chmod +x wallet_quality.sh
 #
 # Executa:
-#  1) mvn -B clean verify  -> tests + JaCoCo (gera HTML/ XML se configurado no POM)
+#  1) mvn -B clean verify  -> tests + JaCoCo (gera HTML/XML se configurado no POM)
 #  2) mvn sonar:sonar      -> envia análise e cobertura via jacoco.xml
 #  3) Abre o HTML do JaCoCo no final (se existir)
 #
@@ -18,7 +18,7 @@ set -euo pipefail
 # -----------------------------------------
 
 SONAR_HOST_URL="${SONAR_HOST_URL:-http://localhost:9000}"
-SONAR_TOKEN="${SONAR_TOKEN:-}"
+SONAR_TOKEN="${SONAR_TOKEN:-sqa_a1e24af056b5b8f91146bbc46c1f88294186a1c2}"
 SKIP_SONAR="${SKIP_SONAR:-false}"
 
 # Maven wrapper se existir
@@ -31,17 +31,17 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 cd "$ROOT_DIR"
 
 echo "🧪 [1/3] Maven: clean verify (tests + JaCoCo)"
-"$MVN" -B clean verify
+"$MVN" -B clean verify -DfailIfNoTests=false -T 1C
 
 # Caminhos esperados do JaCoCo
 JACOCO_XML="$ROOT_DIR/target/site/jacoco/jacoco.xml"
 JACOCO_HTML="$ROOT_DIR/target/site/jacoco/index.html"
 
-if [[ ! -f "$JACOCO_XML" ]]; then
-  echo "⚠️  Não encontrei jacoco.xml em: $JACOCO_XML"
-  echo "    Verifique se o POM está gerando XML e se o módulo é esse mesmo."
-else
+if [[ -f "$JACOCO_XML" ]]; then
   echo "✅ JaCoCo XML: $JACOCO_XML"
+else
+  echo "⚠️  Não encontrei jacoco.xml em: $JACOCO_XML"
+  echo "    Verifique se o jacoco-maven-plugin está gerando XML no POM."
 fi
 
 echo "🔎 [2/3] SonarQube"
@@ -54,7 +54,6 @@ else
     exit 1
   fi
 
-  # Se o jacoco.xml existir, passa o caminho explicitamente pro Sonar.
   SONAR_JACOCO_ARG=()
   if [[ -f "$JACOCO_XML" ]]; then
     SONAR_JACOCO_ARG=(-Dsonar.coverage.jacoco.xmlReportPaths="$JACOCO_XML")
@@ -68,30 +67,28 @@ else
   echo "✅ Sonar analysis enviado para: $SONAR_HOST_URL"
 fi
 
-echo "🧾 [3/3] Abrindo relatório JaCoCo (HTML)"
+echo "🧾 [3/3] Relatório JaCoCo (HTML)"
 if [[ -f "$JACOCO_HTML" ]]; then
-  # Abrir em Windows/macOS/Linux
+  echo "✅ HTML gerado em: $JACOCO_HTML"
+
   if command -v cmd.exe >/dev/null 2>&1; then
-    # Git Bash / MSYS
     winpath="$(cygpath -w "$JACOCO_HTML" 2>/dev/null || echo "$JACOCO_HTML")"
     cmd.exe /c start "" "$winpath" >/dev/null 2>&1 || true
   elif command -v powershell.exe >/dev/null 2>&1; then
-    # WSL com powershell disponível
     powershell.exe -NoProfile -Command "Start-Process '$(wslpath -w "$JACOCO_HTML" 2>/dev/null || echo "$JACOCO_HTML")'" >/dev/null 2>&1 || true
   elif command -v open >/dev/null 2>&1; then
-    # macOS
     open "$JACOCO_HTML" >/dev/null 2>&1 || true
   elif command -v xdg-open >/dev/null 2>&1; then
-    # Linux
     xdg-open "$JACOCO_HTML" >/dev/null 2>&1 || true
   else
-    echo "✅ HTML gerado em: $JACOCO_HTML"
-    echo "   (não consegui auto-abrir pois não encontrei start/open/xdg-open)"
+    echo "ℹ️  Não consegui auto-abrir (sem start/open/xdg-open)."
   fi
 else
   echo "⚠️  Não encontrei o HTML do JaCoCo em: $JACOCO_HTML"
-  echo "    Confirme se você adicionou <format>HTML</format> no POM e rode novamente:"
-  echo "      mvn -B clean verify"
+  echo "    Isso NÃO é gerado pelo script — é gerado pelo jacoco-maven-plugin."
+  echo "    Confira no POM se existe execução do goal 'report' (HTML) na fase verify."
+  echo "    Rode novamente:"
+  echo "      mvn -B clean verify -DfailIfNoTests=false -T 1C"
 fi
 
 echo "✅ Quality finalizado (verify + sonar + jacoco report)"

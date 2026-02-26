@@ -2,58 +2,6 @@
         "configurations": [
             {
                 "type": "java",
-                "name": "[dev](localhost) - Wallet Service API",
-                "request": "launch",
-                "cwd": "${workspaceFolder}",
-                "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
-                "projectName": "wallet-service-api",
-                "args": "",
-                //"envFile": "${workspaceFolder}/.env",
-                "vmArgs": [
-                    "-Dspring.profiles.active=dev",
-                    "-Dspring.devtools.add-properties=false",
-                    "-javaagent:${workspaceFolder}/lib/opentelemetry-javaagent.jar",
-                    "-Dotel.service.name=wallet-service-api",
-                    "-Dotel.resource.attributes=service.name=wallet-service-api,environment=env-dev",
-                    "-Dotel.traces.exporter=otlp",
-                    "-Dotel.metrics.exporter=otlp",
-                    "-Dotel.logs.exporter=otlp",
-                    "-Dotel.exporter.otlp.protocol=http/protobuf",
-                    // MUDANÇA: Usando o IP que o curl validou
-                    "-Dotel.exporter.otlp.endpoint=http://localhost:4318",
-                    // ADIÇÃO: Garante que o OkHttp não se perca no IPv6 do Windows
-                    "-Djava.net.preferIPv4Stack=true",
-                    "-Dotel.exporter.otlp.timeout=10000",
-                    "-Dotel.instrumentation.spring-webmvc.enabled=true",
-                    "-Dotel.instrumentation.spring-web.enabled=true",
-                    "-Dotel.instrumentation.servlet.enabled=true",
-                    // INFORMACOES DO VAULT
-                    "-Dspring.cloud.vault.enabled=true",
-                    "-Dspring.cloud.vault.uri=${VAULT_URI}",
-                    "-Dspring.cloud.vault.token=root",
-                    "-Dspring.cloud.vault.kv.version=2",
-                    "-Dspring.cloud.vault.kv.application-name=wallet-service-api",
-                    "-Dspring.cloud.vault.kv.default-context=wallet-service-api",
-                    "-Dspring.cloud.vault.kv.profiles=${PROFILE}"
-                    // SE VOCÊ ESTIVER RODANDO DENTRO DE UM CONTAINER DO DOCKER, DESCOMENTE AS LINHAS ABAIXO E COMENTE A LINHA ACIMA
-                    //"-Dotel.exporter.otlp.traces.endpoint=http://localhost:4318/v1/traces",
-                    //"-Dotel.exporter.otlp.metrics.endpoint=http://localhost:4318/v1/metrics",
-                    //"-Dotel.exporter.otlp.logs.endpoint=http://localhost:4318/v1/logs"
-                ],
-                "env": {
-                    "SPRING_DATASOURCE_PASSWORD": "wallet_pass",
-                    "APP_NAME": "wallet-service-api",
-                    "PROFILE": "dev",
-                    "ENV": "env-dev",
-                    "WALLET_USER": "wallet_user",
-                    "WALLET_PASS": "wallet_pass",
-                    "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823",
-                    "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1",
-                    "VAULT_URI": "http://localhost:8200"
-                }
-            },
-            {
-                "type": "java",
                 "name": "[local](docker) - Wallet Service API",
                 "request": "launch",
                 "cwd": "${workspaceFolder}",
@@ -92,8 +40,8 @@
                 "env": {
                     "SPRING_DATASOURCE_PASSWORD": "wallet_pass",
                     "APP_NAME": "wallet-service-api",
-                    "PROFILE": "dev",
-                    "ENV": "env-dev",
+                    "PROFILE": "local",
+                    "ENV": "env-local",
                     "WALLET_USER": "wallet_user",
                     "WALLET_PASS": "wallet_pass",
                     "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823",
@@ -101,40 +49,93 @@
                     "SONAR_LOCAL_TOKEN": "squ_ea51cedf0f969507efcbb2a7ce1b985455004a61",
                     "VAULT_URI": "http://vault:8200"
                 }
-            },
-            {
-                "type": "java",
-                "name": "[test/debug](localhost) - Wallet Service API",
-                "request": "launch",
-                "cwd": "${workspaceFolder}",
-                "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
-                "projectName": "wallet-service-api",
-                "args": [
-                    "--debug"
-                ],
-                "vmArgs": [
-                    "-Dspring.profiles.active=test",
-                    "-Dspring.main.log-startup-info=true",
-                    "-Dspring.main.banner-mode=off",
-                    "-Dmanagement.endpoint.startup.enabled=true",
-                    "-Dmanagement.endpoints.web.exposure.include=startup",
-                    "-Dspring.config.import=",
-                    "-Dspring.cloud.vault.enabled=false",
-                    "-Djava.net.preferIPv4Stack=true",
-                    "-Dsonar.projectKey=com.gugawallet:wallet-service-api",
-                    "-Dsonar.host.url=http://localhost:9000",
-                    "-Dsonar.token=${env:SONAR_LOCAL_TOKEN}"
-                ],
-                "env": {
-                    "APP_NAME": "wallet-service-api",
-                    "PROFILE": "test",
-                    "ENV": "env-test",
-                    "WALLET_USER": "wallet_user",
-                    "WALLET_PASS": "wallet_pass",
-                    "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823",
-                    "SONAR_LOCAL_TOKEN": "squ_ea51cedf0f969507efcbb2a7ce1b985455004a61",
-                    "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1",
-                }
             }
+            // {
+            //     "type": "java",
+            //     "name": "[dev](localhost) - Wallet Service API",
+            //     "request": "launch",
+            //     "cwd": "${workspaceFolder}",
+            //     "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
+            //     "projectName": "wallet-service-api",
+            //     "args": "",
+            //     //"envFile": "${workspaceFolder}/.env",
+            //     "vmArgs": [
+            //         "-Dspring.profiles.active=dev",
+            //         "-Dspring.devtools.add-properties=false",
+            //         "-javaagent:${workspaceFolder}/lib/opentelemetry-javaagent.jar",
+            //         "-Dotel.service.name=wallet-service-api",
+            //         "-Dotel.resource.attributes=service.name=wallet-service-api,environment=env-dev",
+            //         "-Dotel.traces.exporter=otlp",
+            //         "-Dotel.metrics.exporter=otlp",
+            //         "-Dotel.logs.exporter=otlp",
+            //         "-Dotel.exporter.otlp.protocol=http/protobuf",
+            //         // MUDANÇA: Usando o IP que o curl validou
+            //         "-Dotel.exporter.otlp.endpoint=http://localhost:4318",
+            //         // ADIÇÃO: Garante que o OkHttp não se perca no IPv6 do Windows
+            //         "-Djava.net.preferIPv4Stack=true",
+            //         "-Dotel.exporter.otlp.timeout=10000",
+            //         "-Dotel.instrumentation.spring-webmvc.enabled=true",
+            //         "-Dotel.instrumentation.spring-web.enabled=true",
+            //         "-Dotel.instrumentation.servlet.enabled=true",
+            //         // INFORMACOES DO VAULT
+            //         "-Dspring.cloud.vault.enabled=true",
+            //         "-Dspring.cloud.vault.uri=${VAULT_URI}",
+            //         "-Dspring.cloud.vault.token=root",
+            //         "-Dspring.cloud.vault.kv.version=2",
+            //         "-Dspring.cloud.vault.kv.application-name=wallet-service-api",
+            //         "-Dspring.cloud.vault.kv.default-context=wallet-service-api",
+            //         "-Dspring.cloud.vault.kv.profiles=${PROFILE}"
+            //         // SE VOCÊ ESTIVER RODANDO DENTRO DE UM CONTAINER DO DOCKER, DESCOMENTE AS LINHAS ABAIXO E COMENTE A LINHA ACIMA
+            //         //"-Dotel.exporter.otlp.traces.endpoint=http://localhost:4318/v1/traces",
+            //         //"-Dotel.exporter.otlp.metrics.endpoint=http://localhost:4318/v1/metrics",
+            //         //"-Dotel.exporter.otlp.logs.endpoint=http://localhost:4318/v1/logs"
+            //     ],
+            //     "env": {
+            //         "SPRING_DATASOURCE_PASSWORD": "wallet_pass",
+            //         "APP_NAME": "wallet-service-api",
+            //         "PROFILE": "dev",
+            //         "ENV": "env-dev",
+            //         "WALLET_USER": "wallet_user",
+            //         "WALLET_PASS": "wallet_pass",
+            //         "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823",
+            //         "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1",
+            //         "SONAR_LOCAL_TOKEN": "squ_ea51cedf0f969507efcbb2a7ce1b985455004a61",
+            //         "VAULT_URI": "http://localhost:8200"
+            //     }
+            // }
+            // ,{
+            //     "type": "java",
+            //     "name": "[test/debug](localhost) - Wallet Service API",
+            //     "request": "launch",
+            //     "cwd": "${workspaceFolder}",
+            //     "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
+            //     "projectName": "wallet-service-api",
+            //     "args": [
+            //         "--debug"
+            //     ],
+            //     "vmArgs": [
+            //         "-Dspring.profiles.active=test",
+            //         "-Dspring.main.log-startup-info=true",
+            //         "-Dspring.main.banner-mode=off",
+            //         "-Dmanagement.endpoint.startup.enabled=true",
+            //         "-Dmanagement.endpoints.web.exposure.include=startup",
+            //         "-Dspring.config.import=",
+            //         "-Dspring.cloud.vault.enabled=false",
+            //         "-Djava.net.preferIPv4Stack=true",
+            //         "-Dsonar.projectKey=com.gugawallet:wallet-service-api",
+            //         "-Dsonar.host.url=http://localhost:9000",
+            //         "-Dsonar.token=${env:SONAR_LOCAL_TOKEN}"
+            //     ],
+            //     "env": {
+            //         "APP_NAME": "wallet-service-api",
+            //         "PROFILE": "test",
+            //         "ENV": "env-test",
+            //         "WALLET_USER": "wallet_user",
+            //         "WALLET_PASS": "wallet_pass",
+            //         "JWT_SECRET": "mock.jwt_secret_value_8235hu23523h523h57823h58723h823",
+            //         "SONAR_LOCAL_TOKEN": "squ_ea51cedf0f969507efcbb2a7ce1b985455004a61",
+            //         "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1",
+            //     }
+            // }
   ]
 }

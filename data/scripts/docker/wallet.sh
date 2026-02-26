@@ -75,22 +75,25 @@ case "$CMD" in
     fi
 
     echo "[Debug] Validando variaveis para o Docker..."
-    # Esse comando passa as variaveis diretamente para o sub-shell do script up.sh
-    PROFILE="$PROFILE" \
-    TZ="$TZ" \
-    ENV="$ENV" \
-    ENVIRONMENT="$ENVIRONMENT" \
-    NAMESPACE="$NAMESPACE" \
-    APP_NAME="$APP_NAME" \
-    APP_VERSION="$APP_VERSION" \
-    APPLICATION_NAME="$APPLICATION_NAME" \
-    SERVICE_NAME="$SERVICE_NAME" \
-    WALLET_USER="$WALLET_USER" \
-    WALLET_PASS="$WALLET_PASS" \
-    VAULT_TOKEN="$VAULT_TOKEN" \
-    VAULT_ADDR="$VAULT_ADDR" \
-    VAULT_SECRET_PATH="$VAULT_SECRET_PATH" \
-    JWT_SECRET="$JWT_SECRET" \
+
+    # # Esse comando passa as variaveis diretamente para o sub-shell do script up.sh
+    # PROFILE="$PROFILE" \
+    # TZ="$TZ" \
+    # ENV="$ENV" \
+    # ENVIRONMENT="$ENVIRONMENT" \
+    # NAMESPACE="$NAMESPACE" \
+    # APP_NAME="$APP_NAME" \
+    # APP_VERSION="$APP_VERSION" \
+    # APPLICATION_NAME="$APPLICATION_NAME" \
+    # SERVICE_NAME="$SERVICE_NAME" \
+    # WALLET_USER="$WALLET_USER" \
+    # WALLET_PASS="$WALLET_PASS" \
+    # VAULT_TOKEN="$VAULT_TOKEN" \
+    # VAULT_ADDR="$VAULT_ADDR" \
+    # VAULT_SECRET_PATH="$VAULT_SECRET_PATH" \
+    # JWT_SECRET="$JWT_SECRET" \
+    echo "APP & VERSION = $APP_NAME - $APP_VERSION"
+    export APP_VERSION
     "$SCRIPT_DIR/up.sh" "$TARGET"
     ;;
   stop)

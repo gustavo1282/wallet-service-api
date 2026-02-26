@@ -81,9 +81,15 @@ management:
       exposure:
         include: "*"
         #include: "startup,health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges,env"
-      base-path: /actuator      
+      base-path: /actuator 
   otlp:
     logging:
+      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/logs
+      timeout: 90s
+    tracing:
+      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/traces
+      timeout: 90s
+    metrics:
       export:
         enabled: false
 

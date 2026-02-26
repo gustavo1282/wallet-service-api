@@ -20,7 +20,11 @@ usage() {
   exit 1
 }
 
-TARGET="${1:-}"
+# Normalização do input:
+# 1. Remove caracteres invisíveis (como \r do Windows)
+# 2. Converte para minúsculas (ALL -> all)
+RAW_TARGET="${1:-}"
+TARGET="$(echo "${RAW_TARGET//$'\r'/}" | tr '[:upper:]' '[:lower:]')"
 
 up()    { docker compose up -d "$@"; }
 up_bld(){ docker compose up -d --build "$@"; }

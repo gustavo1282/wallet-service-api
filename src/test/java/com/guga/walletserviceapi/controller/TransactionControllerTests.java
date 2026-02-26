@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,17 +29,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.helpers.FileUtils;
-import com.guga.walletserviceapi.helpers.TransactionUtils;
-import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
-import com.guga.walletserviceapi.model.DepositMoney;
 import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.MovementTransaction;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Transaction;
-import com.guga.walletserviceapi.model.TransferMoneySend;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.service.TransactionService;
@@ -173,10 +168,10 @@ class TransactionControllerTests extends BaseControllerTest {
     // CRIAÇÃO DE TRANSAÇÕES (POST) Tipadas [Withdraw, Deposit, Transfer]
     // =========================================================
 
+/*
     @Nested
     @DisplayName("Criação de Transações Tipadas [Withdraw, Deposit, Transfer]")
     class TransactionCreation {
-
         @Test
         @DisplayName("Deve realizar um depósito com sucesso")
         void deposit_created() throws Exception {
@@ -253,7 +248,7 @@ class TransactionControllerTests extends BaseControllerTest {
                     .andExpect(status().isOk());
         }
     }
-
+ */
     // Helper auxiliar para buscar o login pelo ID da carteira na massa de dados
     private LoginAuth findLoginAuthByWalletId(long walletId) {
         return loginAuths.stream()

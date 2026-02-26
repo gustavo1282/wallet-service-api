@@ -12,7 +12,10 @@ import com.guga.walletserviceapi.logging.LogMarkers;
 
 
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.MOCK
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    properties = {
+        "MANAGEMENT_OTLP_ENDPOINT=http://localhost:4317",
+    }
 )
 @AutoConfigureMockMvc     // [somente quando @SpringBootTest] injeta e cria todos os beans
 //@WebMvcTest     // [Somente em ControllerTests - sem @SpringBootTest] trabalha no modelo web slice (mais rápido) só de controllers

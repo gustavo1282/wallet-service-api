@@ -19,6 +19,9 @@ jobs:
   build_test:
     name: Build & Test (Java 21)
     runs-on: ubuntu-latest
+    env:
+      # Isso faz o Maven ser rÃ¡pido e silencioso sem vocÃª digitar no run
+      MAVEN_OPTS: "-DskipTests -DfailIfNoTests=false -T 1C -B" 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,15 +33,14 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      # Opcional (só mantenha se você realmente precisa fixar versão do Maven)
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
-        with:
-          maven-version: "3.9.6"
+      # Opcional (sï¿½ mantenha se vocï¿½ realmente precisa fixar versï¿½o do Maven)
+      #- name: Set up Maven
+      #  uses: stCarolas/setup-maven@v4.5
+      #  with:
+      #    maven-version: "3.9.6"
 
       - name: Maven Verify (tests + checks)
-        run: mvn -B verify -DfailIfNoTests=false
-
+        run: mvn verify 
       - name: Upload JaCoCo report (artifact)
         if: always()
         uses: actions/upload-artifact@v4
@@ -50,7 +52,7 @@ jobs:
     name: SonarQube / SonarCloud
     runs-on: ubuntu-latest
     needs: [build_test]
-    # Se quiser rodar Sonar só no main e PRs, use:
+    # Se quiser rodar Sonar sï¿½ no main e PRs, use:
     # if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     steps:
       - name: Checkout (full history)

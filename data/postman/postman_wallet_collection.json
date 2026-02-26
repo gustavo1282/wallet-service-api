@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "4f432aa0-52a2-4eb7-aae3-842d8faaeda1",
+    "_postman_id": "874d3df8-512a-4b8d-85e2-bfa217049b4a",
     "name": "Wallet Service API - v0.2.10-SNAPSHOT",
-    "description": "Documentação da API de Carteira de Clientes.\n\n---\n\n### 🔑 Autenticação (A partir da v0.2.4)\n\nA autenticação agora utiliza **JSON Web Tokens (JWT)**. Para acessar os endpoints protegidos, siga os passos abaixo:\n\n1.  **Obter o Token:**\n    * Execute o endpoint de login: **`POST /api/auth/login`**.\n    * Use suas credenciais de usuário e senha no corpo da requisição (Request Body).\n\n2.  **Autorizar o Swagger (OpenAPI):**\n    * Copie o **token JWT** retornado no campo `access_token`.\n    * Clique no botão **\"Authorize\"** (Autorizar) no topo da página.\n    * Cole o token no campo de autenticação (Geralmente no formato **`Bearer SeuTokenAqui`**).\n\n3.  **Executar Métodos:**\n    * Com o token configurado no Swagger, você pode executar todos os métodos protegidos.\n\n---\n\n**Credenciais de Teste:**\n* **Usuário:** `wallet_user`\n* **Senha:** `wallet_pass`\n",
+    "description": "Documentação da API de Carteira de Clientes.\n\n---\n\n### 🔑 Autenticação (A partir da v0.2.4)\n\nA autenticação agora utiliza **JSON Web Tokens (JWT)**. Para acessar os endpoints protegidos, siga os passos abaixo:\n\n1. **Obter o Token:**\n    \n    - Execute o endpoint de login: **`POST /api/auth/login`**.\n        \n    - Use suas credenciais de usuário e senha no corpo da requisição (Request Body).\n        \n2. **Autorizar o Swagger (OpenAPI):**\n    \n    - Copie o **token JWT** retornado no campo `access_token`.\n        \n    - Clique no botão **\"Authorize\"** (Autorizar) no topo da página.\n        \n    - Cole o token no campo de autenticação (Geralmente no formato **`Bearer SeuTokenAqui`**).\n        \n3. **Executar Métodos:**\n    \n    - Com o token configurado no Swagger, você pode executar todos os métodos protegidos.\n        \n\n---\n\n**Credenciais de Teste:**\n\n- **Usuário:** `wallet_user`\n    \n- **Senha:** `wallet_pass`",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "47458903",
-    "_collection_link": "https://go.postman.co/collection/47458903-4f432aa0-52a2-4eb7-aae3-842d8faaeda1?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/47458903-874d3df8-512a-4b8d-85e2-bfa217049b4a?source=collection_link"
   },
   "item": [
     {
@@ -984,6 +984,1497 @@
               ]
             },
             {
+              "name": "params",
+              "item": [
+                {
+                  "name": "list",
+                  "item": [
+                    {
+                      "name": "find All",
+                      "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{accessToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params/list",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params",
+                            "list"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/list",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "list"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "[\n  {\n    \"id\": 6001,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"1973-06-03\",\n    \"valueDateTime\": \"1977-12-20T06:46:16.534Z\",\n    \"valueBoolean\": false,\n    \"valueLong\": 5242,\n    \"valueInteger\": 653,\n    \"valueBigDecimal\": 7364.655972150558\n  },\n  {\n    \"id\": 5738,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"1963-12-20\",\n    \"valueDateTime\": \"1965-07-10T06:29:17.623Z\",\n    \"valueBoolean\": false,\n    \"valueLong\": 7620,\n    \"valueInteger\": 5593,\n    \"valueBigDecimal\": 2472.563096147098\n  }\n]"
+                        },
+                        {
+                          "name": "Bad Request",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/list",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "list"
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Not Found",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/list",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "list"
+                              ]
+                            }
+                          },
+                          "status": "Not Found",
+                          "code": 404,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Conflict",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/list",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "list"
+                              ]
+                            }
+                          },
+                          "status": "Conflict",
+                          "code": 409,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "update",
+                  "item": [
+                    {
+                      "name": "{paramName}",
+                      "item": [
+                        {
+                          "name": "update Param",
+                          "request": {
+                            "auth": {
+                              "type": "bearer",
+                              "bearer": [
+                                {
+                                  "key": "token",
+                                  "value": "{{accessToken}}",
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "update",
+                                ":paramName"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "paramName",
+                                  "value": "<string>",
+                                  "description": "(Required) "
+                                }
+                              ]
+                            }
+                          },
+                          "response": [
+                            {
+                              "name": "OK",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"id\": \"<long>\",\n  \"name\": \"<string>\",\n  \"description\": \"<string>\",\n  \"valueString\": \"<string>\",\n  \"valueLong\": \"<long>\",\n  \"valueInteger\": \"<integer>\",\n  \"valueBigDecimal\": \"<number>\",\n  \"valueDate\": \"<date>\",\n  \"valueDateTime\": \"<dateTime>\",\n  \"valueBoolean\": \"<boolean>\"\n}"
+                            },
+                            {
+                              "name": "Bad Request",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+                            },
+                            {
+                              "name": "Not Found",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+                            },
+                            {
+                              "name": "Conflict",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "params",
+                                    "update",
+                                    ":paramName"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "paramName",
+                                      "value": "<string>",
+                                      "description": "(Required) "
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Conflict",
+                              "code": 409,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "adjust",
+                  "item": [
+                    {
+                      "name": "adjust Sequence Param",
+                      "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{accessToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params",
+                            "adjust"
+                          ],
+                          "query": [
+                            {
+                              "key": "paramName",
+                              "value": "string"
+                            },
+                            {
+                              "key": "value",
+                              "value": "8317"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "adjust"
+                              ],
+                              "query": [
+                                {
+                                  "key": "paramName",
+                                  "value": "string"
+                                },
+                                {
+                                  "key": "value",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}"
+                        },
+                        {
+                          "name": "Bad Request",
+                          "originalRequest": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "adjust"
+                              ],
+                              "query": [
+                                {
+                                  "key": "paramName",
+                                  "value": "string"
+                                },
+                                {
+                                  "key": "value",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Not Found",
+                          "originalRequest": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "adjust"
+                              ],
+                              "query": [
+                                {
+                                  "key": "paramName",
+                                  "value": "string"
+                                },
+                                {
+                                  "key": "value",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Not Found",
+                          "code": 404,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Conflict",
+                          "originalRequest": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                "adjust"
+                              ],
+                              "query": [
+                                {
+                                  "key": "paramName",
+                                  "value": "string"
+                                },
+                                {
+                                  "key": "value",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Conflict",
+                          "code": 409,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "{id}",
+                  "item": [
+                    {
+                      "name": "find Param By Id",
+                      "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{accessToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params/:id",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params",
+                            ":id"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "8317"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}"
+                        },
+                        {
+                          "name": "Bad Request",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Not Found",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Not Found",
+                          "code": 404,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Conflict",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Conflict",
+                          "code": 409,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "delete Param",
+                      "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{accessToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params/:id",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params",
+                            ":id"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "8317"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "DELETE",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "3411"
+                        },
+                        {
+                          "name": "Bad Request",
+                          "originalRequest": {
+                            "method": "DELETE",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Not Found",
+                          "originalRequest": {
+                            "method": "DELETE",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Not Found",
+                          "code": 404,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Conflict",
+                          "originalRequest": {
+                            "method": "DELETE",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/params/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "params",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "id",
+                                  "value": "8317"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Conflict",
+                          "code": 409,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "create Param",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "*/*"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/api/v1/params",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "params"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "OK",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}"
+                    },
+                    {
+                      "name": "Bad Request",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params"
+                          ]
+                        }
+                      },
+                      "status": "Bad Request",
+                      "code": 400,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                    },
+                    {
+                      "name": "Not Found",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params"
+                          ]
+                        }
+                      },
+                      "status": "Not Found",
+                      "code": 404,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                    },
+                    {
+                      "name": "Conflict",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/params",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "params"
+                          ]
+                        }
+                      },
+                      "status": "Conflict",
+                      "code": 409,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "*/*"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "name": "customers",
               "item": [
                 {
@@ -1541,6 +3032,216 @@
                   "name": "me",
                   "item": [
                     {
+                      "name": "Get authenticated customer profile",
+                      "event": [
+                        {
+                          "listen": "prerequest",
+                          "script": {
+                            "exec": [
+                              ""
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{accessToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "*/*"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/customers/me",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "customers",
+                            "me"
+                          ]
+                        },
+                        "description": "Returns customer data associated with the authenticated user (JWT context)."
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(79)  \\n       91968-0124\",\n  \"customerId\": 3833,\n  \"status\": \"REVIEW\",\n  \"cpf\": \"205.142.028-85\",\n  \"birthDate\": \"2011-03-18\",\n  \"email\": \"string\",\n  \"createdAt\": \"1989-03-22T18:28:33.489Z\",\n  \"updatedAt\": \"1981-04-11T10:23:04.895Z\",\n  \"loginAuthId\": 5373\n}"
+                        },
+                        {
+                          "name": "Bad Request",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Not Found",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "Not Found",
+                          "code": 404,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        },
+                        {
+                          "name": "Conflict",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/customers/me",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "customers",
+                                "me"
+                              ]
+                            }
+                          },
+                          "status": "Conflict",
+                          "code": 409,
+                          "_postman_previewlanguage": "text",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "*/*"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
+                        }
+                      ]
+                    },
+                    {
                       "name": "Update my customer data",
                       "event": [
                         {
@@ -1828,216 +3529,6 @@
                           "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
                         }
                       ]
-                    },
-                    {
-                      "name": "Get authenticated customer profile",
-                      "event": [
-                        {
-                          "listen": "prerequest",
-                          "script": {
-                            "exec": [
-                              ""
-                            ],
-                            "type": "text/javascript",
-                            "packages": {},
-                            "requests": {}
-                          }
-                        }
-                      ],
-                      "request": {
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                            {
-                              "key": "token",
-                              "value": "{{accessToken}}",
-                              "type": "string"
-                            }
-                          ]
-                        },
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/customers/me",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "customers",
-                            "me"
-                          ]
-                        },
-                        "description": "Returns customer data associated with the authenticated user (JWT context)."
-                      },
-                      "response": [
-                        {
-                          "name": "OK",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"documentId\": \"string\",\n  \"firstName\": \"string\",\n  \"fullName\": \"string\",\n  \"lastName\": \"string\",\n  \"phoneNumber\": \"(79)  \\n       91968-0124\",\n  \"customerId\": 3833,\n  \"status\": \"REVIEW\",\n  \"cpf\": \"205.142.028-85\",\n  \"birthDate\": \"2011-03-18\",\n  \"email\": \"string\",\n  \"createdAt\": \"1989-03-22T18:28:33.489Z\",\n  \"updatedAt\": \"1981-04-11T10:23:04.895Z\",\n  \"loginAuthId\": 5373\n}"
-                        },
-                        {
-                          "name": "Bad Request",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "Bad Request",
-                          "code": 400,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Not Found",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "Not Found",
-                          "code": 404,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Conflict",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/me",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                "me"
-                              ]
-                            }
-                          },
-                          "status": "Conflict",
-                          "code": 409,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        }
-                      ]
                     }
                   ]
                 },
@@ -2069,6 +3560,16 @@
                     }
                   ],
                   "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{bearerToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
                     "method": "GET",
                     "header": [
                       {
@@ -8754,1529 +10255,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "name": "params",
-              "item": [
-                {
-                  "name": "update",
-                  "item": [
-                    {
-                      "name": "{paramName}",
-                      "item": [
-                        {
-                          "name": "update Param",
-                          "request": {
-                            "auth": {
-                              "type": "bearer",
-                              "bearer": [
-                                {
-                                  "key": "token",
-                                  "value": "{{accessToken}}",
-                                  "type": "string"
-                                }
-                              ]
-                            },
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                              },
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              }
-                            ],
-                            "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
-                              "options": {
-                                "raw": {
-                                  "headerFamily": "json",
-                                  "language": "json"
-                                }
-                              }
-                            },
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "update",
-                                ":paramName"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "paramName",
-                                  "value": "<string>",
-                                  "description": "(Required) "
-                                }
-                              ]
-                            }
-                          },
-                          "response": [
-                            {
-                              "name": "OK",
-                              "originalRequest": {
-                                "method": "PUT",
-                                "header": [
-                                  {
-                                    "key": "Content-Type",
-                                    "value": "application/json"
-                                  },
-                                  {
-                                    "key": "Accept",
-                                    "value": "*/*"
-                                  },
-                                  {
-                                    "description": "Added as a part of security scheme: bearer",
-                                    "key": "Authorization",
-                                    "value": "Bearer <token>"
-                                  }
-                                ],
-                                "body": {
-                                  "mode": "raw",
-                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
-                                  "options": {
-                                    "raw": {
-                                      "headerFamily": "json",
-                                      "language": "json"
-                                    }
-                                  }
-                                },
-                                "url": {
-                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
-                                  "host": [
-                                    "{{baseUrl}}"
-                                  ],
-                                  "path": [
-                                    "api",
-                                    "v1",
-                                    "params",
-                                    "update",
-                                    ":paramName"
-                                  ],
-                                  "variable": [
-                                    {
-                                      "key": "paramName",
-                                      "value": "<string>",
-                                      "description": "(Required) "
-                                    }
-                                  ]
-                                }
-                              },
-                              "status": "OK",
-                              "code": 200,
-                              "_postman_previewlanguage": "text",
-                              "header": [
-                                {
-                                  "key": "Content-Type",
-                                  "value": "*/*"
-                                }
-                              ],
-                              "cookie": [],
-                              "body": "{\n  \"id\": \"<long>\",\n  \"name\": \"<string>\",\n  \"description\": \"<string>\",\n  \"valueString\": \"<string>\",\n  \"valueLong\": \"<long>\",\n  \"valueInteger\": \"<integer>\",\n  \"valueBigDecimal\": \"<number>\",\n  \"valueDate\": \"<date>\",\n  \"valueDateTime\": \"<dateTime>\",\n  \"valueBoolean\": \"<boolean>\"\n}"
-                            },
-                            {
-                              "name": "Bad Request",
-                              "originalRequest": {
-                                "method": "PUT",
-                                "header": [
-                                  {
-                                    "key": "Content-Type",
-                                    "value": "application/json"
-                                  },
-                                  {
-                                    "key": "Accept",
-                                    "value": "*/*"
-                                  },
-                                  {
-                                    "description": "Added as a part of security scheme: bearer",
-                                    "key": "Authorization",
-                                    "value": "Bearer <token>"
-                                  }
-                                ],
-                                "body": {
-                                  "mode": "raw",
-                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
-                                  "options": {
-                                    "raw": {
-                                      "headerFamily": "json",
-                                      "language": "json"
-                                    }
-                                  }
-                                },
-                                "url": {
-                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
-                                  "host": [
-                                    "{{baseUrl}}"
-                                  ],
-                                  "path": [
-                                    "api",
-                                    "v1",
-                                    "params",
-                                    "update",
-                                    ":paramName"
-                                  ],
-                                  "variable": [
-                                    {
-                                      "key": "paramName",
-                                      "value": "<string>",
-                                      "description": "(Required) "
-                                    }
-                                  ]
-                                }
-                              },
-                              "status": "Bad Request",
-                              "code": 400,
-                              "_postman_previewlanguage": "text",
-                              "header": [
-                                {
-                                  "key": "Content-Type",
-                                  "value": "*/*"
-                                }
-                              ],
-                              "cookie": [],
-                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
-                            },
-                            {
-                              "name": "Not Found",
-                              "originalRequest": {
-                                "method": "PUT",
-                                "header": [
-                                  {
-                                    "key": "Content-Type",
-                                    "value": "application/json"
-                                  },
-                                  {
-                                    "key": "Accept",
-                                    "value": "*/*"
-                                  },
-                                  {
-                                    "description": "Added as a part of security scheme: bearer",
-                                    "key": "Authorization",
-                                    "value": "Bearer <token>"
-                                  }
-                                ],
-                                "body": {
-                                  "mode": "raw",
-                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
-                                  "options": {
-                                    "raw": {
-                                      "headerFamily": "json",
-                                      "language": "json"
-                                    }
-                                  }
-                                },
-                                "url": {
-                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
-                                  "host": [
-                                    "{{baseUrl}}"
-                                  ],
-                                  "path": [
-                                    "api",
-                                    "v1",
-                                    "params",
-                                    "update",
-                                    ":paramName"
-                                  ],
-                                  "variable": [
-                                    {
-                                      "key": "paramName",
-                                      "value": "<string>",
-                                      "description": "(Required) "
-                                    }
-                                  ]
-                                }
-                              },
-                              "status": "Not Found",
-                              "code": 404,
-                              "_postman_previewlanguage": "text",
-                              "header": [
-                                {
-                                  "key": "Content-Type",
-                                  "value": "*/*"
-                                }
-                              ],
-                              "cookie": [],
-                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
-                            },
-                            {
-                              "name": "Conflict",
-                              "originalRequest": {
-                                "method": "PUT",
-                                "header": [
-                                  {
-                                    "key": "Content-Type",
-                                    "value": "application/json"
-                                  },
-                                  {
-                                    "key": "Accept",
-                                    "value": "*/*"
-                                  },
-                                  {
-                                    "description": "Added as a part of security scheme: bearer",
-                                    "key": "Authorization",
-                                    "value": "Bearer <token>"
-                                  }
-                                ],
-                                "body": {
-                                  "mode": "raw",
-                                  "raw": "{\n  \"value\": \"<string>\",\n  \"description\": \"<string>\"\n}",
-                                  "options": {
-                                    "raw": {
-                                      "headerFamily": "json",
-                                      "language": "json"
-                                    }
-                                  }
-                                },
-                                "url": {
-                                  "raw": "{{baseUrl}}/api/v1/params/update/:paramName",
-                                  "host": [
-                                    "{{baseUrl}}"
-                                  ],
-                                  "path": [
-                                    "api",
-                                    "v1",
-                                    "params",
-                                    "update",
-                                    ":paramName"
-                                  ],
-                                  "variable": [
-                                    {
-                                      "key": "paramName",
-                                      "value": "<string>",
-                                      "description": "(Required) "
-                                    }
-                                  ]
-                                }
-                              },
-                              "status": "Conflict",
-                              "code": 409,
-                              "_postman_previewlanguage": "text",
-                              "header": [
-                                {
-                                  "key": "Content-Type",
-                                  "value": "*/*"
-                                }
-                              ],
-                              "cookie": [],
-                              "body": "{\n  \"status\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\",\n  \"traceId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "adjust",
-                  "item": [
-                    {
-                      "name": "adjust Sequence Param",
-                      "request": {
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                            {
-                              "key": "token",
-                              "value": "{{accessToken}}",
-                              "type": "string"
-                            }
-                          ]
-                        },
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params",
-                            "adjust"
-                          ],
-                          "query": [
-                            {
-                              "key": "paramName",
-                              "value": "string"
-                            },
-                            {
-                              "key": "value",
-                              "value": "8317"
-                            }
-                          ]
-                        }
-                      },
-                      "response": [
-                        {
-                          "name": "OK",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "adjust"
-                              ],
-                              "query": [
-                                {
-                                  "key": "paramName",
-                                  "value": "string"
-                                },
-                                {
-                                  "key": "value",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}"
-                        },
-                        {
-                          "name": "Bad Request",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "adjust"
-                              ],
-                              "query": [
-                                {
-                                  "key": "paramName",
-                                  "value": "string"
-                                },
-                                {
-                                  "key": "value",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Bad Request",
-                          "code": 400,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Not Found",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "adjust"
-                              ],
-                              "query": [
-                                {
-                                  "key": "paramName",
-                                  "value": "string"
-                                },
-                                {
-                                  "key": "value",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Not Found",
-                          "code": 404,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Conflict",
-                          "originalRequest": {
-                            "method": "PUT",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/adjust?paramName=string&value=8317",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "adjust"
-                              ],
-                              "query": [
-                                {
-                                  "key": "paramName",
-                                  "value": "string"
-                                },
-                                {
-                                  "key": "value",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Conflict",
-                          "code": 409,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "{id}",
-                  "item": [
-                    {
-                      "name": "find Param By Id",
-                      "request": {
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                            {
-                              "key": "token",
-                              "value": "{{accessToken}}",
-                              "type": "string"
-                            }
-                          ]
-                        },
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "8317"
-                            }
-                          ]
-                        }
-                      },
-                      "response": [
-                        {
-                          "name": "OK",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}"
-                        },
-                        {
-                          "name": "Bad Request",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Bad Request",
-                          "code": 400,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Not Found",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Not Found",
-                          "code": 404,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Conflict",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Conflict",
-                          "code": 409,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        }
-                      ]
-                    },
-                    {
-                      "name": "delete Param",
-                      "request": {
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                            {
-                              "key": "token",
-                              "value": "{{accessToken}}",
-                              "type": "string"
-                            }
-                          ]
-                        },
-                        "method": "DELETE",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params/:id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params",
-                            ":id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "id",
-                              "value": "8317"
-                            }
-                          ]
-                        }
-                      },
-                      "response": [
-                        {
-                          "name": "OK",
-                          "originalRequest": {
-                            "method": "DELETE",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "3411"
-                        },
-                        {
-                          "name": "Bad Request",
-                          "originalRequest": {
-                            "method": "DELETE",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Bad Request",
-                          "code": 400,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Not Found",
-                          "originalRequest": {
-                            "method": "DELETE",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Not Found",
-                          "code": 404,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Conflict",
-                          "originalRequest": {
-                            "method": "DELETE",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/:id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                ":id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "id",
-                                  "value": "8317"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Conflict",
-                          "code": 409,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "list",
-                  "item": [
-                    {
-                      "name": "find All",
-                      "request": {
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                            {
-                              "key": "token",
-                              "value": "{{accessToken}}",
-                              "type": "string"
-                            }
-                          ]
-                        },
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params/list",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params",
-                            "list"
-                          ]
-                        }
-                      },
-                      "response": [
-                        {
-                          "name": "OK",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/list",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "list"
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "[\n  {\n    \"id\": 6001,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"1973-06-03\",\n    \"valueDateTime\": \"1977-12-20T06:46:16.534Z\",\n    \"valueBoolean\": false,\n    \"valueLong\": 5242,\n    \"valueInteger\": 653,\n    \"valueBigDecimal\": 7364.655972150558\n  },\n  {\n    \"id\": 5738,\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"valueString\": \"string\",\n    \"valueDate\": \"1963-12-20\",\n    \"valueDateTime\": \"1965-07-10T06:29:17.623Z\",\n    \"valueBoolean\": false,\n    \"valueLong\": 7620,\n    \"valueInteger\": 5593,\n    \"valueBigDecimal\": 2472.563096147098\n  }\n]"
-                        },
-                        {
-                          "name": "Bad Request",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/list",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "list"
-                              ]
-                            }
-                          },
-                          "status": "Bad Request",
-                          "code": 400,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Not Found",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/list",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "list"
-                              ]
-                            }
-                          },
-                          "status": "Not Found",
-                          "code": 404,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        },
-                        {
-                          "name": "Conflict",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "*/*"
-                              },
-                              {
-                                "description": "Added as a part of security scheme: bearer",
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/params/list",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "params",
-                                "list"
-                              ]
-                            }
-                          },
-                          "status": "Conflict",
-                          "code": 409,
-                          "_postman_previewlanguage": "text",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "*/*"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "create Param",
-                  "request": {
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{accessToken}}",
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      },
-                      {
-                        "key": "Accept",
-                        "value": "*/*"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/v1/params",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "v1",
-                        "params"
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "OK",
-                      "originalRequest": {
-                        "method": "POST",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          },
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params"
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}"
-                    },
-                    {
-                      "name": "Bad Request",
-                      "originalRequest": {
-                        "method": "POST",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          },
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params"
-                          ]
-                        }
-                      },
-                      "status": "Bad Request",
-                      "code": 400,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                    },
-                    {
-                      "name": "Not Found",
-                      "originalRequest": {
-                        "method": "POST",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          },
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params"
-                          ]
-                        }
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                    },
-                    {
-                      "name": "Conflict",
-                      "originalRequest": {
-                        "method": "POST",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          },
-                          {
-                            "key": "Accept",
-                            "value": "*/*"
-                          },
-                          {
-                            "description": "Added as a part of security scheme: bearer",
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"id\": 433,\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"valueString\": \"string\",\n  \"valueDate\": \"1982-10-07\",\n  \"valueDateTime\": \"1978-03-23T19:39:39.385Z\",\n  \"valueBoolean\": false,\n  \"valueLong\": 4881,\n  \"valueInteger\": 7180,\n  \"valueBigDecimal\": 5606.011917573373\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/params",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "params"
-                          ]
-                        }
-                      },
-                      "status": "Conflict",
-                      "code": 409,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "*/*"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "{\n  \"status\": 5675,\n  \"error\": \"string\",\n  \"message\": \"string\",\n  \"traceId\": \"string\",\n  \"timestamp\": \"2023-06-15T11:57:14.369Z\"\n}"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "__START__",
-              "event": [
-                {
-                  "listen": "prerequest",
-                  "script": {
-                    "exec": [
-                      ""
-                    ],
-                    "type": "text/javascript",
-                    "packages": {},
-                    "requests": {}
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "https://postman-echo.com/get",
-                  "protocol": "https",
-                  "host": [
-                    "postman-echo",
-                    "com"
-                  ],
-                  "path": [
-                    "get"
-                  ]
-                }
-              },
-              "response": []
             }
           ]
         }
@@ -10301,6 +10279,19 @@
         "packages": {},
         "requests": {},
         "exec": [
+          "// valida se contém a variavel runId gerada pelos scripts\r",
+          "const runId = m.environment.get(\"runId\");\r",
+          "\r",
+          "if (!runId) {\r",
+          "    pm.environment.set(\"runId\", require('uuid'));\r",
+          "}\r",
+          "\r",
+          "if (pm.environment.get(\"runId\")) {\r",
+          "    pm.request.headers.upsert({\r",
+          "        key: \"X-Run-Id\",\r",
+          "        value: pm.environment.get(\"runId\")\r",
+          "    });\r",
+          "}\r",
           "/**\r",
           " * Runner control por folder (dinâmico) — Newman friendly\r",
           " *\r",
@@ -10334,8 +10325,9 @@
           "  \"/api/v1/__START__\",\r",
           "  \"/api/v1/auth\",\r",
           "  \"/api/v1/customers\",\r",
-          "  // \"/api/v1/wallets\",\r",
-          "  // \"/api/v1/transactions\",\r",
+          "   \"/api/v1/params\",\r",
+          "   \"/api/v1/wallets\",\r",
+          "   \"/api/v1/transactions\"\r",
           "];\r",
           "\r",
           "const envFoldersRaw = pm.environment.get(\"run_folders\"); // \"/api/v1/auth,/api/v1/customers\"\r",
@@ -10347,7 +10339,6 @@
           "const SKIP_FOLDERS = [\r",
           "  \"/api/v1/auth/register\",\r",
           "  \"/api/v1/auth/refresh\",\r",
-          "  \"/api/v1/params\",\r",
           "  \"/api/v1/wallet-operator\",\r",
           "  \"/api/v1/transactions\",\r",
           "  \"/api/v1/wallets\"\r",
@@ -10399,7 +10390,6 @@
           "  // modo desconhecido: não filtra\r",
           "  shouldSkip = false;\r",
           "}\r",
-          "\r",
           "// ---------- AÇÃO ----------\r",
           "if (shouldSkip) {\r",
           "  console.log(`⏭️ [SKIP:${runMode}] ${fullPath}`);\r",

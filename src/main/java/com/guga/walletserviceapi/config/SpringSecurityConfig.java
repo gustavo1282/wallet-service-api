@@ -75,8 +75,6 @@ public class SpringSecurityConfig {
             // Autorização
             // =========================
             .authorizeHttpRequests(auth -> auth
-
-                .requestMatchers(org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console()).permitAll()
     
                 // 1. Libera o que é Público primeiro (Regra mais genérica)
                 .requestMatchers(mvcMatchers(mvc, matchers.getPublicPaths())).permitAll()
