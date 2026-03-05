@@ -7,8 +7,11 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.model.converter.StatusConverter;
+import com.guga.walletserviceapi.model.enums.Status;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,7 +26,7 @@ import lombok.Setter;
 
 
 @JsonPropertyOrder({
-    "id", "name", "description", "valueString", "valueNumber", "valueDate", "valueDateTime", "valueBoolean"
+    "id", "name", "description", "status", "valueString", "valueNumber", "valueDate", "valueDateTime", "valueBoolean"
 })
 @Builder(toBuilder = true)
 @Getter
@@ -54,6 +57,10 @@ public class ParamApp {
     
     @Column(name = "description", nullable = false, length = 45)
     private String description;
+
+    @Convert(converter = StatusConverter.class)
+    @Column(name = "status", nullable = false, length = 2)
+    private Status status;
     
     @Column(name = "valueString", nullable = true, length = 25)
     private String valueString;
@@ -83,6 +90,7 @@ public class ParamApp {
         ParamApp newParam = ParamApp.builder()
             .name(name)
             .description(description)
+            .status(Status.ACTIVE)
             .build();
 
         if (value instanceof Integer) {

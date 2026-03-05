@@ -22,6 +22,6 @@ export MANAGEMENT_OTLP_ENDPOINT="${MANAGEMENT_OTLP_ENDPOINT:-http://otel-collect
 export APP_VERSION
 
 BASE_SERVICES=(postgres vault pgadmin sonarqube)
-OBS_SERVICES=(jaeger loki tempo otel-collector prometheus grafana cadvisor)
+OBS_SERVICES=(jaeger loki tempo otel-collector prometheus grafana cadvisor alertmanager postgres_exporter)
 APP_SERVICES=(wallet-service-api runner-act)
 QUALITY_SERVICES=(sonarqube newman)

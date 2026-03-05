@@ -10,6 +10,8 @@ APP_NAME: wallet-service-api
 
 app:
   api-prefix: /api/v1
+  seeder:
+    enabled: false # Mude para true para executar a carga na inicialização
 
 server:
   address: 0.0.0.0
@@ -20,6 +22,8 @@ server:
 spring:
   application:
     name: ${APP_NAME}
+  # Desativa o cache do OpenAPI (SpringDoc)
+  cache.disabled: true    
   config:
     import: 
       - "optional:classpath:security-matchers.yml"
@@ -44,7 +48,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     generate-ddl: true
     show-sql: true
     open-in-view: true
@@ -63,9 +67,29 @@ spring:
       #path: /api/v1
 
 springdoc:
-  paths-to-match: '/api/v1/**'
+  paths-to-match: "/api/v1/**"
   api-docs:
     path: /v3/api-docs
+
+  ordered-tags:
+    - name: "Authenticator"
+    - name: "ParamApp"
+    - name: "Customers"
+    - name: "Wallet"
+    - name: "Transaction"
+    - name: "WalletOperator"
+    - name: "Seed"
+
+  api-responses:
+    - key: BadRequest
+      description: Invalid request
+    - key: NotFound
+      description: Resource not found
+    - key: Conflict
+      description: Conflict occurred
+    - key: InternalError
+      description: Unexpected error
+
   info:
     title: Wallet Service API
     version: '@project.version@' # Pega a versão do pom.xml automaticamente
@@ -97,12 +121,16 @@ springdoc:
       * **Senha:** `wallet_pass`
   swagger-ui:
     path: /swagger-ui.html
-    groups-order: ASC
-    operationsSorter: alpha
+    displayOperationId: true # Garante que o operationId seja visível
     try-it-out-enabled: 'false'
+    operationsSorter: operationId # Define a ordenação por operationId
+    custom-js: /swagger-ui/custom.js
+    #tagsSorter: none
+    ## groups-order: ASC
   show-actuator: true
   writer-with-default-pretty-printer: true
-  use-root-path: true
+  #use-root-path: true
+
 
 management:
   endpoints:
@@ -183,4 +211,4 @@ logging:
 
     # Silencia o SEU filtro customizado (JwtAuthenticationFilter)
     # Substitua o pacote pelo caminho real da sua classe
-    logging.level.com.github.w.s.f.JwtAuthenticationFilter: ERROR
+    # logging.level.com.github.w.s.f.JwtAuthenticationFilter: ERROR

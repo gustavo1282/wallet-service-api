@@ -19,9 +19,10 @@ import com.guga.walletserviceapi.model.dto.TransactionMockResult;
 @WebMvcTest(controllers = InicializeDataTest.DummyController.class)
 //@AutoConfigureMockMvc     // [somente quando @SpringBootTest] injeta e cria todos os beans
 @Import({
-    com.guga.walletserviceapi.config.ConfigProperties.class,
-    com.guga.walletserviceapi.config.PasswordConfig.class,
-    com.guga.walletserviceapi.service.common.DataPersistenceService.class
+        com.guga.walletserviceapi.config.ConfigProperties.class,
+    //com.guga.walletserviceapi.config.PasswordConfig.class,
+        com.guga.walletserviceapi.service.common.DataPersistenceService.class,
+        com.guga.walletserviceapi.config.TestPasswordConfig.class
     }
 )
 class InicializeDataTest extends BaseControllerTest {

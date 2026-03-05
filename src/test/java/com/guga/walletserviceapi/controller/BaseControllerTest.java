@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.config.IBaseControllerTest;
+import com.guga.walletserviceapi.config.OpenApiConfig;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositSender;
@@ -83,6 +84,9 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
 
     @Autowired
     protected ObjectMapper objectMapper = FileUtils.instanceObjectMapper();
+
+    @MockitoBean
+    protected OpenApiConfig openApiConfig;
 
     // --- Variáveis de Ambiente ---
     @Value("${spring.application.name:}")
@@ -151,10 +155,6 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
 
 
     private LoginAuth getRandomLoginByRole(List<LoginRole> roles) {
-
-        //List<LoginRole> targetRoles = roles.stream()
-        //    .map(r -> LoginRole.valueOf(r.trim().toUpperCase()))
-        //    .toList();
 
         Set<Long> laWalletIds = wallets.stream()
             .map(Wallet::getWalletId)

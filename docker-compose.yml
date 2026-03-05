@@ -302,6 +302,19 @@ services:
       - wallet_network
 
 
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    restart: unless-stopped
+    networks:
+      - wallet_network
+
 # ======================================================================
 # VOLUMES (todos usados)
 # ======================================================================

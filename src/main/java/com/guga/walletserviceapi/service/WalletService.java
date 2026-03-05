@@ -1,5 +1,6 @@
 package com.guga.walletserviceapi.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class WalletService implements IWalletApiService {
 
     public Wallet saveWallet(Wallet wallet) {
 
-        Customer customer = customerService.getCustomerById(wallet.getCustomer().getCustomerId());
+        Customer customer = customerService.getCustomerById(wallet.getCustomerId());
 
         Page<Wallet> findAllCustomer = walletRepository.findByCustomerId(wallet.getCustomerId(), GlobalHelper.getDefaultPageable());
 
@@ -49,6 +50,13 @@ public class WalletService implements IWalletApiService {
 
         wallet.setWalletId(nextIdGenerate());
         wallet.setCustomer(customer);
+        wallet.setStatus(Status.PENDING);
+        wallet.setCurrentBalance(BigDecimal.ZERO);
+        wallet.setPreviousBalance(BigDecimal.ZERO);
+        wallet.setLastOperationType(null);
+        LocalDateTime currentDT = LocalDateTime.now();
+        wallet.setCreatedAt(currentDT);
+        wallet.setUpdatedAt(currentDT);
         Wallet newWallet = walletRepository.save(wallet);
 
         if (newWallet.getWalletId() == null) {
@@ -59,18 +67,21 @@ public class WalletService implements IWalletApiService {
     }
 
     public Wallet updateWallet(Long walletId, Wallet walletUpdate) {
+        if (walletUpdate == null) {
+            throw new IllegalArgumentException("Wallet update data cannot be null");
+        }
 
         Wallet wallet = getWalletById(walletId);
 
-        if (!wallet.getStatus().equals(walletUpdate.getStatus())) {
+        if (walletUpdate.getStatus() != null && !wallet.getStatus().equals(walletUpdate.getStatus())) {
             wallet.setStatus( walletUpdate.getStatus() );
         }
 
-        if (wallet.getCurrentBalance().compareTo(walletUpdate.getCurrentBalance()) != 0) {
+        if (walletUpdate.getCurrentBalance() != null && wallet.getCurrentBalance().compareTo(walletUpdate.getCurrentBalance()) != 0) {
             wallet.setCurrentBalance( walletUpdate.getCurrentBalance() );
         }
 
-        if (wallet.getPreviousBalance().compareTo(walletUpdate.getPreviousBalance()) != 0) {
+        if (walletUpdate.getPreviousBalance() != null && wallet.getPreviousBalance().compareTo(walletUpdate.getPreviousBalance()) != 0) {
             wallet.setPreviousBalance( walletUpdate.getPreviousBalance() );
         }
 
@@ -81,7 +92,7 @@ public class WalletService implements IWalletApiService {
 
     public Page<Wallet> getAllWallets(Status status, Pageable pageable) {
 
-       Page<Wallet> findResult;
+        Page<Wallet> findResult;
         if (status == null) {
             findResult = walletRepository.findAll(pageable);
         }

@@ -8,10 +8,13 @@ global:
     application: "wallet-service-api"
     app: "wallet-service-api"
     service_name: "wallet-service-api"
+    service: "wallet-service-api"
     #instance: "wallet-api-local-ide"
 
 rule_files:
-  - /etc/prometheus/rules/http_otel_compat.yml
+  - /etc/prometheus/rules/*.yml
+  #- /etc/prometheus/rules/http_otel_compat.yml
+
 
 scrape_configs:
   - job_name: "otel-collector-metrics"
@@ -74,6 +77,7 @@ scrape_configs:
       - { target_label: application, replacement: "wallet-service-api" }
       - { target_label: app, replacement: "wallet-service-api" }
       - { target_label: service_name, replacement: "wallet-service-api" }
+      - { target_label: service, replacement: "wallet-service-api" }
     basic_auth:
       username: "wallet_user"
       password: "wallet_pass"
@@ -111,3 +115,17 @@ scrape_configs:
   - job_name: "postgres"
     static_configs:
       - targets: ["postgres_exporter:9187"]
+    relabel_configs:
+      - { target_label: application, replacement: "postgres" }
+      - { target_label: app, replacement: "postgres" }
+      - { target_label: service_name, replacement: "postgres" }
+      - { target_label: service, replacement: "postgres" }
+
+  - job_name: "alertmanager"
+    static_configs:
+      - targets: ["alertmanager:9093"]
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]

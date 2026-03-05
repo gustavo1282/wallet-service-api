@@ -4,10 +4,10 @@ import java.util.stream.Stream;
 
 public enum LoginRole {
     ADMIN(1),
-    USER(2),
-    SUPPORT(3),
-    SYSTEM(4),
-    MONITOR(5)
+    USER(2)
+    //SUPPORT(3),
+    //SYSTEM(4),
+    //MONITOR(5)
     ;
 
     private final Integer value;

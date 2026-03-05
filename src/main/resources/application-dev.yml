@@ -26,7 +26,8 @@ spring:
     url: jdbc:h2:file:./data/h2/wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: ${WALLET_USER:wallet_user}
-    password: ${WALLET_PASS:wallet_pass}
+    password: ""
+    #password: ${WALLET_PASS:wallet_pass}
     
     # Configuração para POSTGRES via arquivo
     #url: jdbc:postgresql://host.docker.internal:5432/wallet_db

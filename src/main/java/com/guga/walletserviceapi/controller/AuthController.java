@@ -20,6 +20,7 @@ import com.guga.walletserviceapi.security.auth.JwtAuthenticatedUserProvider;
 import com.guga.walletserviceapi.security.jwt.JwtService;
 import com.guga.walletserviceapi.service.LoginAuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -41,13 +42,19 @@ public class AuthController {
 
     public record TokenResponse(String accessToken, String refreshToken) { }
 
+    @Operation(
+        operationId = "auth_01_login",
+        summary = "Login",
+        description = "Authenticates the user and returns accessToken and refreshToken."
+        )
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(
-        @Valid @RequestBody LoginRequest request
-        ) 
-    {
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
 
         LoginAuth loginAuth = loginAuthService.findByLogin(request.username);
+
+        if (loginAuth == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         String accessToken = jwtService.generateAccessToken(loginAuth);
         String refreshToken = jwtService.generateRefreshToken(loginAuth);
@@ -63,17 +70,26 @@ public class AuthController {
         return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<LoginAuth> register(@Valid @RequestBody LoginRequest request) {
-        LoginAuth loginAuth = loginAuthService.register(request.username, request.password);
-        return ResponseEntity.ok( loginAuth );
-    }
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @Operation(
+        operationId = "auth_02_get_my_profile",
+        summary = "Get My Profile",
+        description = "Returns authentication details for the authenticated user."
+    )
+    @GetMapping("/my_profile")
+     public ResponseEntity<JwtAuthenticationDetails> getMyProfile() {
+        JwtAuthenticationDetails authDetails = authUserProvider.get();
+        return new ResponseEntity<>(authDetails, HttpStatus.OK);
+    }    
 
+    @Operation(
+        operationId = "auth_03_refresh",
+        summary = "Refresh Token",
+        description = "Validates refreshToken and returns a new accessToken."
+    )
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(
-        @RequestParam String refreshToken
-        ) 
-    {
+    public ResponseEntity<TokenResponse> refresh(@RequestParam String refreshToken) {
         if (!jwtService.validateToken(refreshToken)) {
             return ResponseEntity.badRequest().build();
         }
@@ -89,24 +105,16 @@ public class AuthController {
         // 4. Retorna o novo access token + refresh antigo
         return ResponseEntity.ok(new TokenResponse(newAccessToken, refreshToken));
     }
-
-
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/data")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-     public ResponseEntity<JwtAuthenticationDetails> getDataLogin() 
-    {
-        JwtAuthenticationDetails authDetails = authUserProvider.get();
-        return new ResponseEntity<>(authDetails, HttpStatus.OK);
-    }
  
-    //@SecurityRequirement(name = "bearerAuth")
-    //@GetMapping("/login/dinamic")
-    //@PreAuthorize("hasAnyRole('ADMIN')")
-    // public ResponseEntity<JwtAuthenticationDetails> getDinamicLogin() 
-    //{
-    //    JwtAuthenticationDetails authDetails = authUserProvider.get();
-    //    return new ResponseEntity<>(authDetails, HttpStatus.OK);
-    //}
+    @Operation(
+        operationId = "auth_04_register",
+        summary = "Register",
+        description = "Registers a new user."
+    )
+    @PostMapping("/register")
+    public ResponseEntity<LoginAuth> register(@Valid @RequestBody LoginRequest request) {
+        LoginAuth loginAuth = loginAuthService.register(request.username, request.password);
+        return ResponseEntity.ok( loginAuth );
+    }
 
 }

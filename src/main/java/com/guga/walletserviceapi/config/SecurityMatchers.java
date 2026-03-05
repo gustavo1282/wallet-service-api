@@ -51,10 +51,6 @@ public class SecurityMatchers {
         return addContextPath(documentation);
     }
 
-    public String[] getMonitor() {
-        return addContextPath(monitor);
-    }
-
     public String[] getSecured() {
         return addContextPath(secured);
     }
@@ -71,28 +67,23 @@ public class SecurityMatchers {
     public List<String> getAllMatchers() {
         List<String> allPublicPatterns = new ArrayList<>();
 
-        if (getPublicPaths() != null) {
+        if (getPublicPaths() != null)
             allPublicPatterns.addAll( List.of(getPublicPaths()) );
-        }
-        if (getDocumentation() != null) {
+        
+        if (getDocumentation() != null)
             allPublicPatterns.addAll( List.of(getDocumentation()) );
-        }
-        if (getMonitor() != null) {
-            allPublicPatterns.addAll( List.of(getMonitor()) );
-        }
-        if (getSecured() != null) {
+        
+        if (getSecured() != null) 
             allPublicPatterns.addAll( List.of(getSecured()) );
-        }
-        if (getAdmin() != null) {
+        
+        if (getAdmin() != null)
             allPublicPatterns.addAll( List.of(getAdmin() ) );
-        }
-        if (getPermitAllPaths() != null) {
-            allPublicPatterns.addAll( List.of(getPermitAllPaths()) );
-        }
+        
+        //if (getPermitAllPaths() != null) 
+        //    allPublicPatterns.addAll( List.of(getPermitAllPaths()) );
 
-        if (allPublicPatterns.size() == 0){
+        if (allPublicPatterns.size() == 0)
             throw new ResourceBadRequestException("Nenhum matcher foi encontrado.");
-        }
 
         return allPublicPatterns.stream()
             .filter(Objects::nonNull)
@@ -102,12 +93,11 @@ public class SecurityMatchers {
 
     @PostConstruct
     public void logMatchers() {
-       LOGGER.info(LogMarkers.LOG, "SecurityMatchers loaded with context-path: " + contextPath);
-       LOGGER.info(LogMarkers.LOG, "publicPaths: " + Arrays.toString(getPublicPaths()));
-       LOGGER.info(LogMarkers.LOG, "documentation: " + Arrays.toString(getDocumentation()));
-       LOGGER.info(LogMarkers.LOG, "monitor: " + Arrays.toString(getMonitor()));
-       LOGGER.info(LogMarkers.LOG, "secured: " + Arrays.toString(getSecured()));
-       LOGGER.info(LogMarkers.LOG, "admin: " + Arrays.toString(getAdmin()));
-       LOGGER.info(LogMarkers.LOG, "permitpaths: " + Arrays.toString(getPermitAllPaths()));
+        LOGGER.info(LogMarkers.LOG, "SecurityMatchers loaded with context-path: " + contextPath);
+        LOGGER.info(LogMarkers.LOG, "publicPaths: " + Arrays.toString(getPublicPaths()));
+        LOGGER.info(LogMarkers.LOG, "documentation: " + Arrays.toString(getDocumentation()));
+        LOGGER.info(LogMarkers.LOG, "secured: " + Arrays.toString(getSecured()));
+        LOGGER.info(LogMarkers.LOG, "admin: " + Arrays.toString(getAdmin()));
+        //LOGGER.info(LogMarkers.LOG, "permitpaths: " + Arrays.toString(getPermitAllPaths()));
     }
 }
