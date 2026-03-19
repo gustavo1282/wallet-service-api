@@ -46,7 +46,6 @@ data/h2/
 .m2/repository
 
 # Arquivos wrapper do Maven (manter o .mvn/wrapper/maven-wrapper.jar)
-.mvn/wrapper/
 
 ### Outros Arquivos de Sistema ###
 # macOS
