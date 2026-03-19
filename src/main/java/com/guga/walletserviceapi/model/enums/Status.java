@@ -28,4 +28,8 @@ public enum Status {
                 .orElseThrow(IllegalArgumentException::new);
     }
 
+    public static int lastIndex() {
+        return values().length - 1;
+    }
+
 }

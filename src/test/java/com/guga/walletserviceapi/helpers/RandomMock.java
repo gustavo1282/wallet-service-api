@@ -92,6 +92,7 @@ public class RandomMock {
     }
 
     public static int generateIntNumberByInterval(int init, int end) {
+        if (end <= init) return init;
         return ThreadLocalRandom.current().nextInt(init, end);
     }
 
@@ -180,6 +181,10 @@ public class RandomMock {
         String secondPart = String.format("%04d", generateIntNumberByInterval(0, 9999)); // Segundo bloco com 4 dígitos
 
         return String.format("(%s) %s-%s", ddd, firstPart, secondPart);
+    }
+
+    public static boolean getDynamicInt10(int input) {
+        return ThreadLocalRandom.current().nextInt(10) == input;
     }
 
 }

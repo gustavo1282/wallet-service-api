@@ -1,0 +1,771 @@
+[ {
+  "terminalId" : "771",
+  "fullName" : "NICOLE DO PRADO",
+  "cpf" : "851.170.561-91",
+  "amount" : 270.79,
+  "createdAt" : "2026-03-19 01:19:51.059740400",
+  "senderId" : 12003
+}, {
+  "terminalId" : "135",
+  "fullName" : "ANA VITÓRIA LIMEIRA",
+  "cpf" : "323.070.315-45",
+  "amount" : 22.33,
+  "createdAt" : "2026-03-19 01:19:51.065299700",
+  "senderId" : 12006
+}, {
+  "terminalId" : "573",
+  "fullName" : "FELIPE ALMADA",
+  "cpf" : "310.428.562-49",
+  "amount" : 603.08,
+  "createdAt" : "2026-03-19 01:19:51.067590700",
+  "senderId" : 12008
+}, {
+  "terminalId" : "525",
+  "fullName" : "CLARA LARANJEIRA",
+  "cpf" : "344.815.160-20",
+  "amount" : 139.42,
+  "createdAt" : "2026-03-19 01:19:51.070560000",
+  "senderId" : 12014
+}, {
+  "terminalId" : "277",
+  "fullName" : "FÁBIO RAMALHO",
+  "cpf" : "115.264.538-27",
+  "amount" : 501.42,
+  "createdAt" : "2026-03-19 01:19:51.071806000",
+  "senderId" : 12017
+}, {
+  "terminalId" : "625",
+  "fullName" : "ANA JÚLIA HENRIQUES",
+  "cpf" : "521.001.117-87",
+  "amount" : 26.25,
+  "createdAt" : "2026-03-19 01:19:51.074807200",
+  "senderId" : 12030
+}, {
+  "terminalId" : "641",
+  "fullName" : "JOÃO LUCA PALHARES",
+  "cpf" : "136.238.700-21",
+  "amount" : 745.01,
+  "createdAt" : "2026-03-19 01:19:51.077519800",
+  "senderId" : 12035
+}, {
+  "terminalId" : "122",
+  "fullName" : "ANTONIA CALDAS",
+  "cpf" : "085.241.718-71",
+  "amount" : 417.12,
+  "createdAt" : "2026-03-19 01:19:51.080775100",
+  "senderId" : 12040
+}, {
+  "terminalId" : "403",
+  "fullName" : "DAVI LUCA VIVEIROS",
+  "cpf" : "161.870.517-26",
+  "amount" : 113.51,
+  "createdAt" : "2026-03-19 01:19:51.082781100",
+  "senderId" : 12044
+}, {
+  "terminalId" : "885",
+  "fullName" : "SARA APARÍCIO",
+  "cpf" : "065.824.653-41",
+  "amount" : 748.04,
+  "createdAt" : "2026-03-19 01:19:51.091189900",
+  "senderId" : 12051
+}, {
+  "terminalId" : "279",
+  "fullName" : "BRUNA VIVEIROS",
+  "cpf" : "245.870.283-04",
+  "amount" : 58.76,
+  "createdAt" : "2026-03-19 01:19:51.095692700",
+  "senderId" : 12056
+}, {
+  "terminalId" : "897",
+  "fullName" : "BEATRIZ ROLIM",
+  "cpf" : "581.128.402-02",
+  "amount" : 568.90,
+  "createdAt" : "2026-03-19 01:19:51.097693800",
+  "senderId" : 12058
+}, {
+  "terminalId" : "317",
+  "fullName" : "ANA LUIZA PEDROSO",
+  "cpf" : "086.280.441-83",
+  "amount" : 80.94,
+  "createdAt" : "2026-03-19 01:19:51.099901600",
+  "senderId" : 12059
+}, {
+  "terminalId" : "839",
+  "fullName" : "FERNANDA JESUS",
+  "cpf" : "474.187.554-73",
+  "amount" : 643.48,
+  "createdAt" : "2026-03-19 01:19:51.101968000",
+  "senderId" : 12060
+}, {
+  "terminalId" : "505",
+  "fullName" : "LETÍCIA BANHEIRA",
+  "cpf" : "607.468.152-04",
+  "amount" : 697.75,
+  "createdAt" : "2026-03-19 01:19:51.105172700",
+  "senderId" : 12070
+}, {
+  "terminalId" : "190",
+  "fullName" : "CLARA DE LINS",
+  "cpf" : "851.066.332-73",
+  "amount" : 46.55,
+  "createdAt" : "2026-03-19 01:19:51.107174700",
+  "senderId" : 12074
+}, {
+  "terminalId" : "216",
+  "fullName" : "MARIA ALICE DA GAMA",
+  "cpf" : "051.620.620-65",
+  "amount" : 248.53,
+  "createdAt" : "2026-03-19 01:19:51.108940800",
+  "senderId" : 12076
+}, {
+  "terminalId" : "524",
+  "fullName" : "SOPHIE BONFIM",
+  "cpf" : "544.450.511-87",
+  "amount" : 228.36,
+  "createdAt" : "2026-03-19 01:19:51.110940300",
+  "senderId" : 12082
+}, {
+  "terminalId" : "478",
+  "fullName" : "MIRELLA PALMEIRA",
+  "cpf" : "006.743.044-97",
+  "amount" : 675.14,
+  "createdAt" : "2026-03-19 01:19:51.113127800",
+  "senderId" : 12087
+}, {
+  "terminalId" : "760",
+  "fullName" : "DALILA DA CONCEIÇÃO",
+  "cpf" : "600.405.330-93",
+  "amount" : 653.19,
+  "createdAt" : "2026-03-19 01:19:51.115128200",
+  "senderId" : 12088
+}, {
+  "terminalId" : "151",
+  "fullName" : "VITÓRIA MEIRA",
+  "cpf" : "125.462.164-49",
+  "amount" : 793.70,
+  "createdAt" : "2026-03-19 01:19:51.117917200",
+  "senderId" : 12089
+}, {
+  "terminalId" : "540",
+  "fullName" : "MARINA GUTERRES",
+  "cpf" : "522.166.756-87",
+  "amount" : 406.08,
+  "createdAt" : "2026-03-19 01:19:51.119883300",
+  "senderId" : 12098
+}, {
+  "terminalId" : "846",
+  "fullName" : "JANAÍNA GOMES",
+  "cpf" : "254.555.263-16",
+  "amount" : 504.03,
+  "createdAt" : "2026-03-19 01:19:51.122103500",
+  "senderId" : 12101
+}, {
+  "terminalId" : "904",
+  "fullName" : "CARLOS EDUARDO HENRIQUES",
+  "cpf" : "413.450.300-02",
+  "amount" : 281.99,
+  "createdAt" : "2026-03-19 01:19:51.126322600",
+  "senderId" : 12116
+}, {
+  "terminalId" : "731",
+  "fullName" : "DANIEL DA BANDEIRA",
+  "cpf" : "870.613.444-07",
+  "amount" : 94.61,
+  "createdAt" : "2026-03-19 01:19:51.129326700",
+  "senderId" : 12117
+}, {
+  "terminalId" : "040",
+  "fullName" : "LUCAS HENRIQUES",
+  "cpf" : "027.021.130-60",
+  "amount" : 542.17,
+  "createdAt" : "2026-03-19 01:19:51.131324700",
+  "senderId" : 12127
+}, {
+  "terminalId" : "919",
+  "fullName" : "JOÃO AGUIAR",
+  "cpf" : "417.132.212-09",
+  "amount" : 769.59,
+  "createdAt" : "2026-03-19 01:19:51.132328300",
+  "senderId" : 12128
+}, {
+  "terminalId" : "572",
+  "fullName" : "STELLA GALEGO",
+  "cpf" : "853.033.764-60",
+  "amount" : 604.40,
+  "createdAt" : "2026-03-19 01:19:51.134328300",
+  "senderId" : 12130
+}, {
+  "terminalId" : "412",
+  "fullName" : "NICOLAS DOMINGUES",
+  "cpf" : "371.574.604-16",
+  "amount" : 493.28,
+  "createdAt" : "2026-03-19 01:19:51.136529900",
+  "senderId" : 12133
+}, {
+  "terminalId" : "548",
+  "fullName" : "YASMIN XIMENES",
+  "cpf" : "387.037.680-58",
+  "amount" : 235.88,
+  "createdAt" : "2026-03-19 01:19:51.142535600",
+  "senderId" : 12134
+}, {
+  "terminalId" : "917",
+  "fullName" : "ALLANA GOMIDE",
+  "cpf" : "035.804.088-44",
+  "amount" : 477.46,
+  "createdAt" : "2026-03-19 01:19:51.144979700",
+  "senderId" : 12136
+}, {
+  "terminalId" : "137",
+  "fullName" : "MARIA VITÓRIA DA ROSA",
+  "cpf" : "214.401.233-49",
+  "amount" : 554.12,
+  "createdAt" : "2026-03-19 01:19:51.146981000",
+  "senderId" : 12137
+}, {
+  "terminalId" : "828",
+  "fullName" : "ARTHUR HENRIQUE VELASQUES",
+  "cpf" : "724.735.480-13",
+  "amount" : 85.57,
+  "createdAt" : "2026-03-19 01:19:51.149336000",
+  "senderId" : 12138
+}, {
+  "terminalId" : "007",
+  "fullName" : "NATHAN DA ROSA",
+  "cpf" : "603.504.707-66",
+  "amount" : 729.16,
+  "createdAt" : "2026-03-19 01:19:51.150860400",
+  "senderId" : 12139
+}, {
+  "terminalId" : "979",
+  "fullName" : "MÉRCIA GERALDES",
+  "cpf" : "810.823.507-37",
+  "amount" : 177.65,
+  "createdAt" : "2026-03-19 01:19:51.152859300",
+  "senderId" : 12147
+}, {
+  "terminalId" : "643",
+  "fullName" : "LUIZ FELIPE CASTANHEIRA",
+  "cpf" : "685.401.173-63",
+  "amount" : 377.13,
+  "createdAt" : "2026-03-19 01:19:51.154608100",
+  "senderId" : 12151
+}, {
+  "terminalId" : "472",
+  "fullName" : "CECÍLIA TAVARES",
+  "cpf" : "686.785.100-21",
+  "amount" : 105.80,
+  "createdAt" : "2026-03-19 01:19:51.156611200",
+  "senderId" : 12154
+}, {
+  "terminalId" : "696",
+  "fullName" : "ENZO MIGUEL CASEIRA",
+  "cpf" : "332.332.840-04",
+  "amount" : 338.04,
+  "createdAt" : "2026-03-19 01:19:51.173534800",
+  "senderId" : 12161
+}, {
+  "terminalId" : "411",
+  "fullName" : "DAVI MIGUEL RAMALHO",
+  "cpf" : "448.566.388-40",
+  "amount" : 563.83,
+  "createdAt" : "2026-03-19 01:19:51.177854200",
+  "senderId" : 12167
+}, {
+  "terminalId" : "100",
+  "fullName" : "TERTULIANO VIANA",
+  "cpf" : "706.712.677-01",
+  "amount" : 48.65,
+  "createdAt" : "2026-03-19 01:19:51.180095600",
+  "senderId" : 12169
+}, {
+  "terminalId" : "407",
+  "fullName" : "GUSTAVO ALVES",
+  "cpf" : "377.678.282-04",
+  "amount" : 463.23,
+  "createdAt" : "2026-03-19 01:19:51.182095100",
+  "senderId" : 12170
+}, {
+  "terminalId" : "137",
+  "fullName" : "CAROLINA ARAGÃO",
+  "cpf" : "365.514.186-60",
+  "amount" : 217.72,
+  "createdAt" : "2026-03-19 01:19:51.183315400",
+  "senderId" : 12172
+}, {
+  "terminalId" : "056",
+  "fullName" : "JOÃO LUCA CUSTÓDIO",
+  "cpf" : "881.131.266-35",
+  "amount" : 529.38,
+  "createdAt" : "2026-03-19 01:19:51.185321200",
+  "senderId" : 12173
+}, {
+  "terminalId" : "989",
+  "fullName" : "MARIA FERNANDA MOREIRA",
+  "cpf" : "318.788.878-07",
+  "amount" : 472.33,
+  "createdAt" : "2026-03-19 01:19:51.201076100",
+  "senderId" : 12186
+}, {
+  "terminalId" : "209",
+  "fullName" : "JOÃO GABRIEL VIEIRA",
+  "cpf" : "053.661.583-70",
+  "amount" : 567.03,
+  "createdAt" : "2026-03-19 01:19:51.203072100",
+  "senderId" : 12198
+}, {
+  "terminalId" : "263",
+  "fullName" : "THEO FARIAS",
+  "cpf" : "017.038.316-40",
+  "amount" : 476.65,
+  "createdAt" : "2026-03-19 01:19:51.205545200",
+  "senderId" : 12199
+}, {
+  "terminalId" : "675",
+  "fullName" : "PATRICIA ESPINHOSA",
+  "cpf" : "212.365.085-48",
+  "amount" : 385.94,
+  "createdAt" : "2026-03-19 01:19:51.207544800",
+  "senderId" : 12200
+}, {
+  "terminalId" : "045",
+  "fullName" : "MIGUEL DA PAZ",
+  "cpf" : "636.642.412-82",
+  "amount" : 469.46,
+  "createdAt" : "2026-03-19 01:19:51.212759500",
+  "senderId" : 12204
+}, {
+  "terminalId" : "169",
+  "fullName" : "MARIA JÚLIA SARAIVA",
+  "cpf" : "056.210.453-43",
+  "amount" : 380.28,
+  "createdAt" : "2026-03-19 01:19:51.216759800",
+  "senderId" : 12207
+}, {
+  "terminalId" : "611",
+  "fullName" : "LUCAS GOMES",
+  "cpf" : "523.317.485-51",
+  "amount" : 605.19,
+  "createdAt" : "2026-03-19 01:19:51.219093800",
+  "senderId" : 12208
+}, {
+  "terminalId" : "906",
+  "fullName" : "MARIA VALENTINA DIAS",
+  "cpf" : "643.251.707-90",
+  "amount" : 529.38,
+  "createdAt" : "2026-03-19 01:19:51.221099200",
+  "senderId" : 12212
+}, {
+  "terminalId" : "009",
+  "fullName" : "NOAH PEREIRA",
+  "cpf" : "733.651.406-54",
+  "amount" : 329.02,
+  "createdAt" : "2026-03-19 01:19:51.223306000",
+  "senderId" : 12218
+}, {
+  "terminalId" : "656",
+  "fullName" : "PEDRO LUCAS NOVAES",
+  "cpf" : "335.211.124-38",
+  "amount" : 270.31,
+  "createdAt" : "2026-03-19 01:19:51.225315100",
+  "senderId" : 12222
+}, {
+  "terminalId" : "523",
+  "fullName" : "MÁRCIO CAMPOS",
+  "cpf" : "128.041.351-44",
+  "amount" : 156.10,
+  "createdAt" : "2026-03-19 01:19:51.230672900",
+  "senderId" : 12238
+}, {
+  "terminalId" : "900",
+  "fullName" : "ADRIANA LONGUINHO",
+  "cpf" : "068.331.531-59",
+  "amount" : 703.47,
+  "createdAt" : "2026-03-19 01:19:51.232860500",
+  "senderId" : 12239
+}, {
+  "terminalId" : "219",
+  "fullName" : "KLÉBER DA PAZ",
+  "cpf" : "848.284.378-86",
+  "amount" : 249.06,
+  "createdAt" : "2026-03-19 01:19:51.234385700",
+  "senderId" : 12240
+}, {
+  "terminalId" : "725",
+  "fullName" : "LAÍS MANGUEIRA",
+  "cpf" : "761.758.312-50",
+  "amount" : 318.39,
+  "createdAt" : "2026-03-19 01:19:51.236386400",
+  "senderId" : 12241
+}, {
+  "terminalId" : "553",
+  "fullName" : "TIAGO SOUZA",
+  "cpf" : "370.211.752-05",
+  "amount" : 276.47,
+  "createdAt" : "2026-03-19 01:19:51.239616900",
+  "senderId" : 12245
+}, {
+  "terminalId" : "517",
+  "fullName" : "ANA LAURA AROEIRA",
+  "cpf" : "380.130.171-09",
+  "amount" : 561.28,
+  "createdAt" : "2026-03-19 01:19:51.241662000",
+  "senderId" : 12248
+}, {
+  "terminalId" : "747",
+  "fullName" : "MARCIA ALMADA",
+  "cpf" : "155.746.183-03",
+  "amount" : 506.60,
+  "createdAt" : "2026-03-19 01:19:51.242831300",
+  "senderId" : 12250
+}, {
+  "terminalId" : "739",
+  "fullName" : "ALESSANDRA CAMPOS",
+  "cpf" : "005.360.207-28",
+  "amount" : 785.83,
+  "createdAt" : "2026-03-19 01:19:51.244830300",
+  "senderId" : 12251
+}, {
+  "terminalId" : "365",
+  "fullName" : "SALVADOR OURIQUES",
+  "cpf" : "814.334.238-71",
+  "amount" : 667.25,
+  "createdAt" : "2026-03-19 01:19:51.247053300",
+  "senderId" : 12253
+}, {
+  "terminalId" : "029",
+  "fullName" : "BENJAMIN BERNARDES",
+  "cpf" : "185.568.384-99",
+  "amount" : 327.59,
+  "createdAt" : "2026-03-19 01:19:51.250761000",
+  "senderId" : 12256
+}, {
+  "terminalId" : "002",
+  "fullName" : "NATHAN BRAGA",
+  "cpf" : "202.708.120-83",
+  "amount" : 170.57,
+  "createdAt" : "2026-03-19 01:19:51.252761000",
+  "senderId" : 12259
+}, {
+  "terminalId" : "186",
+  "fullName" : "LARA DA NÓBREGA",
+  "cpf" : "578.575.230-11",
+  "amount" : 714.23,
+  "createdAt" : "2026-03-19 01:19:51.263976700",
+  "senderId" : 12260
+}, {
+  "terminalId" : "928",
+  "fullName" : "LUCAS APARÍCIO",
+  "cpf" : "828.671.065-75",
+  "amount" : 80.66,
+  "createdAt" : "2026-03-19 01:19:51.275944600",
+  "senderId" : 12267
+}, {
+  "terminalId" : "611",
+  "fullName" : "GUILHERME DATENA",
+  "cpf" : "618.143.311-23",
+  "amount" : 712.37,
+  "createdAt" : "2026-03-19 01:19:51.280677000",
+  "senderId" : 12269
+}, {
+  "terminalId" : "448",
+  "fullName" : "PIETRA ESTEVES",
+  "cpf" : "311.673.873-41",
+  "amount" : 176.07,
+  "createdAt" : "2026-03-19 01:19:51.283039300",
+  "senderId" : 12270
+}, {
+  "terminalId" : "799",
+  "fullName" : "KARLA MADEIRA",
+  "cpf" : "315.631.162-60",
+  "amount" : 138.30,
+  "createdAt" : "2026-03-19 01:19:51.284037000",
+  "senderId" : 12271
+}, {
+  "terminalId" : "179",
+  "fullName" : "MARIA LAURA MUNHOZ",
+  "cpf" : "101.786.284-25",
+  "amount" : 677.72,
+  "createdAt" : "2026-03-19 01:19:51.286045000",
+  "senderId" : 12282
+}, {
+  "terminalId" : "924",
+  "fullName" : "MORGANA SIQUEIRA",
+  "cpf" : "376.606.125-90",
+  "amount" : 231.91,
+  "createdAt" : "2026-03-19 01:19:51.289289100",
+  "senderId" : 12292
+}, {
+  "terminalId" : "706",
+  "fullName" : "PABLO DA GAMA",
+  "cpf" : "726.784.267-42",
+  "amount" : 125.48,
+  "createdAt" : "2026-03-19 01:19:51.295285700",
+  "senderId" : 12306
+}, {
+  "terminalId" : "793",
+  "fullName" : "ALESSANDRO DA ALDEIA",
+  "cpf" : "082.814.086-34",
+  "amount" : 747.37,
+  "createdAt" : "2026-03-19 01:19:51.298301500",
+  "senderId" : 12310
+}, {
+  "terminalId" : "652",
+  "fullName" : "OTÁVIO DORNELES",
+  "cpf" : "531.773.363-42",
+  "amount" : 646.94,
+  "createdAt" : "2026-03-19 01:19:51.300833100",
+  "senderId" : 12311
+}, {
+  "terminalId" : "321",
+  "fullName" : "ANA CECÍLIA MARINS",
+  "cpf" : "050.256.481-49",
+  "amount" : 415.50,
+  "createdAt" : "2026-03-19 01:19:51.302831600",
+  "senderId" : 12313
+}, {
+  "terminalId" : "589",
+  "fullName" : "PATRICIA CASTANHO",
+  "cpf" : "682.230.215-87",
+  "amount" : 355.52,
+  "createdAt" : "2026-03-19 01:19:51.304848700",
+  "senderId" : 12314
+}, {
+  "terminalId" : "278",
+  "fullName" : "MATHEUS ROSEIRA",
+  "cpf" : "675.784.764-75",
+  "amount" : 277.16,
+  "createdAt" : "2026-03-19 01:19:51.306906500",
+  "senderId" : 12322
+}, {
+  "terminalId" : "949",
+  "fullName" : "PAULO ESPINHOSA",
+  "cpf" : "747.278.620-93",
+  "amount" : 148.80,
+  "createdAt" : "2026-03-19 01:19:51.312087200",
+  "senderId" : 12329
+}, {
+  "terminalId" : "150",
+  "fullName" : "ISABELLA REGUEIRA",
+  "cpf" : "757.318.416-67",
+  "amount" : 389.99,
+  "createdAt" : "2026-03-19 01:19:51.330750200",
+  "senderId" : 12334
+}, {
+  "terminalId" : "648",
+  "fullName" : "IAN DA ROCHA",
+  "cpf" : "315.840.022-71",
+  "amount" : 572.22,
+  "createdAt" : "2026-03-19 01:19:51.348752100",
+  "senderId" : 12336
+}, {
+  "terminalId" : "247",
+  "fullName" : "MAYA ARRIAGA",
+  "cpf" : "270.052.646-57",
+  "amount" : 512.88,
+  "createdAt" : "2026-03-19 01:19:51.351465500",
+  "senderId" : 12339
+}, {
+  "terminalId" : "122",
+  "fullName" : "MAYA DOS REIS",
+  "cpf" : "541.080.866-51",
+  "amount" : 75.24,
+  "createdAt" : "2026-03-19 01:19:51.357824400",
+  "senderId" : 12341
+}, {
+  "terminalId" : "297",
+  "fullName" : "SUÉLEN MOREIRA",
+  "cpf" : "157.522.751-72",
+  "amount" : 154.11,
+  "createdAt" : "2026-03-19 01:19:51.369585800",
+  "senderId" : 12342
+}, {
+  "terminalId" : "292",
+  "fullName" : "MALU FARIAS",
+  "cpf" : "463.400.375-93",
+  "amount" : 436.47,
+  "createdAt" : "2026-03-19 01:19:51.372587200",
+  "senderId" : 12345
+}, {
+  "terminalId" : "668",
+  "fullName" : "DAVI LUIZ LONGUINHO",
+  "cpf" : "275.564.537-74",
+  "amount" : 792.34,
+  "createdAt" : "2026-03-19 01:19:51.375588500",
+  "senderId" : 12349
+}, {
+  "terminalId" : "954",
+  "fullName" : "ARTHUR GABRIEL PEDROSO",
+  "cpf" : "411.377.458-78",
+  "amount" : 142.63,
+  "createdAt" : "2026-03-19 01:19:51.380591300",
+  "senderId" : 12353
+}, {
+  "terminalId" : "756",
+  "fullName" : "AURORA VASQUES",
+  "cpf" : "351.862.275-79",
+  "amount" : 124.37,
+  "createdAt" : "2026-03-19 01:19:51.383587000",
+  "senderId" : 12362
+}, {
+  "terminalId" : "318",
+  "fullName" : "NICOLAS CARDOSO",
+  "cpf" : "811.440.056-04",
+  "amount" : 326.78,
+  "createdAt" : "2026-03-19 01:19:51.384590600",
+  "senderId" : 12363
+}, {
+  "terminalId" : "707",
+  "fullName" : "MARCELO SANCHES",
+  "cpf" : "623.645.150-84",
+  "amount" : 214.46,
+  "createdAt" : "2026-03-19 01:19:51.388588800",
+  "senderId" : 12370
+}, {
+  "terminalId" : "985",
+  "fullName" : "MARIA ALICE CASEIRA",
+  "cpf" : "818.574.308-83",
+  "amount" : 432.26,
+  "createdAt" : "2026-03-19 01:19:51.391588300",
+  "senderId" : 12372
+}, {
+  "terminalId" : "473",
+  "fullName" : "NICOLAS DA PENHA",
+  "cpf" : "373.480.354-34",
+  "amount" : 462.58,
+  "createdAt" : "2026-03-19 01:19:51.393590800",
+  "senderId" : 12375
+}, {
+  "terminalId" : "740",
+  "fullName" : "TERTULIANO PIRES",
+  "cpf" : "086.723.467-93",
+  "amount" : 600.48,
+  "createdAt" : "2026-03-19 01:19:51.396588600",
+  "senderId" : 12378
+}, {
+  "terminalId" : "588",
+  "fullName" : "JOÃO FELIPE GODINS",
+  "cpf" : "055.884.018-32",
+  "amount" : 774.99,
+  "createdAt" : "2026-03-19 01:19:51.397592500",
+  "senderId" : 12379
+}, {
+  "terminalId" : "175",
+  "fullName" : "MATHIAS JUNQUEIRA",
+  "cpf" : "221.628.015-15",
+  "amount" : 784.18,
+  "createdAt" : "2026-03-19 01:19:51.411116400",
+  "senderId" : 12383
+}, {
+  "terminalId" : "435",
+  "fullName" : "DJALMA DA BARRA",
+  "cpf" : "425.407.443-38",
+  "amount" : 620.51,
+  "createdAt" : "2026-03-19 01:19:51.430706400",
+  "senderId" : 12387
+}, {
+  "terminalId" : "319",
+  "fullName" : "LUNA BRUM",
+  "cpf" : "103.508.572-02",
+  "amount" : 32.03,
+  "createdAt" : "2026-03-19 01:19:51.433712900",
+  "senderId" : 12392
+}, {
+  "terminalId" : "591",
+  "fullName" : "RICARDO CHAVES",
+  "cpf" : "838.867.211-83",
+  "amount" : 645.28,
+  "createdAt" : "2026-03-19 01:19:51.435721800",
+  "senderId" : 12395
+}, {
+  "terminalId" : "147",
+  "fullName" : "ISABELA GARCÊS",
+  "cpf" : "210.363.734-87",
+  "amount" : 296.45,
+  "createdAt" : "2026-03-19 01:19:51.437720800",
+  "senderId" : 12397
+}, {
+  "terminalId" : "734",
+  "fullName" : "ALÍCIA LESSA",
+  "cpf" : "614.082.362-57",
+  "amount" : 684.39,
+  "createdAt" : "2026-03-19 01:19:51.451036700",
+  "senderId" : 12398
+}, {
+  "terminalId" : "535",
+  "fullName" : "ENRICO GONÇALVES",
+  "cpf" : "550.414.788-30",
+  "amount" : 93.32,
+  "createdAt" : "2026-03-19 01:19:51.455065800",
+  "senderId" : 12405
+}, {
+  "terminalId" : "621",
+  "fullName" : "MELISSA ANTUNES",
+  "cpf" : "846.153.712-25",
+  "amount" : 155.06,
+  "createdAt" : "2026-03-19 01:19:51.459063500",
+  "senderId" : 12414
+}, {
+  "terminalId" : "015",
+  "fullName" : "PÉROLA GOMIDE",
+  "cpf" : "211.841.782-91",
+  "amount" : 430.86,
+  "createdAt" : "2026-03-19 01:19:51.475064200",
+  "senderId" : 12415
+}, {
+  "terminalId" : "275",
+  "fullName" : "EDUARDA DA FONTOURA",
+  "cpf" : "126.632.478-04",
+  "amount" : 211.95,
+  "createdAt" : "2026-03-19 01:19:51.479068400",
+  "senderId" : 12417
+}, {
+  "terminalId" : "256",
+  "fullName" : "EDUARDO DA CONCEIÇÃO",
+  "cpf" : "816.181.234-91",
+  "amount" : 48.32,
+  "createdAt" : "2026-03-19 01:19:51.482066900",
+  "senderId" : 12425
+}, {
+  "terminalId" : "387",
+  "fullName" : "SUÉLEN DOS REIS",
+  "cpf" : "777.350.621-33",
+  "amount" : 606.65,
+  "createdAt" : "2026-03-19 01:19:51.483092200",
+  "senderId" : 12431
+}, {
+  "terminalId" : "709",
+  "fullName" : "ANA LÍVIA PORTEIRA",
+  "cpf" : "165.323.486-51",
+  "amount" : 211.07,
+  "createdAt" : "2026-03-19 01:19:51.487089900",
+  "senderId" : 12443
+}, {
+  "terminalId" : "546",
+  "fullName" : "VITÓRIA SILVEIRA",
+  "cpf" : "085.684.208-77",
+  "amount" : 640.89,
+  "createdAt" : "2026-03-19 01:19:51.489094900",
+  "senderId" : 12452
+}, {
+  "terminalId" : "476",
+  "fullName" : "NATHAN RAMEIRA",
+  "cpf" : "837.316.366-20",
+  "amount" : 366.78,
+  "createdAt" : "2026-03-19 01:19:51.491091000",
+  "senderId" : 12453
+}, {
+  "terminalId" : "877",
+  "fullName" : "ANTONELLA DAS NEVES",
+  "cpf" : "556.112.777-21",
+  "amount" : 720.17,
+  "createdAt" : "2026-03-19 01:19:51.492087300",
+  "senderId" : 12464
+}, {
+  "terminalId" : "522",
+  "fullName" : "JOÃO LUCAS CASTANHEIRA",
+  "cpf" : "002.560.635-24",
+  "amount" : 239.56,
+  "createdAt" : "2026-03-19 01:19:51.494109100",
+  "senderId" : 12470
+} ]

@@ -31,11 +31,13 @@ log/
 logs/
 tmp/
 temp/
-data/seed/
+#data/seed/
 
 # Arquivos de banco de dados H2 (Causadores de conflito)
+data/h2/
 *.mv.db
 *.trace.db
+
 
 ### Maven/Gradle Wrappers e Cache ###
 # Cache do Maven/Gradle
@@ -44,7 +46,6 @@ data/seed/
 .m2/repository
 
 # Arquivos wrapper do Maven (manter o .mvn/wrapper/maven-wrapper.jar)
-.mvn/wrapper/
 
 ### Outros Arquivos de Sistema ###
 # macOS
@@ -54,7 +55,9 @@ data/seed/
 Thumbs.db
 
 #artefatos do projeto
+data/scripts/backup
 data/postman/postman_wallet_download.json
 data/postman/postman_merged_final__v*.json
 data/postman/reports/
+data/postman/newman/
 grafana/data/grafana.db

@@ -1,0 +1,24 @@
+spring:
+  config:
+    import: 
+      - "optional:classpath:security-matchers.yml"
+      - "optional:vault://secret/${APP_NAME}/${PROFILE}"
+  cloud:
+    vault:
+      enabled: true
+      #host: localhost
+      #scheme: http
+      uri: http://localhost:8200
+      token: root
+      kv:
+        enabled: true
+        backend: secret
+        version: 2
+        default-context: wallet-service-api
+        profiles: ${PROFILE:local}
+        profile-separator: /
+      config:
+        order: 1
+      kv-version: 2
+      ssl:
+        enabled: false        

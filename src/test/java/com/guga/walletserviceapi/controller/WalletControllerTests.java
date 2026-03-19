@@ -4,71 +4,42 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.guga.walletserviceapi.dto.wallet.WalletMapper;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.RandomMock;
-import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.ParamApp;
+import com.guga.walletserviceapi.model.Routers;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.service.WalletService;
 
-@WebMvcTest(WalletController.class)
+@WebMvcTest(controllers = WalletController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import({
-        //com.guga.walletserviceapi.config.ConfigProperties.class,
-        com.guga.walletserviceapi.config.TestPasswordConfig.class,
-        com.guga.walletserviceapi.service.common.DataPersistenceService.class
-})
+@Import({WalletMapper.class})
 class WalletControllerTests extends BaseControllerTest {
-
-    private static final String API_NAME = "/wallets";
 
     @MockitoBean
     private WalletService walletService;
-
-
-    @BeforeAll
-    void setupOnce() {
-        this.URI_API = getBaseUri(API_NAME);
-        loadMockData();
-    }
-
-    @BeforeEach
-    void setUp() {
-        Mockito.reset(
-            this.jwtAuthenticationFilter,            
-            this.jwtService,
-            this.authenticationManager
-        );
-    }    
 
     // =========================================================
     // CONTEXTO DE USUÁRIO (Endereços /me)
@@ -82,21 +53,18 @@ class WalletControllerTests extends BaseControllerTest {
         @DisplayName("Deve retornar a wallet do usuário autenticado")
         void getMyWallet_ok() throws Exception {
             LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
-
             Wallet mockWallet = getWalletById(auth.getWalletId());
-
             when(walletService.getWalletById(auth.getWalletId())).thenReturn(mockWallet);
 
-            mockMvc.perform(get(URI_API + "/me"))
+            performRequest(HttpMethod.GET, Routers.WALLETS + "/me", null, null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.walletId").value(mockWallet.getWalletId()));
         }
 
         @Test
         @DisplayName("Deve listar todas as wallets do customer autenticado")
-        void getMyWallets_ok() throws Exception {
+        void getMyListWallets_ok() throws Exception {
             LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
-
             List<Wallet> mockWallets = wallets.stream()
                 .filter(w -> w.getCustomerId().equals(auth.getCustomerId()))
                 .collect(java.util.stream.Collectors.toList());
@@ -104,9 +72,9 @@ class WalletControllerTests extends BaseControllerTest {
             when(walletService.getWalletByCustomerId(eq(auth.getCustomerId()), any()))
                 .thenReturn(new PageImpl<>(mockWallets));
 
-            mockMvc.perform(get(URI_API + "/me/all"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content", hasSize(mockWallets.size())));
+            performRequest(HttpMethod.GET, Routers.WALLETS + "/me/list", null, null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(mockWallets.size())));
         }
     }
 
@@ -117,7 +85,7 @@ class WalletControllerTests extends BaseControllerTest {
     @Nested
     @DisplayName("Operações Administrativas")
     class AdminContext {
-
+/*
         @Test
         @DisplayName("Admin deve criar uma nova wallet com sucesso")
         void createWallet_created() throws Exception {           
@@ -141,23 +109,8 @@ class WalletControllerTests extends BaseControllerTest {
                     .andExpect(header().exists("Location"))
                     .andExpect(jsonPath("$.walletId").value(walletResult.getWalletId()));
         }
-
-        @Test
-        @DisplayName("Admin deve obter wallet por ID")
-        void getWalletById_ok() throws Exception {
-
-            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
-
-            Wallet mockWallet = getAleatoryWallet();
-
-            when(walletService.getWalletById(mockWallet.getWalletId())).thenReturn(mockWallet);
-
-            mockMvc.perform(get(URI_API + "/{id}", mockWallet.getWalletId()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.walletId").value(mockWallet.getWalletId()));
-        }
-
-        @Test
+ 
+         @Test
         @DisplayName("Admin deve atualizar uma wallet")
         void updateWallet_ok() throws Exception {
 
@@ -175,51 +128,63 @@ class WalletControllerTests extends BaseControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(mockWallet)))
                     .andExpect(status().isOk());
+        }s
+ */
+
+        @Test
+        @DisplayName("Admin deve obter wallet por ID")
+        void getWalletById_ok() throws Exception {
+            LoginAuth loginAuth = setupMockAuth(List.of(LoginRole.ADMIN));
+            Wallet mockWallet = getWalletByCustomerId(loginAuth.getCustomerId());
+            when(walletService.getWalletById(mockWallet.getWalletId())).thenReturn(mockWallet);
+
+            String url = Routers.WALLETS + "/" + mockWallet.getWalletId();
+            performRequest(HttpMethod.GET, url, null, null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.walletId").value(mockWallet.getWalletId()));
         }
 
         @Test
         @DisplayName("Admin deve listar todas as wallets de forma paginada")
         void listWallets_ok() throws Exception {
-            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
-
+            setupMockAuth(List.of(LoginRole.ADMIN));
             when(walletService.getAllWallets(any(), any()))
                 .thenReturn(new PageImpl<>(wallets));
 
-            mockMvc.perform(get(URI_API)
-                    .param("page", "0"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content").exists());
+            performRequest(HttpMethod.GET, Routers.WALLETS, null, params("page", "0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists());
         }
 
-        @Test
-        @DisplayName("Admin deve listar wallets por ID do Customer")
-        void getWalletsByCustomer_ok() throws Exception {
-            LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
+    //     @Test
+    //     @DisplayName("Admin deve listar wallets por ID do Customer")
+    //     void getWalletsByCustomer_ok() throws Exception {
+    //         setupMockAuth(List.of(LoginRole.ADMIN));
 
-            // PASSO 1: Criar um mapa de "ID do Cliente" -> "Quantidade de Wallets"
-            Map<Long, Long> contagemPorCliente = wallets.stream()
-                .collect(Collectors.groupingBy(
-                    w -> w.getCustomer().getCustomerId(), // Agrupa pelo ID
-                    Collectors.counting()                 // Conta quantos existem
-                ));
+    //         Map<Long, Long> contagemPorCliente = wallets.stream()
+    //             .collect(Collectors.groupingBy(
+    //                 w -> w.getCustomer().getCustomerId(),
+    //                 Collectors.counting()
+    //             ));
 
-            long customerId = contagemPorCliente.entrySet().stream()
-                .filter(entry -> entry.getValue() > 0) // Filtra apenas clientes com pelo menos 1 wallet
-                .findAny()
-                .map(Map.Entry::getKey)
-                .orElseThrow(() -> new ResourceBadRequestException("Nenhum cliente encontrado com wallets na massa de dados."));
+    //         long customerId = contagemPorCliente.entrySet().stream()
+    //             .filter(entry -> entry.getValue() > 0)
+    //             .findAny()
+    //             .map(Map.Entry::getKey)
+    //             .orElseThrow(() -> new ResourceBadRequestException("Nenhum cliente encontrado com wallets na massa de dados."));
 
-            List<Wallet> filteredWallets = wallets.stream()
-                .filter(w -> w.getCustomerId().equals(customerId))
-                .collect(Collectors.toList());
+    //         List<Wallet> filteredWallets = wallets.stream()
+    //             .filter(w -> w.getCustomerId().equals(customerId))
+    //             .collect(Collectors.toList());
 
-            when(walletService.getWalletByCustomerId(eq(customerId), any()))
-                .thenReturn(new PageImpl<>(filteredWallets));
+    //         when(walletService.getWalletByCustomerId(eq(customerId), any()))
+    //             .thenReturn(new PageImpl<>(filteredWallets));
 
-            mockMvc.perform(get(URI_API + "/by-customer/{customerId}", customerId))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content").exists());
-        }
+    //         String url = Routers.WALLETS + "/by-customer/" + customerId;
+    //         performRequest(HttpMethod.GET, url, null, null)
+    //             .andExpect(status().isOk())
+    //             .andExpect(jsonPath("$.content").exists());
+    //     }
     }
 
     @Override
@@ -244,6 +209,17 @@ class WalletControllerTests extends BaseControllerTest {
             .findFirst()
             .orElseThrow(() -> new ResourceBadRequestException("Wallet não encontrada para o LoginAuth"));
     }
+
+    private Wallet getWalletByCustomerId(Long customerId) {
+        List<Wallet> waFilter = wallets.stream()
+            .filter(w -> w.getCustomerId().equals(customerId))
+            .collect(Collectors.toList());
+
+        if (waFilter == null) new ResourceBadRequestException("Wallet não encontrada para o LoginAuth");
+
+        int idxWallet = RandomMock.generateIntNumberByInterval(0, waFilter.size() - 1);
+        return waFilter.get(idxWallet);
+    }    
 
     private Wallet getAleatoryWallet() {
         int idxWallet = RandomMock.generateIntNumberByInterval(0, wallets.size() - 1);

@@ -32,8 +32,7 @@ import lombok.Setter;
     "id", "login", "status", "loginAuthType", "customerId", "walletId", "accessKey", "lastLoginAt", "createdAt", "updatedAt"
 })
 @Builder(toBuilder = true)
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -56,7 +55,7 @@ public class LoginAuth {
 
 
     @NotNull(message = "Wallet cannot be null")
-    @Column(name = "wallet_id_fk", nullable = false, unique = true)
+    @Column(name = "wallet_id_fk", nullable = false)
     private Long walletId;
 
 

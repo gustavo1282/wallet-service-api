@@ -1,7 +1,10 @@
 package com.guga.walletserviceapi.service.common;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -12,12 +15,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.logging.LogMarkers;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class DataPersistenceService {
+
+    private static final Logger LOGGER = LogManager.getLogger(DataPersistenceService.class);
 
     private final ObjectMapper mapper;
 
@@ -37,19 +43,20 @@ public class DataPersistenceService {
         try {
             java.io.File file = new java.io.File(filePath);
             
-            if (!file.exists()) {
-                throw new RuntimeException("Arquivo não encontrado no sistema de arquivos: " + filePath);
+            if (file.exists()) {
+                java.io.InputStream is = new java.io.FileInputStream(file);
+                if (is != null) {
+                    List<T> result = mapper.readValue(is, typeRef);
+                    LOGGER.info(LogMarkers.LOG, "Arquivo " + filePath + " importado com sucesso.");
+                    return result;
+                }
             }
 
-            java.io.InputStream is = new java.io.FileInputStream(file);
-
-            if (is == null) throw new RuntimeException("Arquivo não encontrado: " + filePath);
-
-            return mapper.readValue(is, typeRef);
-            
+            LOGGER.info(LogMarkers.LOG, "Arquivo " + filePath + " não existe.");
         } catch (Exception e) {
-            throw new ResourceBadRequestException("Erro na análise dos dados: " + e.getMessage());
+            LOGGER.info(LogMarkers.LOG, "Arquivo " + filePath + " não foi processado. " + e.getMessage());
         }
+        return Collections.emptyList();
     }    
 
     /**

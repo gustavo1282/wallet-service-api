@@ -1,6 +1,5 @@
 package com.guga.walletserviceapi.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -42,6 +41,9 @@ public class CustomerService implements IWalletApiService {
      */
     public Customer existsCustomer(Long id) {
 
+        if (id == null || id < 1)
+            return null;
+
         return customerRepository.findById(id).orElse(null);
 
     }
@@ -61,18 +63,24 @@ public class CustomerService implements IWalletApiService {
 
     @Transactional
     public Customer updateCustomer(Long id, Customer customerUpdate) {
+        if (customerUpdate == null) {
+            throw new IllegalArgumentException("Customer update data cannot be null");
+        }
 
         Customer customer = getCustomerById(id);
-
-        customer.setStatus(customerUpdate.getStatus());
-        customer.setPhoneNumber(customerUpdate.getPhoneNumber());
-        customer.setEmail(customerUpdate.getEmail());
-        customer.setBirthDate(customerUpdate.getBirthDate());
-        customer.setUpdatedAt(LocalDateTime.now());
-        //customer.setCpf(customerUpdate.getCpf());
-        //customer.setFirstName(customerUpdate.getFirstName());
-        //customer.setLastName(customerUpdate.getLastName());
-        //customer.setDocumentId(customerUpdate.getDocumentId());
+        
+        if (customerUpdate.getStatus() != null) {
+            customer.setStatus(customerUpdate.getStatus());
+        }
+        if (customerUpdate.getPhoneNumber() != null) {
+            customer.setPhoneNumber(customerUpdate.getPhoneNumber());
+        }
+        if (customerUpdate.getEmail() != null) {
+            customer.setEmail(customerUpdate.getEmail());
+        }
+        if (customerUpdate.getBirthDate() != null) {
+            customer.setBirthDate(customerUpdate.getBirthDate());
+        }
 
         return customerRepository.save(customer);
     }

@@ -4,10 +4,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 // Importação estática para métodos 'when' e 'thenReturn'
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -20,9 +20,18 @@ import com.guga.walletserviceapi.security.jwt.JwtService;
 
 @ActiveProfiles("test")
 @WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
-@WebMvcTest(JwtAuthenticationFilter.class)
 @AutoConfigureMockMvc(addFilters = false)
+@WebMvcTest(JwtAuthenticationFilter.class)
+//@Transactional(propagation = Propagation.NOT_SUPPORTED) // Garante que o Seed persista no banco
+@Import({
+    org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class,
+    com.guga.walletserviceapi.config.ConfigProperties.class,
+    com.guga.walletserviceapi.config.ApiDocsTags.class
+})
 public class JwtAuthenticationFilterTest {
+
+    @MockitoBean
+    private com.guga.walletserviceapi.config.ApiDocsResponses apiDocsTags;
 
 	@MockitoBean
 	private JwtService jwtService;
@@ -30,11 +39,6 @@ public class JwtAuthenticationFilterTest {
 	@MockitoBean
 	private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
-    @BeforeEach
-    public void setUp() {
-
-    }
 
     @Test
     public void testTokenValidoPassaPeloFiltro() throws Exception {

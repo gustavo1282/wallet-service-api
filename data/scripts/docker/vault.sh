@@ -41,7 +41,7 @@ provision_vault() {
       "spring.datasource.password"="$WALLET_PASS" \
       "sonar.projectKey"="com.gugawallet:$APP_NAME" \
       "sonar.host.url"="http://cont-wallet-sonarqube:9000" \
-      "sonar.token"="squ_ea51cedf0f969507efcbb2a7ce1b985455004a61"
+      "sonar.token"="sqa_26c64d9618282081aa091e3527e728c8a9eadcfc"
 
   echo "Segredos injetados com sucesso!"
   

@@ -58,35 +58,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-                
-        boolean validationMatcher = validationMatcher(request);
-            
-        //LOGGER.debug(LogMarkers.LOG, "JwtAuthFilter - {} {} | validationMatcher={}",
-        //    request.getMethod(), request.getRequestURI(), validationMatcher);
-
-        if (validationMatcher) {
+        // 1) Rotas permitAll/documentação/infra: pula JWT
+        if (shouldSkipJwt(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // 2) Extrai Authorization
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith("Bearer ")) {
-            LOGGER.warn(LogMarkers.LOG, "JwtAuthFilter - sem Authorization Bearer");
+            // Aqui é endpoint "protegido" (não skipamos), então faz sentido avisar
+            LOGGER.warn(LogMarkers.LOG, "JwtAuthFilter - missing Authorization Bearer");
             filterChain.doFilter(request, response);
             return;
         }
 
         final String jwt = authHeader.substring(7);
 
-        LOGGER.debug(LogMarkers.LOG, "JwtAuthFilter - JWT recebido (len={})", jwt.length());
+        LOGGER.debug(LogMarkers.LOG, "JwtAuthFilter - JWT received (len={})", jwt.length());
 
+        // 3) Valida token
         if (!jwtService.validateToken(jwt)) {
-            LOGGER.warn(LogMarkers.LOG, "JwtAuthFilter - JWT invalido");
+            LOGGER.warn(LogMarkers.LOG, "JwtAuthFilter - invalid JWT");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ===== Roles → Authorities =====
+        // 4) Roles → Authorities
         List<LoginRole> roles = jwtService.extractRoles(jwt).stream()
             .filter(Objects::nonNull)
             .map(role -> LoginRole.valueOf(role.trim().toUpperCase()))
@@ -94,10 +92,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         List<GrantedAuthority> authorities = roles.stream()
             .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-            .collect(Collectors.toList())
-            ;
+            .collect(Collectors.toList());
 
-        // ===== Identity (JWT Context) =====
+        // 5) Identity (JWT Context)
         JwtAuthenticationDetails authDetails = JwtAuthenticationDetails.builder()
             .loginId(jwtService.extractLoginId(jwt))
             .login(jwtService.extractLogin(jwt))
@@ -107,17 +104,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             .roles(roles)
             .build();
 
+        // 6) Set authentication context
         UsernamePasswordAuthenticationToken authToken =
-            new UsernamePasswordAuthenticationToken(
-                authDetails,
-                null,
-                authorities
-            );
+            new UsernamePasswordAuthenticationToken(authDetails, null, authorities);
 
-        authToken.setDetails(
-            new WebAuthenticationDetailsSource().buildDetails(request)
-        );
-
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
@@ -128,36 +119,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return Arrays.asList(value);
     }
 
-    private boolean validationMatcher(HttpServletRequest request) {
+    /**
+     * Pula o JWT apenas para rotas que são permitAll (públicas/documentação/infra).
+     * Para rotas secured/admin, o filtro DEVE rodar.
+     */
+    private boolean shouldSkipJwt(HttpServletRequest request) {
 
         String path = request.getRequestURI()
             .replace(contextPath, "")
             .replace(servletPath, "");
 
-        // Se for o Prometheus, passa direto sem logar o WARN
-        if (path.startsWith("/actuator/prometheus") ||
-            path.startsWith("/h2-console")
-            ) 
-        {
+        // Infra
+        if (path.startsWith("/actuator/prometheus")) {
             return true;
         }
 
         List<String> publicPaths = getMatchersSession(matchers.getPublicPaths());
         List<String> documentationPaths = getMatchersSession(matchers.getDocumentation());
-        List<String> adminPaths = getMatchersSession(matchers.getAdmin());
         List<String> securedPaths = getMatchersSession(matchers.getSecured());
-        
+        List<String> adminPaths = getMatchersSession(matchers.getAdmin());
+
         AntPathMatcher pathMatcher = new AntPathMatcher();
 
-        boolean isPublic = publicPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-        boolean isDocumentation = documentationPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-        boolean isAdmin = adminPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-        boolean isSecured = securedPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
-        //boolean isPermitAll = allPaths.stream().filter(Objects::nonNull).anyMatch(p -> pathMatcher.match(p, path));
+        boolean isPublic = publicPaths.stream()
+            .filter(Objects::nonNull)
+            .anyMatch(p -> pathMatcher.match(p, path));
 
-        return (isPublic || isDocumentation || isAdmin || isSecured);
-        
+        boolean isDocumentation = documentationPaths.stream()
+            .filter(Objects::nonNull)
+            .anyMatch(p -> pathMatcher.match(p, path));
+
+        boolean isSecured = securedPaths.stream()
+            .filter(Objects::nonNull)
+            .anyMatch(p -> pathMatcher.match(p, path));
+
+        boolean isAdmin = adminPaths.stream()
+            .filter(Objects::nonNull)
+            .anyMatch(p -> pathMatcher.match(p, path));
+
+        return (isPublic || isDocumentation || isSecured || isAdmin);
     }
-
-
 }

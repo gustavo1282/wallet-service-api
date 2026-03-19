@@ -8,19 +8,23 @@ usage() {
   echo "Uso (UP):"
   echo "  ./wallet.sh up all"
   echo "  ./wallet.sh up base"
-  echo "  ./wallet.sh up vault"
+  ##echo "  ./wallet.sh up vault"
   echo "  ./wallet.sh up obs"
   echo "  ./wallet.sh up app"
   echo "  ./wallet.sh up quality"
-  echo "  ./wallet.sh up wallet-service-api"
-  echo "  ./wallet.sh up <service>"
+  ##echo "  ./wallet.sh up wallet-service-api"
+  ##echo "  ./wallet.sh up <service>"
   echo ""
   echo "Variaveis:"
   echo "  SKIP_VERIFY=true    # pula 'mvn clean verify' (nao recomendado)"
   exit 1
 }
 
-TARGET="${1:-}"
+# Normalização do input:
+# 1. Remove caracteres invisíveis (como \r do Windows)
+# 2. Converte para minúsculas (ALL -> all)
+RAW_TARGET="${1:-}"
+TARGET="$(echo "${RAW_TARGET//$'\r'/}" | tr '[:upper:]' '[:lower:]')"
 
 up()    { docker compose up -d "$@"; }
 up_bld(){ docker compose up -d --build "$@"; }
@@ -48,16 +52,9 @@ case "$TARGET" in
   "" ) usage ;;
 
   all)
-    # Base primeiro (DB, Vault, etc.)
-    up "${BASE_SERVICES[@]}"
-
-    # Vault provision
+    up "${BASE_SERVICES[@]}"  # O Docker inicia estes...
     "$(dirname "$0")/vault.sh" all
-
-    # Observabilidade
-    up "${OBS_SERVICES[@]}"
-
-    # Antes de buildar/subir app: gera jar snapshot + tests + JaCoCo
+    up "${OBS_SERVICES[@]}"   # ...e estes quase ao mesmo tempo.
     run_maven_verify
     up_bld "${APP_SERVICES[@]}"
     ;;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.logging.log4j.ThreadContext;
+import org.springframework.stereotype.Component;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -13,6 +14,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Component
 public class TraceIdFilter implements Filter {
 
     private static final String TRACE_ID_HEADER = "X-Trace-Id";
@@ -40,7 +42,7 @@ public class TraceIdFilter implements Filter {
         try {
             chain.doFilter(request, response);
         } finally {
-            ThreadContext.clearAll(); // MUITO IMPORTANTE
+            ThreadContext.remove(TRACE_ID_MDC_KEY);
         }
     }
 }

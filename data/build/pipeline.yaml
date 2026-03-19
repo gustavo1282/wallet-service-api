@@ -2,14 +2,9 @@ name: Pipeline > wallet-service-api
 
 on:
   push:
-    branches:
-      - main
-      - develop
-      - "feature/*"
+    branches: [main, develop, "feature/*"]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,14 +25,10 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      # Opcional (só mantenha se você realmente precisa fixar versão do Maven)
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
-        with:
-          maven-version: "3.9.6"
-
       - name: Maven Verify (tests + checks)
-        run: mvn -B verify -DfailIfNoTests=false
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -T 1C verify
 
       - name: Upload JaCoCo report (artifact)
         if: always()
@@ -45,13 +36,12 @@ jobs:
         with:
           name: jacoco-report
           path: target/site/jacoco/
+          retention-days: 1
 
   sonar:
     name: SonarQube / SonarCloud
     runs-on: ubuntu-latest
     needs: [build_test]
-    # Se quiser rodar Sonar só no main e PRs, use:
-    # if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
@@ -65,23 +55,22 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Cache Sonar
-        uses: actions/cache@v4
+      - name: Download JaCoCo report
+        uses: actions/download-artifact@v4
         with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          name: jacoco-report
+          path: target/site/jacoco/
 
       - name: Build and analyze (Sonar)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify sonar:sonar \
+          chmod +x mvnw
+          ./mvnw -B sonar:sonar \
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-            -Dsonar.junit.reportPaths=target/surefire-reports
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
   docker:
     name: Docker Build & Push
@@ -95,7 +84,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Exemplo usando GHCR (GitHub Container Registry)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build JAR for Docker
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -DskipTests clean package
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -103,7 +103,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set Docker metadata (tags)
+      - name: Set Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:

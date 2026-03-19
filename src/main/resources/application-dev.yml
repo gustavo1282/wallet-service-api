@@ -1,3 +1,22 @@
+# =========================
+# Vars usadas por placeholders (bootstrapping)
+# =========================
+APP_NAME: wallet-service-api
+PROFILE: dev
+API_PREFIX: /api/v1
+ENV: env-dev
+WALLET_USER: wallet_user
+WALLET_PASS: wallet_pass
+JWT_SECRET: mock.jwt_token.profile_test.859jg89045j9045i
+MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
+
+
+app:
+  api-prefix: /api/v1
+  seeder:
+    enabled: true # Mude para true para executar a carga na inicialização
+
+
 spring:
   config:
     import: 
@@ -23,10 +42,11 @@ spring:
   datasource:
     # Configuração para H2 via arquivo
     #url: jdbc:h2:mem:wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    url: jdbc:h2:file:./data/h2/wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    url: jdbc:h2:file:./data/h2/wallet-dev-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: ${WALLET_USER:wallet_user}
-    password: ${WALLET_PASS:wallet_pass}
+    password: ""
+    #password: ${WALLET_PASS:wallet_pass}
     
     # Configuração para POSTGRES via arquivo
     #url: jdbc:postgresql://host.docker.internal:5432/wallet_db
@@ -43,7 +63,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 

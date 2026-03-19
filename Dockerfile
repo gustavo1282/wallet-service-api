@@ -1,28 +1,44 @@
-# Estágio de Build
-FROM maven:3.9.6-eclipse-temurin-21 AS build
-WORKDIR /app
+# syntax=docker/dockerfile:1.6
 
-# Cache de dependências
-COPY pom.xml .
-RUN mvn -B -DskipTests dependency:go-offline
+# ===============================
+# STAGE 1 - BUILD
+# ===============================
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
+WORKDIR /build
 
-# Código fonte
+# 1) Copia só o descriptor primeiro (melhor cache por layer)
+COPY pom.xml ./
+
+# 2) Aquece/cacheia dependências (usa cache persistente do BuildKit)
+#RUN --mount=type=cache,target=/root/.m2 \
+##mvn -B -DskipTests dependency:go-offline
+## -->  ~/.m2 #LINUX
+## -->  %USERPROFILE%\.m2 #WINDOWS
+
+RUN --mount=type=bind,source=~/.m2,target=/root/.m2 \
+    mvn -B -o -DskipTests dependency:go-offline
+
+    # 3) Agora copia o código
 COPY src ./src
 
-# Build (sem testes dentro do Docker; testes rodam no CI)
-RUN mvn -B -DskipTests clean package
+# 4) Build de verdade (usa o MESMO cache .m2)
+#RUN --mount=type=cache,target=/root/.m2 \
+RUN --mount=type=bind,source=~/.m2,target=/root/.m2 \
+    mvn -B -DskipTests package
 
-
-# Estágio de Execução
-FROM eclipse-temurin:21-jre-alpine
+# ===============================
+# STAGE 2 - RUNTIME
+# ===============================
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
-# Copia o jar gerado
-COPY --from=build /app/target/wallet-service-api.jar app.jar
+# Mantém o jar com versão (do seu finalName) dentro do container
+COPY --from=builder /build/target/*.jar /app/
 
-# Usuário não-root por segurança
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
+# Cria um alias estável pra rodar sempre (opcional, mas recomendo)
+RUN set -eux; \
+    JAR="$(ls -1 /app/*.jar | head -n 1)"; \
+    ln -sf "$JAR" /app/app.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]

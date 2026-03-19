@@ -1,97 +1,122 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# -----------------------------------------
-# wallet_quality.sh  -- >> chmod +x wallet_quality.sh
-#
-# Executa:
-#  1) mvn -B clean verify  -> tests + JaCoCo (gera HTML/ XML se configurado no POM)
-#  2) mvn sonar:sonar      -> envia análise e cobertura via jacoco.xml
-#  3) Abre o HTML do JaCoCo no final (se existir)
-#
-# Uso:
-#   SONAR_TOKEN=xxxx ./wallet_quality.sh
-#
-# Opcional:
-#   SONAR_HOST_URL=http://localhost:9000 SONAR_TOKEN=xxxx ./wallet_quality.sh
-#   SKIP_SONAR=true ./wallet_quality.sh
-# -----------------------------------------
+# --- Configurações ---
+SONAR_CONTAINER_NAME="sonarqube"
+SONAR_URL="http://localhost:9000"
+SONAR_TOKEN="${SONAR_TOKEN:-squ_b19895184c9a2005d4cedd2624781467ad68859f}"
 
-SONAR_HOST_URL="${SONAR_HOST_URL:-http://localhost:9000}"
-SONAR_TOKEN="${SONAR_TOKEN:-}"
-SKIP_SONAR="${SKIP_SONAR:-false}"
-
-# Maven wrapper se existir
+# Maven wrapper check
 MVN="./mvnw"
 if [[ ! -f "$MVN" ]]; then MVN="mvn"; fi
 
-# Raiz do projeto
+# Raiz do projeto (Ajuste conforme sua estrutura)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+#ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 cd "$ROOT_DIR"
+JACOCO_REPORT_PATH="$ROOT_DIR/target/site/jacoco/index.html"
+# --- Funções de Etapas ---
 
-echo "🧪 [1/3] Maven: clean verify (tests + JaCoCo)"
-"$MVN" -B clean verify
+check_sonar_status() {
+    echo "🔍 Verificando SonarQube..."
+    if curl -s --connect-timeout 2 "$SONAR_URL" > /dev/null; then
+        return 0 # Online
+    else
+        return 1 # Offline
+    fi
+}
 
-# Caminhos esperados do JaCoCo
-JACOCO_XML="$ROOT_DIR/target/site/jacoco/jacoco.xml"
-JACOCO_HTML="$ROOT_DIR/target/site/jacoco/index.html"
+start_sonar_docker() {
+    echo "🐳 Verificando status do container: $SONAR_CONTAINER_NAME..."
 
-if [[ ! -f "$JACOCO_XML" ]]; then
-  echo "⚠️  Não encontrei jacoco.xml em: $JACOCO_XML"
-  echo "    Verifique se o POM está gerando XML e se o módulo é esse mesmo."
-else
-  echo "✅ JaCoCo XML: $JACOCO_XML"
-fi
+    # 1. Check se o Docker Engine (Desktop) está aberto
+    if ! docker info >/dev/null 2>&1; then
+        echo "❌ ERRO: O Docker Desktop não está rodando. Abra-o primeiro."
+        return 1
+    fi
 
-echo "🔎 [2/3] SonarQube"
-if [[ "$SKIP_SONAR" == "true" ]]; then
-  echo "⏭️  SKIP_SONAR=true - pulando sonar:sonar"
-else
-  if [[ -z "$SONAR_TOKEN" ]]; then
-    echo "❌ SONAR_TOKEN não definido."
-    echo "   Exemplo: SONAR_TOKEN=xxxx ./wallet_quality.sh"
-    exit 1
-  fi
+    # 2. Verifica o estado atual do container específico do seu compose
+    # {{.State.Running}} retorna 'true' ou 'false'
+    local IS_RUNNING
+    IS_RUNNING=$(docker inspect -f '{{.State.Running}}' "$SONAR_CONTAINER_NAME" 2>/dev/null || echo "not_found")
 
-  # Se o jacoco.xml existir, passa o caminho explicitamente pro Sonar.
-  SONAR_JACOCO_ARG=()
-  if [[ -f "$JACOCO_XML" ]]; then
-    SONAR_JACOCO_ARG=(-Dsonar.coverage.jacoco.xmlReportPaths="$JACOCO_XML")
-  fi
+    if [[ "$IS_RUNNING" == "true" ]]; then
+        echo "✅ O container '$SONAR_CONTAINER_NAME' já está rodando. Nada a fazer."
+    else
+        echo "⚠️  O container está $IS_RUNNING (ou não existe). Iniciando via Compose..."
+        
+        COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
+        
+        if [[ -f "$COMPOSE_FILE" ]]; then
+            # 'up -d' é idempotente, mas chamamos apenas o serviço 'sonarqube'
+            docker compose -f "$COMPOSE_FILE" up -d sonarqube
+            echo "🚀 Comando enviado. Aguarde o Sonar subir totalmente."
+        else
+            echo "❌ Erro: Arquivo $COMPOSE_FILE não encontrado."
+        fi
+    fi
+}
 
-  "$MVN" -B sonar:sonar \
-    -Dsonar.host.url="$SONAR_HOST_URL" \
-    -Dsonar.login="$SONAR_TOKEN" \
-    "${SONAR_JACOCO_ARG[@]}"
+run_tests() {
+    echo "🧪 [1] Maven: clean verify (Tests + JaCoCo)..."
+    
+    # Adicionamos -Dsurefire.useFile=false para ver o erro no console
+    # Adicionamos --fail-at-end para ele rodar todos os testes antes de mostrar o resumo
+    "$MVN" -B clean verify \
+        -DfailIfNoTests=false \
+        -T 2C \
+        -Dsurefire.useFile=false \
+        -Dfailsafe.useFile=false
+}
 
-  echo "✅ Sonar analysis enviado para: $SONAR_HOST_URL"
-fi
+run_sonar_analysis() {
+    if check_sonar_status; then
+        echo "✅ SonarQube online. Enviando análise..."
+        "$MVN" -B sonar:sonar \
+            -Dsonar.host.url="$SONAR_URL" \
+            -Dsonar.login="$SONAR_TOKEN" \
+            -Dsonar.coverage.jacoco.xmlReportPaths="target/site/jacoco/jacoco.xml"
+    else
+        echo "⚠️  SonarQube OFFLINE. Pulando esta etapa."
+        echo "   Dica: Use a opção 5 para subir o Docker."
+    fi
+}
 
-echo "🧾 [3/3] Abrindo relatório JaCoCo (HTML)"
-if [[ -f "$JACOCO_HTML" ]]; then
-  # Abrir em Windows/macOS/Linux
-  if command -v cmd.exe >/dev/null 2>&1; then
-    # Git Bash / MSYS
-    winpath="$(cygpath -w "$JACOCO_HTML" 2>/dev/null || echo "$JACOCO_HTML")"
-    cmd.exe /c start "" "$winpath" >/dev/null 2>&1 || true
-  elif command -v powershell.exe >/dev/null 2>&1; then
-    # WSL com powershell disponível
-    powershell.exe -NoProfile -Command "Start-Process '$(wslpath -w "$JACOCO_HTML" 2>/dev/null || echo "$JACOCO_HTML")'" >/dev/null 2>&1 || true
-  elif command -v open >/dev/null 2>&1; then
-    # macOS
-    open "$JACOCO_HTML" >/dev/null 2>&1 || true
-  elif command -v xdg-open >/dev/null 2>&1; then
-    # Linux
-    xdg-open "$JACOCO_HTML" >/dev/null 2>&1 || true
-  else
-    echo "✅ HTML gerado em: $JACOCO_HTML"
-    echo "   (não consegui auto-abrir pois não encontrei start/open/xdg-open)"
-  fi
-else
-  echo "⚠️  Não encontrei o HTML do JaCoCo em: $JACOCO_HTML"
-  echo "    Confirme se você adicionou <format>HTML</format> no POM e rode novamente:"
-  echo "      mvn -B clean verify"
-fi
+open_report() {
+    if [[ -f "$JACOCO_REPORT_PATH" ]]; then
+        echo "✅ Relatório encontrado!"
+        # Converte o caminho /c/Users/... para C:\Users\... que o Windows entende
+        local WIN_PATH
+        WIN_PATH=$(cygpath -w "$JACOCO_REPORT_PATH")
+        start "" "$WIN_PATH"
+    else
+        echo "⚠️  Relatório ainda não encontrado em: $JACOCO_REPORT_PATH"
+    fi
+}
 
-echo "✅ Quality finalizado (verify + sonar + jacoco report)"
+# --- Menu Principal ---
+clear
+echo "===================================================="
+echo "      WALLET SERVICE - QUALITY DASHBOARD"
+echo "===================================================="
+echo " 1) 🚀 FULL PIPELINE (Testes + Sonar + Report)"
+echo " 2) 🧪 APENAS TESTES (Maven Verify + JaCoCo)"
+echo " 3) 🔎 APENAS SONAR (Enviar resultados existentes)"
+echo " 4) 📊 ABRIR RELATÓRIO (JaCoCo HTML)"
+echo " 5) 🐳 SUBIR SONARQUBE (Docker)"
+echo " q) Sair"
+echo "----------------------------------------------------"
+read -rp " Escolha uma opção: " opt
+
+case $opt in
+    1) run_tests; run_sonar_analysis; open_report ;;
+    2) run_tests; open_report ;;
+    3) run_sonar_analysis ;;
+    4) open_report ;;
+    5) start_sonar_docker ;;
+    q) exit 0 ;;
+    *) echo "Opção inválida."; sleep 2; exec "$0" ;;
+esac
+
+echo -e "\n✅ Processo concluído!"

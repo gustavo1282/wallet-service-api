@@ -6,42 +6,39 @@ PROFILE: test
 ENV: env-test
 WALLET_USER: wallet_user
 WALLET_PASS: wallet_pass
-
-# Se sua app usa ${JWT_SECRET} diretamente em algum lugar, isso garante o valor em testes
-JWT_SECRET: mock.jwt_secret_value_8235hu23523h523h57823h58723h823
-
-###############################
-###############################
-###############################
-###############################
-
+JWT_SECRET: mock.jwt_token.profile_test.859jg89045j9045i
+MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
 
 app:
   api-prefix: /api/v1
+  security:
+    crypto:
+      strength: 4
+  seeder:
+    enabled: false # Mude para true para executar a carga na inicialização
 
 server:
-  servlet:
-    context-path: /${APP_NAME}
+  address: 0.0.0.0
+  port: 8080
+  #servlet:
+  #  context-path: /${APP_NAME}
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
+    lazy-initialization: true
+
   autoconfigure:
     exclude:
-      # --- REDIS
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
-      # --- REDIS (Evita busca por servidor Redis e criação de Repositories) ---
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
       - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
-      # --- OBSERVABILIDADE (O "Sonar" das métricas que vimos travar seu log) ---
       - org.springframework.boot.actuate.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
       - org.springframework.boot.actuate.autoconfigure.observation.ObservationAutoConfiguration
       - org.springframework.boot.actuate.autoconfigure.tracing.MicrometerTracingAutoConfiguration
       - org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
       - org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
-      # --- COUCHBASE (Se ainda estiver no seu pom.xml e causando o "Strict Mode") ---
       - org.springframework.boot.autoconfigure.data.couchbase.CouchbaseDataAutoConfiguration
-      # --- VAULT
       - org.springframework.cloud.vault.config.VaultAutoConfiguration
       - org.springframework.cloud.vault.config.VaultReactiveAutoConfiguration
 
@@ -57,22 +54,27 @@ spring:
       - "optional:vault://secret/wallet-service-api/local"
 
   datasource:
-    #url: jdbc:h2:mem:wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     url: jdbc:h2:file:./data/h2/wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: ${WALLET_USER:wallet_user}
-    password: ${WALLET_PASS:wallet_pass}
-
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create
-    show-sql: true
+    password: ""
 
   h2:
     console:
       enabled: true
       path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  sql:
+      init:
+        mode: always
+
+
 
 management:
   endpoints:
@@ -80,39 +82,34 @@ management:
     web:
       exposure:
         include: "*"
-        #include: "startup,health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges,env"
-      base-path: /actuator      
+      base-path: /actuator 
   otlp:
     logging:
+      enabled: false
+      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/logs
+      timeout: 90s
+    tracing:
+      enabled: false
+      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/traces
+      timeout: 90s
+    metrics:
       export:
         enabled: false
+        otpl:
+          enabled: false
 
 logging:
   file:
     name: logs/${APP_NAME:wallet-service-api}-test.log
-  exception-conversion-word: "%wEx{5}"
-  level:
-    root: INFO
-    com.guga.walletserviceapi: DEBUG
-    org.springframework.boot.context.config: TRACE
-    org.springframework.core.env: INFO
-    org.hibernate: INFO
-    #org.hibernate.engine.jdbc.env: INFO
-    org.springframework.cloud.vault: INFO
-    org.springframework.vault: INFO
-    #org.springframework.security: INFO
-    #org.springdoc: INFO
-    org.springframework.web.servlet.handler.AbstractHandlerMapping: DEBUG    
-    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
-    org.springframework.boot.StartupInfoLogger: DEBUG
-    org.springframework.context.support.PostProcessorRegistrationDelegate: DEBUG
+#  exception-conversion-word: "%wEx{5}"
+#  level:
+    # root: INFO
+    # #error:
+    # #  include-stacktrace: on-param
+    # com.guga.walletserviceapi: DEBUG
+    # org.springframework.web: DEBUG
+    # org.springframework.security: DEBUG
+    # org.springframework.beans.factory.support: DEBUG
 
-    org.springframework.context.support: DEBUG
-    org.springframework.beans.factory.support: DEBUG
-
-
-  # Recomendado: evita quebrar se APP_NAME não existir por algum motivo
-
-# Se você usa config do tipo jwt.secret no código/config:
 jwt:
   secret: "${JWT_SECRET}"

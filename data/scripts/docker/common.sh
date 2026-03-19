@@ -19,9 +19,9 @@ export VAULT_ADDR="${VAULT_ADDR:-http://vault:8200}"
 export VAULT_SECRET_PATH="${VAULT_SECRET_PATH:-secret/${APP_NAME}/${PROFILE}}"
 export JWT_SECRET="${JWT_SECRET:-mock.jwt.secret.docker.${PROFILE}.value_8235hu23523h523h57823h58723h823}"
 export MANAGEMENT_OTLP_ENDPOINT="${MANAGEMENT_OTLP_ENDPOINT:-http://otel-collector:4318/v1}"
-
+export APP_VERSION
 
 BASE_SERVICES=(postgres vault pgadmin sonarqube)
-OBS_SERVICES=(jaeger loki tempo otel-collector prometheus grafana cadvisor)
+OBS_SERVICES=(jaeger loki tempo otel-collector prometheus grafana cadvisor alertmanager postgres_exporter)
 APP_SERVICES=(wallet-service-api runner-act)
-QUALITY_SERVICES=(sonarqube, newman)
+QUALITY_SERVICES=(sonarqube newman)

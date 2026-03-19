@@ -1,10 +1,17 @@
 package com.guga.walletserviceapi.model;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class Routers {
-    public static final String API = "/api/v1";
-    public static final String AUTH = API + "/auth";
-    public static final String CUSTOMERS = API + "/customers";
-    public static final String WALLETS = API + "/wallets";
-    public static final String TRANSACTIONS = API + "/transactions";
-    public static final String WALLET_OPERATOR = API + "/wallet-operator";
+    
+    public static String CONTEXT_PATH = "wallet-service-api";
+    public static String PREFIX = "/api/v1";
+    
+    public static String AUTH = "/auth";
+    public static String CUSTOMERS = "/customers";
+    public static String WALLETS = "/wallets";
+    public static String TRANSACTIONS = "/transactions";
+    public static String WALLET_OPERATOR = "/wallet-operator";
+
 }

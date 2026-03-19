@@ -2,6 +2,14 @@
 # Vars usadas por placeholders (bootstrapping)
 # =========================
 APP_NAME: wallet-service-api
+PROFILE: local
+API_PREFIX: /api/v1
+ENV: env-local
+WALLET_USER: wallet_user
+WALLET_PASS: wallet_pass
+JWT_SECRET: mock.jwt_token.profile_test.859jg89045j9045i
+MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
+
 
 ###############################
 ###############################
@@ -9,7 +17,9 @@ APP_NAME: wallet-service-api
 ###############################
 
 app:
-  api-prefix: /api/v1
+  api-prefix: ${API_PREFIX}
+  seeder:
+    enabled: false # Mude para true para executar a carga na inicialização
 
 server:
   address: 0.0.0.0
@@ -20,15 +30,22 @@ server:
 spring:
   application:
     name: ${APP_NAME}
+  # Desativa o cache do OpenAPI (SpringDoc)
+  cache.disabled: true    
   config:
     import: 
       - "optional:classpath:security-matchers.yml"
-      - "optional:vault://secret/${APP_NAME}/${PROFILE}"
+      ##- "optional:vault://secret/${APP_NAME}/${PROFILE}"
+      ##- "optional:vault://secret/${APP_NAME}/${PROFILE}"
+    active:
+      on-profile: local
   cloud:
     bootstrap:
       enabled: false  # Desativa o carregamento do bootstrap.yml
     vault:
       enabled: false
+      ssl:
+        enabled: false
       #authentication: TOKEN
       #kv:
       #  enabled: true
@@ -44,7 +61,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     generate-ddl: true
     show-sql: true
     open-in-view: true
@@ -63,9 +80,25 @@ spring:
       #path: /api/v1
 
 springdoc:
-  paths-to-match: '/api/v1/**'
+  #paths-to-match: "${API_PREFIX}/**"
+  packages-to-scan: com.guga.walletserviceapi.controller  
+  show-actuator: true
+  writer-with-default-pretty-printer: true
+
   api-docs:
     path: /v3/api-docs
+
+  api-responses:
+    - key: BadRequest
+      description: Invalid request
+    - key: NotFound
+      description: Resource not found
+    - key: Conflict
+      description: Conflict occurred
+    - key: InternalError
+      description: Unexpected error
+
+
   info:
     title: Wallet Service API
     version: '@project.version@' # Pega a versão do pom.xml automaticamente
@@ -95,14 +128,28 @@ springdoc:
       **Credenciais de Teste:**
       * **Usuário:** `wallet_user`
       * **Senha:** `wallet_pass`
+
+  ordered-tags:
+    - name: "Authenticator"
+    - name: "ParamApp"
+    - name: "Customers"
+    - name: "Wallet"
+    - name: "Transaction"
+    - name: "WalletOperator"
+    - name: "Seed"
+
+  # sql.init.mode: none
+
   swagger-ui:
     path: /swagger-ui.html
-    groups-order: ASC
-    operationsSorter: alpha
+    displayOperationId: true # Garante que o operationId seja visível
     try-it-out-enabled: 'false'
-  show-actuator: true
-  writer-with-default-pretty-printer: true
-  use-root-path: true
+    operationsSorter: operationId # Define a ordenação por operationId
+    custom-js: /swagger-ui/custom.js
+    #tagsSorter: none
+    ## groups-order: ASC
+  #use-root-path: true
+
 
 management:
   endpoints:
@@ -161,26 +208,46 @@ management:
     skip-pattern: /actuator/**, /swagger-ui/**, /v3/api-docs/**
 
 logging:
+  # Garante que o log saia no terminal/console do seu IDE
+  stderr:
+    level: DEBUG
+  stdout:
+    level: DEBUG
   file:
     name: logs/${APP_NAME:wallet-service-api}.log
   exception-conversion-word: "%wEx{5}"
   level:
-    root: INFO
-    com.guga.walletserviceapi: INFO
-    #org.springframework.boot.context.config: INFO
+    # --- Raiz e Projeto ---
+    root: DEBUG
+    com.guga.walletserviceapi: DEBUG
+    com.guga.walletserviceapi.security: DEBUG
+
+    # --- Silencia os logs de /actuator/prometheus ---
+    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR
+    #org.apache.tomcat.util.http.Parameters: ERROR    # Se quiser silenciar o log de acesso do servidor (se estiver ativado)
+
+    # --- Spring Web e Endpoints ---
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+
+    # --- Spring Security ---
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.authentication.AnonymousAuthenticationFilter: DEBUG    
+
+    # --- Infraestrutura e Testes ---
+    org.springframework.test: DEBUG
     org.springframework.core.env: DEBUG
     org.hibernate: INFO
-    #org.hibernate.engine.jdbc.env: INFO
+
+    # --- Cloud e Vault ---
     org.springframework.cloud.vault: DEBUG
     org.springframework.vault: DEBUG
-    org.springframework.security: INFO
-    #org.springdoc: DEBUG
-    #org.springframework.web.client.RestTemplate: DEBUG
-    #org.springframework.context.annotation
-    # Silencia o debug do filtro do Spring Security (o que remove o "Securing GET /actuator/prometheus")
-    logging.level.org.springframework.security.web.FilterChainProxy: INFO
-    logging.level.org.springframework.security.web.authentication.AnonymousAuthenticationFilter: INFO
+
 
     # Silencia o SEU filtro customizado (JwtAuthenticationFilter)
     # Substitua o pacote pelo caminho real da sua classe
-    logging.level.com.github.w.s.f.JwtAuthenticationFilter: ERROR
+    # logging.level.com.github.w.s.f.JwtAuthenticationFilter: ERROR
+
+

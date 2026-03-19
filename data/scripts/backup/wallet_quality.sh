@@ -10,10 +10,10 @@ set -euo pipefail
 #  3) Abre o HTML do JaCoCo no final (se existir)
 #
 # Uso:
-#   SONAR_TOKEN=xxxx ./wallet_quality.sh
+#   SONAR_TOKEN=sqa_a1e24af056b5b8f91146bbc46c1f88294186a1c2 ./wallet_quality.sh
 #
 # Opcional:
-#   SONAR_HOST_URL=http://localhost:9000 SONAR_TOKEN=xxxx ./wallet_quality.sh
+#   SONAR_HOST_URL=http://localhost:9000 SONAR_TOKEN=${SONAR_TOKEN} ./wallet_quality.sh
 #   SKIP_SONAR=true ./wallet_quality.sh
 # -----------------------------------------
 

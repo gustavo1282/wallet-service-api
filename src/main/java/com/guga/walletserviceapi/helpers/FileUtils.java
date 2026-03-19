@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -125,20 +126,25 @@ public class FileUtils {
          Path filePath = Paths.get(filePathString).normalize();
         
         if (!Files.exists(filePath)) {
-            throw new RuntimeException("Arquivo não encontrado no Sistema de Arquivos: " + filePathString);
+            LOGGER.info(LogMarkers.LOG, "Arquivo " + filePath + " não existe.");
+            return Collections.emptyList();
         }
         
         try (InputStream stream = Files.newInputStream(filePath)) { // Use Files.newInputStream
             ObjectMapper objectMapper = instanceObjectMapper();
             
-            return objectMapper.readValue(
-                    stream,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)
+            List<T> result = objectMapper.readValue(stream,
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)
             );
+
+            LOGGER.info(LogMarkers.LOG, "Arquivo " + filePath + " importado com sucesso.");
+
+            return result;
             
         } catch (Exception e) {
-            throw new RuntimeException("Erro carregando JSON: " + filePathString, e);
+            LOGGER.info(LogMarkers.LOG, "Arquivo " + filePath + " não foi processado. " + e.getMessage());
         }
+        return Collections.emptyList();
     }
 
     public static Path getResourcePath() {

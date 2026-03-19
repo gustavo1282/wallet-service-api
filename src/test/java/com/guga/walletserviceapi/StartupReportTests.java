@@ -12,9 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.guga.walletserviceapi.logging.LogMarkers;
-
 @ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {
+        "MANAGEMENT_OTLP_ENDPOINT=http://localhost:4317",
+    }
+)
 class StartupReportTests {
     private static final Logger LOGGER = LogManager.getLogger(StartupReportTests.class);
 

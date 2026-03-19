@@ -23,7 +23,12 @@ import jakarta.servlet.ServletException;
 
 @ActiveProfiles("test")
 @WithMockUser(username = "wallet_user", roles = { "USER" }, password = "wallet_pass")
-@SpringBootTest
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    properties = {
+        "MANAGEMENT_OTLP_ENDPOINT=http://localhost:4317",
+    }
+)
 @AutoConfigureMockMvc(addFilters = false)
 public class JwtAuthenticationFilterIntegrationTest {
 
