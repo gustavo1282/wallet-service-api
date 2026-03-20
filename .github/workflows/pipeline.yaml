@@ -1,3 +1,10 @@
+# act -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:full-latest
+# act -j sonar
+# act -j build_test
+# act -j build_test   
+# if: false     # pular coisas específicas
+# if: github.event_name == 'workflow_dispatch'    # criar modo debug
+
 name: Pipeline > wallet-service-api
 
 on:
@@ -14,6 +21,10 @@ jobs:
   build_test:
     name: Build & Test (Java 21)
     runs-on: ubuntu-latest
+
+    outputs:
+      build-done: true
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,15 +39,17 @@ jobs:
       - name: Make mvnw executable
         run: chmod +x ./mvnw
 
+      # 🔥 REMOVIDO clean → ganho de tempo
       - name: Maven Verify (tests + checks)
         run: |
-          ./mvnw -B -T 1C clean verify \
+          ./mvnw -B -T 1C verify \
             -DfailIfNoTests=false \
             -Dsurefire.useFile=false \
             -Dfailsafe.useFile=false
 
+      # 🔥 MANTIDO, mas só se necessário (ex: debug ou histórico)
       - name: Upload JaCoCo report (artifact)
-        if: always()
+        if: false  # 👈 desativado por padrão (remove overhead)
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
@@ -47,14 +60,12 @@ jobs:
     name: SonarQube / SonarCloud
     runs-on: ubuntu-latest
     needs: [build_test]
+
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -63,11 +74,10 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Download JaCoCo report
-        uses: actions/download-artifact@v4
-        with:
-          name: jacoco-report
-          path: target/site/jacoco/
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      # 🔥 REMOVIDO download de artifact (não precisamos mais)
 
       - name: Cache Sonar
         uses: actions/cache@v4
@@ -76,12 +86,14 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build and analyze (Sonar)
+      # 🔥 NÃO rebuilda tudo → usa skipTests e evita custo pesado
+      - name: Analyze (Sonar)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./mvnw -B sonar:sonar \
+          ./mvnw -B -T 1C compile sonar:sonar \
+            -DskipTests \
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
@@ -92,9 +104,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build_test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
     permissions:
       contents: read
       packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
