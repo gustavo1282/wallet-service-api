@@ -2,27 +2,25 @@ package com.guga.walletserviceapi.controller;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.guga.walletserviceapi.dto.transaction.TransactionMapper;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.logging.LogMarkers;
@@ -31,6 +29,7 @@ import com.guga.walletserviceapi.model.DepositSender;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.MovementTransaction;
 import com.guga.walletserviceapi.model.ParamApp;
+import com.guga.walletserviceapi.model.Routers;
 import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.LoginRole;
@@ -43,15 +42,9 @@ import com.guga.walletserviceapi.service.WalletService;
 
 @WebMvcTest(WalletOperatorController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import({
-        com.guga.walletserviceapi.config.ConfigProperties.class,
-        com.guga.walletserviceapi.config.TestPasswordConfig.class,
-        com.guga.walletserviceapi.service.common.DataPersistenceService.class
-})
+@Import({TransactionMapper.class})
 class WalletOperatorControllerTests extends BaseControllerTest {
     
-    private static final String API_NAME = "/wallet-operator";
-
     @MockitoBean
     private CustomerService customerService;
 
@@ -66,25 +59,7 @@ class WalletOperatorControllerTests extends BaseControllerTest {
 
     @MockitoBean
     private MovementTransactionService movementTransactionService;
-
-    private String URI_API;
     
-
-    @BeforeAll
-    void setupOnce() {
-        this.URI_API = getBaseUri(API_NAME);
-        loadMockData();
-    }
-
-    @BeforeEach
-    void setUp() {
-        Mockito.reset(
-            this.jwtAuthenticationFilter,            
-            this.jwtService,
-            this.authenticationManager
-        );
-    }    
-
     // =========================================================
     // CONTEXTO DE OPERAÇÕES DA WALLET
     // =========================================================
@@ -96,7 +71,6 @@ class WalletOperatorControllerTests extends BaseControllerTest {
         @DisplayName("Get my last 100 transactions (All types)")
         void getMyRecentTransactions() throws Exception {
             LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
-
             invokeMyTransactions(auth, null);
         }
 
@@ -129,11 +103,8 @@ class WalletOperatorControllerTests extends BaseControllerTest {
         }
 
         private void invokeMyTransactions(LoginAuth auth, OperationType operationType) throws Exception{
-
             Pageable pageable = GlobalHelper.getDefaultPageable();
-
             List<Transaction> dataMock = filterTransactionByWalletIdAndOperationType(auth.getWalletId(), operationType);
-
             Page<Transaction> pageMock = new PageImpl<Transaction>(dataMock, pageable, dataMock.size());
             
             when(transactionService.filterTransactionByWalletIdAndOperationType(eq(auth.getWalletId()), eq(operationType), eq(pageable)))
@@ -141,7 +112,7 @@ class WalletOperatorControllerTests extends BaseControllerTest {
 
             String endpoint = getEndPointByOperationType(operationType);
 
-            ResultActions ra = mockMvc.perform(get(URI_API + endpoint, auth.getWalletId()));
+            ResultActions ra = performRequest(HttpMethod.GET, Routers.WALLET_OPERATOR + endpoint, null, null);
             LOGGER.info(LogMarkers.LOG, ra);
         }
 

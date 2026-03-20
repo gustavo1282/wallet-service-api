@@ -32,4 +32,8 @@ public enum StatusTransaction {
                 .orElseThrow(IllegalArgumentException::new);
     }
 
+    public static int lastIndex() {
+        return values().length - 1;
+    }
+
 }

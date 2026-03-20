@@ -1,15 +1,17 @@
+# act -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:full-latest
+# act -j sonar
+# act -j build_test
+# act -j build_test   
+# if: false     # pular coisas específicas
+# if: github.event_name == 'workflow_dispatch'    # criar modo debug
+
 name: Pipeline > wallet-service-api
 
 on:
   push:
-    branches:
-      - main
-      - develop
-      - "feature/*"
+    branches: [main, develop, "feature/*"]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,6 +21,10 @@ jobs:
   build_test:
     name: Build & Test (Java 21)
     runs-on: ubuntu-latest
+
+    outputs:
+      build-done: true
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,28 +36,31 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      # Opcional (s� mantenha se voc� realmente precisa fixar vers�o do Maven)
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
-        with:
-          maven-version: "3.9.6"
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
 
+      # 🔥 REMOVIDO clean → ganho de tempo
       - name: Maven Verify (tests + checks)
-        run: mvn -B verify -DfailIfNoTests=false
+        run: |
+          ./mvnw -B -T 1C verify \
+            -DfailIfNoTests=false \
+            -Dsurefire.useFile=false \
+            -Dfailsafe.useFile=false
 
+      # 🔥 MANTIDO, mas só se necessário (ex: debug ou histórico)
       - name: Upload JaCoCo report (artifact)
-        if: always()
+        if: false  # 👈 desativado por padrão (remove overhead)
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
           path: target/site/jacoco/
+          retention-days: 1
 
   sonar:
     name: SonarQube / SonarCloud
     runs-on: ubuntu-latest
     needs: [build_test]
-    # Se quiser rodar Sonar s� no main e PRs, use:
-    # if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
@@ -65,6 +74,11 @@ jobs:
           distribution: "temurin"
           cache: maven
 
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      # 🔥 REMOVIDO download de artifact (não precisamos mais)
+
       - name: Cache Sonar
         uses: actions/cache@v4
         with:
@@ -72,30 +86,33 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build and analyze (Sonar)
+      # 🔥 NÃO rebuilda tudo → usa skipTests e evita custo pesado
+      - name: Analyze (Sonar)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn -B verify sonar:sonar \
+          ./mvnw -B -T 1C compile sonar:sonar \
+            -DskipTests \
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-            -Dsonar.junit.reportPaths=target/surefire-reports
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
   docker:
     name: Docker Build & Push
     runs-on: ubuntu-latest
     needs: [build_test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
     permissions:
       contents: read
       packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Exemplo usando GHCR (GitHub Container Registry)
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -120,3 +137,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

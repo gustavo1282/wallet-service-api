@@ -1,3 +1,20 @@
+# =========================
+# Vars usadas por placeholders (bootstrapping)
+# =========================
+APP_NAME: wallet-service-api
+PROFILE: local
+API_PREFIX: /api/v1
+ENV: env-local
+WALLET_USER: wallet_user
+WALLET_PASS: wallet_pass
+JWT_SECRET: mock.jwt_token.profile_test.859jg89045j9045i
+MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
+
+
+app:
+  seeder:
+    enabled: true # Mude para true para executar a carga na inicialização
+
 spring:
   config:
     import: 
@@ -6,7 +23,9 @@ spring:
   cloud:
     vault:
       enabled: true
-      uri: http://vault:8200
+      #host: localhost
+      scheme: http
+      uri: http://localhost:8200
       token: root
       kv:
         enabled: true
@@ -14,6 +33,12 @@ spring:
         version: 2
         default-context: wallet-service-api
         profiles: ${PROFILE:local}
+        profile-separator: /
+      config:
+        order: 1
+      kv-version: 2
+      ssl:
+        enabled: false
     bootstrap:
       enabled: false
       
@@ -36,4 +61,3 @@ spring:
       roles:
         - ADMIN
         - USER
-

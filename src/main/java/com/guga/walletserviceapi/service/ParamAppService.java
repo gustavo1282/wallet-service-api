@@ -1,8 +1,6 @@
 package com.guga.walletserviceapi.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,6 +66,7 @@ public class ParamAppService {
      * @return A entidade ParamApp atualizada.
      * @throws RuntimeException se o parâmetro não for encontrado.
      */
+    @SuppressWarnings("null")
     @Transactional
     public ParamApp updateByName(String paramName, ParamApp paramAppUpdate) {
         
@@ -78,35 +77,39 @@ public class ParamAppService {
             new ResourceBadRequestException("Parâmetro não encontrado com o identificador fornecido: " + paramName)
         );
 
-        paramApp.setValueBoolean(paramAppUpdate.isValueBoolean());
-        paramApp.setValueDate(paramAppUpdate.getValueDate());
-        paramApp.setValueDateTime(paramAppUpdate.getValueDateTime());
-        paramApp.setValueInteger(paramAppUpdate.getValueInteger());
-        paramApp.setValueLong(paramAppUpdate.getValueLong());
-        paramApp.setValueString(paramAppUpdate.getValueString());
+        applyRuleUpdate(paramApp, paramAppUpdate);
 
         return paramAppRepository.save(paramApp);
     }
 
-    private void applyRuleUpdate(ParamApp paramApp, Object valueUpdate) {
-        if (paramApp.getName().startsWith("seq")) {
-            paramApp.setValueLong( paramApp.getValueLong() +1L );
-        } 
-        else {
-            if (valueUpdate instanceof Integer) {
-                paramApp.setValueInteger((Integer)valueUpdate);
-            } else if (valueUpdate instanceof Long) {
-                paramApp.setValueLong((Long)valueUpdate);
-            } else if (valueUpdate instanceof Boolean) {
-                paramApp.setValueBoolean((Boolean)valueUpdate);
-            } else if (valueUpdate instanceof LocalDate) {
-                paramApp.setValueDate((LocalDate)valueUpdate);
-            } else if (valueUpdate instanceof LocalDateTime) {
-                paramApp.setValueDateTime((LocalDateTime)valueUpdate);
-            } else {
-                paramApp.setValueString((String)valueUpdate);
-            }
-        }
+    private void applyRuleUpdate(ParamApp paramApp, ParamApp valueUpdate) {
+
+        // // paramApp.setStatus(paramAppUpdate.getStatus());
+        // paramApp.setValueBoolean(false);
+        // paramApp.setValueDate(null);
+        // paramApp.setValueDateTime(null);
+        // paramApp.setValueInteger(null);
+        // paramApp.setValueLong(null);
+        // paramApp.setValueString(null);
+
+        // if (paramApp.getName().startsWith("seq")) {
+        //     paramApp.setValueLong( paramApp.getValueLong() +1L );
+        // } 
+        // else {
+        //     if (valueUpdate instanceof Integer) {
+        //         paramApp.setValueInteger((Integer)valueUpdate);
+        //     } else if (valueUpdate instanceof Long) {
+        //         paramApp.setValueLong((Long)valueUpdate);
+        //     } else if (valueUpdate instanceof Boolean) {
+        //         paramApp.setValueBoolean((Boolean)valueUpdate);
+        //     } else if (valueUpdate instanceof LocalDate) {
+        //         paramApp.setValueDate((LocalDate)valueUpdate);
+        //     } else if (valueUpdate instanceof LocalDateTime) {
+        //         paramApp.setValueDateTime((LocalDateTime)valueUpdate);
+        //     } else {
+        //         paramApp.setValueString((String)valueUpdate);
+        //     }
+        // }
     }
 
 

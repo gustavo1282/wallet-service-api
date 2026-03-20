@@ -7,7 +7,7 @@ usage() {
   echo "Uso (DOWN/STOP/RM):"
   echo "  ./wallet.sh stop all"
   echo "  ./wallet.sh rm all"
-  echo "  ./wallet.sh stop base|obs|app|quality"
+  echo "  ./wallet.sh stop base|obs|app|quality|alertmanager|postgres_exporter"
   echo "  ./wallet.sh rm base|obs|app|quality"
   echo "  ./wallet.sh stop <service>"
   echo "  ./wallet.sh rm <service>"

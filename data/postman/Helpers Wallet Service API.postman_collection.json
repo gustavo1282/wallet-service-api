@@ -246,7 +246,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-key-super-secret-jwt.HOMOLOG.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://host.docker.internal:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"squ_ea51cedf0f969507efcbb2a7ce1b985455004a61\"\r\n  }\r\n}"
+                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-key-super-secret-jwt.HOMOLOG.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://host.docker.internal:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"sqa_26c64d9618282081aa091e3527e728c8a9eadcfc\"\r\n  }\r\n}"
                 },
                 "url": {
                   "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/homolog",
@@ -370,7 +370,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-key-super-secret-jwt.LOCAL.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://localhost:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"squ_ea51cedf0f969507efcbb2a7ce1b985455004a61\"\r\n  }\r\n}"
+                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-key-super-secret-jwt.LOCAL.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://localhost:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"sqa_26c64d9618282081aa091e3527e728c8a9eadcfc\"\r\n  }\r\n}"
                 },
                 "url": {
                   "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/local",
@@ -495,7 +495,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-jwt.profile.DEV.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://localhost:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"squ_ea51cedf0f969507efcbb2a7ce1b985455004a61\"\r\n  }\r\n}"
+                  "raw": "{\r\n  \"data\": {\r\n    \"jwt.secret\": \"mock-jwt.profile.DEV.239FHF2F923HF9823HF98238F\"\r\n    ,\"spring.datasource.url\": \"jdbc:postgresql://localhost:5432/wallet_db\"\r\n    ,\"spring.datasource.username\": \"wallet_user\"\r\n    ,\"spring.datasource.password\": \"wallet_pass\"\r\n    ,\"sonar.projectKey\": \"com.gugawallet:wallet-service-api\"\r\n    ,\"sonar.host.url\": \"http://localhost:9000\"\r\n    ,\"sonar.token\": \"sqa_26c64d9618282081aa091e3527e728c8a9eadcfc\"\r\n  }\r\n}"
                 },
                 "url": {
                   "raw": "{{vault_url}}/v1/secret/data/wallet-service-api/dev",

@@ -108,6 +108,18 @@ Esta área foca em escolher a ferramenta certa para garantir que o algoritmo nã
 | **PriorityQueue** | -- | -- | $O(\log n)$ | Médio | Implementada sobre um array (Heap), eficiente em espaço. |
 
 
+## Testes - MockMvc
+
+Métodos de testes de Controller para imprimir no console todos os detalhes da requisição e da resposta (Headers, Body, Status, etc.), o que ajuda muito a debugar quando o teste falha.
+
+``` java
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+mockMvc.perform(get("/api/endpoint"))
+       .andDo(print()) // <-- É este comando aqui
+       .andExpect(status().isOk());
+```
+
 
 
 

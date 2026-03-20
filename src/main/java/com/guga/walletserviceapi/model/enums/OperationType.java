@@ -52,4 +52,8 @@ public enum OperationType {
         return fromName(value);
     }
 
+    public static int lastIndex() {
+        return values().length - 1;
+    }
+
 }

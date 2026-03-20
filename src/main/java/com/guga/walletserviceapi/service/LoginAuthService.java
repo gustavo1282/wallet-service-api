@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.repository.LoginAuthRepository;
@@ -26,7 +26,7 @@ public class LoginAuthService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private org.springframework.core.env.Environment env;
+    private Environment env;
 
     public LoginAuth register(String username, String password) {
         // 1. Busque o usuário no seu banco de dados
@@ -43,9 +43,8 @@ public class LoginAuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 1. Busque o usuário no seu banco de dados
-        LoginAuth loginAuth = loginAuthRepository.findByLogin(username)
-            .orElseThrow(() -> new UsernameNotFoundException("Login não encontrado: " + username));
+        // 1. Busque o usuário no seu banco de dados (lógica simplificada)
+        LoginAuth loginAuth = findByLogin(username);
 
         // 2. Retorne um objeto UserDetails que o Spring Security entende
         return User.builder()
@@ -57,48 +56,36 @@ public class LoginAuthService implements UserDetailsService {
                     .stream()
                     .map(LoginRole::name)
                     .toArray(String[]::new)
-            )            
+            )
             .build();
     }
 
+    /**
+     * Busca um usuário pelo seu login. Lógica simplificada.
+     *
+     * @param username O login do usuário.
+     * @return O LoginAuth do usuário.
+     * @throws UsernameNotFoundException se o usuário não for encontrado.
+     */
     public LoginAuth findByLogin(String username) {
-        
-        LoginAuth loginAuth = null;
-
-        if (GlobalHelper.blankToNull(env.getProperty("WALLET_USER")).equals(username)){
-            if (GlobalHelper.blankToNull(env.getProperty("PROFILE")).equals("dev") || 
-                GlobalHelper.blankToNull(env.getProperty("PROFILE")).equals("local")){
-                loginAuth = anyLogin();
-            }
-        }
-
-        if (loginAuth == null || loginAuth.getLogin() == null) {
-            Optional<LoginAuth> loginAuthOptional= loginAuthRepository.findByLogin(username);
-            loginAuth = (loginAuthOptional.isPresent()) ? loginAuthOptional.get(): null;
-        }
-
-        return loginAuth;
+        return loginAuthRepository.findByLogin(username)
+            .orElseThrow(() -> new UsernameNotFoundException("Login não encontrado: " + username));
     }
 
-    public LoginAuth anyLogin() {
-
-        List<LoginAuth> result = loginAuthRepository.findAnyLogin().get();
-        
-        // getFirst() é um método novo da SequencedCollection no Java 21
-        return result.isEmpty() ? null : result.getFirst();
-
-        /*** 
-            return Optional.ofNullable(loginAuthRepository.findAnyLogin().get())
-            .filter(list -> !list.isEmpty()) // Evita erro se a query não trouxer nada
+    /**
+     * Retorna um registro de login aleatório do banco de dados.
+     * Usado para ambientes de teste e desenvolvimento.
+     *
+     * @return Um LoginAuth aleatório ou lança exceção se nenhum for encontrado.
+     */
+    private LoginAuth findRandomLogin() {
+        return Optional.ofNullable(loginAuthRepository.findAnyLogin().get())
+            .filter(list -> !list.isEmpty())
             .map(list -> {
-                // No Java 21, RandomGenerator é a forma moderna e eficiente
                 var random = java.util.random.RandomGenerator.getDefault();
                 int randomIndex = random.nextInt(list.size());
-                
-                return list.get(randomIndex); // Retorna o registro sorteado (ex: o 15º)
+                return list.get(randomIndex);
             })
-            .orElse(null); // Retorna null se a lista for nula ou vazia
-        ***/
+            .orElseThrow(() -> new UsernameNotFoundException("Nenhum usuário aleatório encontrado para o perfil de teste."));
     }
-    
 }

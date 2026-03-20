@@ -1,0 +1,15 @@
+global:
+  resolve_timeout: 3m
+
+route:
+  receiver: "webhook-wallet"
+  group_by: ["alertname", "service_name", "job", "environment"]
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 10m
+
+receivers:
+  - name: "webhook-wallet"
+    webhook_configs:
+      - url: "http://wallet-service-api:8080/wallet-service-api/api/v1/alerts/webhook"
+        send_resolved: true

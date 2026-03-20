@@ -27,8 +27,8 @@ public class JwtService {
 
     private SecretKey key;
 
-    private static final long ACCESS_TOKEN_VALIDITY = 45 * 60 * 1000;             // 45 minutos
-    private static final long REFRESH_TOKEN_VALIDITY = 2 * 24 * 60 * 60 * 1000;   // 2 dias
+    private static final long ACCESS_TOKEN_VALIDITY = 25 * 60 * 1000;             // 25 minutos
+    private static final long REFRESH_TOKEN_VALIDITY = 1 * 1 * 60 * 60 * 1000;    // 1 hora
 
     @Value("${jwt.secret}")
     private String jwtSecret;

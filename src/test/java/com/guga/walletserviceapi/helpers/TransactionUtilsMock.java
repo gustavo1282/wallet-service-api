@@ -68,10 +68,6 @@ public class TransactionUtilsMock {
     private static long SEQUENCE_LOGIN_AUTH_ID;
 
     public static List<Customer> createCustomerListMock() {
-
-        Faker faker = new Faker(new Locale("pt-BR"));
-        
-
         List<Customer> customers = new ArrayList<>();
 
         customers.add(TransactionUtilsMock.addCustomerApplication(RANGE_CUSTOMER_ID + 1));
@@ -87,51 +83,80 @@ public class TransactionUtilsMock {
     public static List<LoginAuth> createLoginAuthListMock(List<Wallet> wallets) {
 
         List<LoginAuth> loginAuths = new ArrayList<>();
+        String fullnameCustomerApp = GlobalHelper.APP_WALLET_USER.toUpperCase() + " APPLICATION";
+
+        // Pega todos os status possíveis exceto o ACTIVE para a distribuição dos 30%
+        List<Status> otherStatuses = java.util.stream.Stream.of(Status.values())
+                .filter(s -> s != Status.ACTIVE)
+                .toList();
+
+        boolean addLoginAuthApp = true;
 
         for (Wallet wallet : wallets) {
-
             Customer customer = wallet.getCustomer();
+            // Para cada carteira, decide quantos logins criar (de 1 a 3)
+            int loginsToCreate = RandomMock.generateIntNumberByInterval(1, 3);
 
-            Long walletId = wallet.getWalletId();
-            
-            LoginAuthType loginAuthType = LoginAuthType.fromValue(RandomMock.generateIntNumberByInterval(0, LoginAuthType.lastIndex()));
+            for (int i = 0; i < loginsToCreate; i++) {
+                // --- Lógica de Distribuição de Status (70% ACTIVE, 30% Outros) ---
+                int statusDiceRoll = RandomMock.generateIntNumberByInterval(1, 100);
+                Status assignedStatus = (statusDiceRoll <= 70)
+                        ? Status.ACTIVE
+                        : otherStatuses.get(RandomMock.generateIntNumberByInterval(0, otherStatuses.size() - 1));
 
-            String loginAccess = (customer.getFirstName() + wallet.getWalletId().toString()).toLowerCase(); 
-            switch (loginAuthType) {
-                case CPF: loginAccess = GlobalHelper.onlyNumbers(customer.getCpf()); break;
-                case E_MAIL: loginAccess = customer.getEmail(); break;                    
-                default: break;
+                // --- Lógica de Distribuição de Roles (70% USER, 25% ADMIN, 5% Ambos) ---
+                int roleDiceRoll = RandomMock.generateIntNumberByInterval(1, 100);
+                List<LoginRole> assignedRoles;
+                if (roleDiceRoll <= 70) {
+                    assignedRoles = Arrays.asList(LoginRole.USER);
+                } else if (roleDiceRoll <= 95) { // 71 a 95 (25% de chance)
+                    assignedRoles = Arrays.asList(LoginRole.ADMIN);
+                } else { // 96 a 100 (5% de chance)
+                    assignedRoles = Arrays.asList(LoginRole.USER, LoginRole.ADMIN);
+                }
+
+                // --- Geração do Login/AccessKey ---
+                LoginAuthType loginAuthType = LoginAuthType.fromValue(RandomMock.generateIntNumberByInterval(0, LoginAuthType.lastIndex()));
+                String loginAccess = (customer.getFirstName() + wallet.getWalletId().toString()).toLowerCase();
+                
+                // Adiciona um sufixo para garantir unicidade, caso haja mais de 1 login por wallet
+                if (i > 0) {
+                    loginAccess += "_" + i;
+                }
+
+                switch (loginAuthType) {
+                    case CPF: loginAccess = GlobalHelper.onlyNumbers(customer.getCpf()); break;
+                    case E_MAIL: loginAccess = customer.getEmail(); break;
+                    default: break;
+                }
+
+                String accessKey = GlobalHelper.APP_WALLET_PASS + "_" + wallet.getWalletId().toString() + "_" + i;
+
+                // --- Lógica para o usuário especial 'wallet_user' ---
+                // Aplica apenas ao primeiro login da primeira carteira para garantir um usuário previsível
+                if (addLoginAuthApp && customer.getFullName().equalsIgnoreCase(fullnameCustomerApp)) {
+                    loginAccess = GlobalHelper.APP_WALLET_USER;
+                    accessKey = GlobalHelper.APP_WALLET_PASS;
+                    assignedRoles = Arrays.asList(LoginRole.ADMIN, LoginRole.USER);
+                    addLoginAuthApp = false;
+                }
+
+                SEQUENCE_LOGIN_AUTH_ID++;
+
+                loginAuths.add(
+                    createLoginAuthMock(
+                        (long)(RANGE_LOGIN_AUTH_ID + SEQUENCE_LOGIN_AUTH_ID),
+                        customer.getCustomerId(),
+                        wallet.getWalletId(),
+                        loginAccess,
+                        accessKey,
+                        loginAuthType,
+                        assignedRoles,
+                        assignedStatus
+                    )
+
+                );
             }
-            
-            String accessKey = GlobalHelper.APP_WALLET_PASS + "_" + walletId.toString();
-
-            List<LoginRole> loginRole = Arrays.asList(LoginRole.fromValue(RandomMock.generateIntNumberByInterval(1, LoginRole.values().length)));
-            
-            // codigo exclusivo para o cliente da aplicação ( wallet_user )
-            if (customer.getFirstName().toLowerCase().contains(GlobalHelper.APP_WALLET_USER.toLowerCase())) {
-                loginAccess = GlobalHelper.APP_WALLET_USER;
-                accessKey = GlobalHelper.APP_WALLET_PASS;
-                loginRole = Arrays.asList(LoginRole.ADMIN, LoginRole.USER);
-            }
-
-
-            SEQUENCE_LOGIN_AUTH_ID++;
-
-            loginAuths.add(
-                LoginAuth.builder()
-                    .id( (long)(RANGE_LOGIN_AUTH_ID + SEQUENCE_LOGIN_AUTH_ID) )
-                    .status(wallet.getStatus())
-                    .customerId(customer.getCustomerId())
-                    .walletId(wallet.getWalletId())
-                    .login(loginAccess)
-                    .accessKey(accessKey)
-                    .loginAuthType(loginAuthType)
-                    .role(loginRole)
-                    .createdAt(customer.getCreatedAt())
-                    .updatedAt(customer.getCreatedAt())
-                    .build()
-            );
-
         }
 
         return loginAuths;
@@ -408,6 +433,18 @@ public class TransactionUtilsMock {
                 .toList();
     }
 
+    public static Customer getCustomerApplicationByWallets(List<Wallet> wallets) {
+        String fullname = GlobalHelper.APP_WALLET_USER.toUpperCase() + " APPLICATION";
+
+        Wallet result = wallets.stream()        
+                .filter(c -> c.getCustomer().getFullName().toUpperCase().equalsIgnoreCase(fullname))
+                .findFirst()
+                .orElse(null);
+
+        return (result == null || result.getCustomer() == null) ? null : result.getCustomer();
+    }
+
+
     public static List<Wallet> getWalletsByStatus(List<Wallet> wallets, Status status) {
 
         if (!APPLY_FILTER_WALLET_BY_STATUS) {
@@ -558,6 +595,7 @@ public class TransactionUtilsMock {
         customer.setFullName( GlobalHelper.APP_WALLET_USER.toUpperCase() + " APPLICATION" );
         customer.setFirstName( GlobalHelper.APP_WALLET_USER.toUpperCase() );
         customer.setLastName( "APPLICATION" );
+        customer.setStatus(Status.ACTIVE);
         return customer;        
     }
 
@@ -651,4 +689,21 @@ public class TransactionUtilsMock {
             .orElse(0L) + 1;
     }
 
+    public static LoginAuth createLoginAuthMock(Long id, Long customerId, Long walletId, String login, String accessKey, LoginAuthType type, List<LoginRole> roles, Status status) {
+        LocalDateTime createAt = LocalDateTime.now();
+        return LoginAuth.builder()
+                .id(id)
+                .customerId(customerId)
+                .walletId(walletId)
+                .login(login)
+                .accessKey(accessKey)
+                .loginAuthType(type)
+                .role(roles)
+                .status(status)
+                .createdAt(createAt)
+                .updatedAt(createAt)
+                .build();
+    }
+
+    
 }
