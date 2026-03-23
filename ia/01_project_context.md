@@ -50,10 +50,28 @@ O projeto também serve como laboratório para estudo de:
 
 ---
 
-## Complemento da documentação ( obrigatório )
+## Documentação do sistema / projeto
+- Na raiz do projeto o arquivo REAME.md ( dentro do arquivo ele direciona aos arquivos complementares )
+./
+|   README.md
+|   /data
+|   |   /docs
+│   │   │   API_REFERENCE.md
+│   │   │   ARCHITECTURE_AND_DESIGN.md
+│   │   │   ARQUITECTURE_DECISIONS-ADR.md
+│   │   │   BUILD_AND_CI.md
+│   │   │   CONTRIBUTING.md
+│   │   │   DATA_MODEL.md
+│   │   │   OBSERVABILITY.md
+│   │   │   SECURITY.md
+
+---
+
+## Documentação para compreensão e formato de trabalho com IA
 
 Realize a leitura e entendimento de todo o contexto na ordem dos arquivos:
 
+./ia/
 - 02_tech_lead_collaboration.md
 - 03_aiengineering_rules.md
 - 04_architecture_context.md

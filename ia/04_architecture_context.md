@@ -9,6 +9,7 @@ Stack:
 - Docker
 - Prometheus
 - Grafana
+- Jaeger
 
 Arquitetura:
 - API REST
@@ -20,6 +21,9 @@ Observabilidade:
 - OpenTelemetry
 - Prometheus metrics
 - Grafana dashboards
+- Loki
+- Grafana Tempo
+- Alert Manager
 
 Padrões:
 - Clean Architecture
