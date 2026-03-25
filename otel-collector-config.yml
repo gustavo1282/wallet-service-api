@@ -17,7 +17,7 @@ processors:
   resource:
     attributes:
       - key: service.name
-        value: ${APP_NAME}
+        value: wallet-service-api
         action: insert
       - key: job
         value: "cont-${APP_NAME}"
@@ -51,7 +51,7 @@ exporters:
       insecure: true
 
   loki:
-    endpoint: "http://cont-wallet-loki:3100/loki/api/v1/push"
+    endpoint: "http://loki:3100/loki/api/v1/push"
     default_labels_enabled:
       exporter: true
       job: true
@@ -63,7 +63,7 @@ exporters:
   # Exporta traces pro Tempo via OTLP gRPC na rede Docker.
   # Use o NOME DO SERVIÇO/CONTAINER que está na mesma network do collector.
   otlphttp/tempo:
-    endpoint: http://cont-wallet-tempo:4318
+    endpoint: http://tempo:4318
     tls:
       insecure: true
     retry_on_failure:

@@ -1,26 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
-    </encoder>
-  </appender>
 
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>logs/${APP_NAME:-wallet-service-api}.log</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>logs/${APP_NAME:-wallet-service-api}.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>14</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
-    </encoder>
-  </appender>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-  <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender"/>
+    <!-- Console (debug local + docker logs) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
 
-  <root level="DEBUG">
-    <appender-ref ref="OTEL"/>
-    <appender-ref ref="CONSOLE"/>
-    <appender-ref ref="FILE"/>
-  </root>
+        <!-- Evita poluir com scraping do Prometheus -->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return message.contains("/actuator/prometheus");</expression>
+            </evaluator>
+            <OnMismatch>NEUTRAL</OnMismatch>
+            <OnMatch>DENY</OnMatch>
+        </filter>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{trace_id}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- OpenTelemetry Appender -->
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <!-- Mantém só o essencial (evita custo alto em produção) -->
+        <captureCodeAttributes>false</captureCodeAttributes>
+        <captureMarkerAttributes>false</captureMarkerAttributes>
+        <captureKeyValuePairAttributes>true</captureKeyValuePairAttributes>
+        <captureContextDataAttributes>true</captureContextDataAttributes>
+    </appender>
+
+    <!-- Root -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="OTEL"/>
+    </root>
+
 </configuration>

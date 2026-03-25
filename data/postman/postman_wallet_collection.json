@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "d9c9905e-467d-4259-8822-f7f8a8ce9744",
-    "name": "Wallet Service API - v1.0.5-SNAPSHOT Copy",
+    "_postman_id": "7e0c4f63-bf51-48da-a6a4-388799a99ebb",
+    "name": "Wallet Service API - v1.0.7-SNAPSHOT",
     "description": "Documentação da API de Carteira de Clientes.\n\n---\n\n### 🔑 Autenticação (A partir da v0.2.4)\n\nA autenticação agora utiliza **JSON Web Tokens (JWT)**. Para acessar os endpoints protegidos, siga os passos abaixo:\n\n1.  **Obter o Token:**\n    * Execute o endpoint de login: **`POST /api/auth/login`**.\n    * Use suas credenciais de usuário e senha no corpo da requisição (Request Body).\n\n2.  **Autorizar o Swagger (OpenAPI):**\n    * Copie o **token JWT** retornado no campo `access_token`.\n    * Clique no botão **\"Authorize\"** (Autorizar) no topo da página.\n    * Cole o token no campo de autenticação (Geralmente no formato **`Bearer SeuTokenAqui`**).\n\n3.  **Executar Métodos:**\n    * Com o token configurado no Swagger, você pode executar todos os métodos protegidos.\n\n---\n\n**Credenciais de Teste:**\n* **Usuário:** `wallet_user`\n* **Senha:** `wallet_pass`\n",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "47458903",
-    "_collection_link": "https://go.postman.co/collection/47458903-d9c9905e-467d-4259-8822-f7f8a8ce9744?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/47458903-7e0c4f63-bf51-48da-a6a4-388799a99ebb?source=collection_link"
   },
   "item": [
     {
@@ -17,6 +17,123 @@
             {
               "name": "auth",
               "item": [
+                {
+                  "name": "test",
+                  "item": [
+                    {
+                      "name": "anylogin",
+                      "item": [
+                        {
+                          "name": "Any Login",
+                          "request": {
+                            "auth": {
+                              "type": "bearer",
+                              "bearer": [
+                                {
+                                  "key": "token",
+                                  "value": "{{bearerToken}}",
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "*/*"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/auth/test/anylogin",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "test",
+                                "anylogin"
+                              ]
+                            },
+                            "description": "Authenticates a user based on the environment profile. For test/dev environments, it can return a random user. Otherwise, it performs standard authentication. This endpoint does NOT use the standard Spring AuthenticationManager."
+                          },
+                          "response": [
+                            {
+                              "name": "OK",
+                              "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "*/*"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/api/v1/auth/test/anylogin",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "api",
+                                    "v1",
+                                    "auth",
+                                    "test",
+                                    "anylogin"
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "*/*"
+                                }
+                              ],
+                              "cookie": [],
+                              "body": "{\n  \"customerId\": \"<long>\",\n  \"walletId\": \"<long>\",\n  \"id\": \"<long>\",\n  \"login\": \"<string>\",\n  \"status\": \"PENDING\",\n  \"loginAuthType\": \"E_MAIL\",\n  \"accessKey\": \"<string>\",\n  \"lastLoginAt\": \"<dateTime>\",\n  \"createdAt\": \"<dateTime>\",\n  \"updatedAt\": \"<dateTime>\",\n  \"role\": [\n    \"ADMIN\",\n    \"USER\"\n  ]\n}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
                 {
                   "name": "login",
                   "item": [
@@ -274,6 +391,16 @@
                     {
                       "name": "Refresh Token",
                       "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{bearerToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
                         "method": "POST",
                         "header": [
                           {
@@ -353,6 +480,16 @@
                     {
                       "name": "Register",
                       "request": {
+                        "auth": {
+                          "type": "bearer",
+                          "bearer": [
+                            {
+                              "key": "token",
+                              "value": "{{bearerToken}}",
+                              "type": "string"
+                            }
+                          ]
+                        },
                         "method": "POST",
                         "header": [
                           {
@@ -2279,11 +2416,11 @@
                           "\r",
                           "pm.variables.set(\"status\", null);\r",
                           "\r",
-                          "if (r_0_1 = 1) {\r",
+                          "if (r_0_1 == 1) {\r",
                           "    const random_status = eval(pm.collectionVariables.get(\"fn_random_status\"));\r",
-                          "    pm.variables.set(\"status\", random_status.randomFromEnum(random_status.ENUMS.status));\r",
+                          "    var status = random_status.randomFromEnum(random_status.ENUMS.status);\r",
+                          "    pm.variables.set(\"status\", status);\r",
                           "}\r",
-                          "\r",
                           ""
                         ],
                         "type": "text/javascript",
@@ -4332,10 +4469,10 @@
               ]
             },
             {
-              "name": "admin",
+              "name": "seeder",
               "item": [
                 {
-                  "name": "seed",
+                  "name": "admin",
                   "item": [
                     {
                       "name": "run",
@@ -4343,9 +4480,6 @@
                         {
                           "name": "Run data seeder",
                           "request": {
-                            "auth": {
-                              "type": "noauth"
-                            },
                             "method": "POST",
                             "header": [
                               {
@@ -4354,15 +4488,15 @@
                               }
                             ],
                             "url": {
-                              "raw": "{{baseUrl}}/api/v1/admin/seed/run",
+                              "raw": "{{baseUrl}}/api/v1/seeder/admin/run",
                               "host": [
                                 "{{baseUrl}}"
                               ],
                               "path": [
                                 "api",
                                 "v1",
+                                "seeder",
                                 "admin",
-                                "seed",
                                 "run"
                               ]
                             },
@@ -4377,23 +4511,18 @@
                                   {
                                     "key": "Accept",
                                     "value": "*/*"
-                                  },
-                                  {
-                                    "description": "Added as a part of security scheme: bearer",
-                                    "key": "Authorization",
-                                    "value": "Bearer <token>"
                                   }
                                 ],
                                 "url": {
-                                  "raw": "{{baseUrl}}/api/v1/admin/seed/run",
+                                  "raw": "{{baseUrl}}/api/v1/seeder/admin/run",
                                   "host": [
                                     "{{baseUrl}}"
                                   ],
                                   "path": [
                                     "api",
                                     "v1",
+                                    "seeder",
                                     "admin",
-                                    "seed",
                                     "run"
                                   ]
                                 }
@@ -4408,9 +4537,95 @@
                                 }
                               ],
                               "cookie": [],
-                              "body": "string"
+                              "body": "<string>"
                             }
                           ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "alerts",
+              "item": [
+                {
+                  "name": "webhook",
+                  "item": [
+                    {
+                      "name": "receive",
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"status\": \"<string>\",\n  \"alerts\": [\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    },\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\",\n        \"key_2\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    }\n  ],\n  \"groupLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"commonLabels\": {\n    \"key_0\": \"<string>\"\n  },\n  \"commonAnnotations\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"externalURL\": \"<string>\",\n  \"version\": \"<string>\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/alerts/webhook",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "alerts",
+                            "webhook"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"status\": \"<string>\",\n  \"alerts\": [\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    },\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\",\n        \"key_2\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    }\n  ],\n  \"groupLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"commonLabels\": {\n    \"key_0\": \"<string>\"\n  },\n  \"commonAnnotations\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"externalURL\": \"<string>\",\n  \"version\": \"<string>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/alerts/webhook",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "alerts",
+                                "webhook"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": ""
                         }
                       ]
                     }

@@ -1,0 +1,16 @@
+<tipo>(<escopo>): <resumo curto em minúsculas>
+
+# ---------------------------------------------------------
+# Escolha um tipo: 
+#   feat: Nova funcionalidade
+#   fix: Correção de bug
+#   docs: Alteração na documentação
+#   style: Formatação (espaços, vírgulas, etc)
+#   refactor: Mudança de código que não altera comportamento
+#   test: Adição ou correção de testes
+#   chore: Atualização de build, dependências, etc.
+# ---------------------------------------------------------
+
+- O que foi feito:
+- Por que foi feito:
+- Arquivos impactados:

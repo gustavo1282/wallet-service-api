@@ -21,7 +21,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "05a85619-53e8-457c-ba7d-346389837978",
+                          "id": "10a6f9dd-b3ca-48f0-b17d-6e1cf983a59b",
                           "name": "Any Login",
                           "request": {
                             "name": "Any Login",
@@ -76,7 +76,7 @@
                           },
                           "response": [
                             {
-                              "id": "997e40fd-ad16-4e16-892e-a5fd307a330d",
+                              "id": "4bf7816e-9fa9-477c-9064-664943739dae",
                               "name": "OK",
                               "originalRequest": {
                                 "url": {
@@ -131,7 +131,7 @@
                                   "value": "*/*"
                                 }
                               ],
-                              "body": "{\n  \"customerId\": \"<long>\",\n  \"walletId\": \"<long>\",\n  \"id\": \"<long>\",\n  \"login\": \"<string>\",\n  \"status\": \"BLOCKED\",\n  \"loginAuthType\": \"E_MAIL\",\n  \"accessKey\": \"<string>\",\n  \"lastLoginAt\": \"<dateTime>\",\n  \"createdAt\": \"<dateTime>\",\n  \"updatedAt\": \"<dateTime>\",\n  \"role\": [\n    \"ADMIN\",\n    \"USER\"\n  ]\n}",
+                              "body": "{\n  \"customerId\": \"<long>\",\n  \"walletId\": \"<long>\",\n  \"id\": \"<long>\",\n  \"login\": \"<string>\",\n  \"status\": \"PENDING\",\n  \"loginAuthType\": \"E_MAIL\",\n  \"accessKey\": \"<string>\",\n  \"lastLoginAt\": \"<dateTime>\",\n  \"createdAt\": \"<dateTime>\",\n  \"updatedAt\": \"<dateTime>\",\n  \"role\": [\n    \"ADMIN\",\n    \"USER\"\n  ]\n}",
                               "cookie": [],
                               "_postman_previewlanguage": "text"
                             }
@@ -150,7 +150,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "a5b7e392-e368-496d-96c2-262548284f81",
+                      "id": "9113e004-d367-42e9-86e9-979372dd4c1d",
                       "name": "Login",
                       "request": {
                         "name": "Login",
@@ -307,7 +307,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "9401a53b-15e9-4194-89c2-0121826c7ee3",
+                      "id": "a9a5d266-5176-4f67-a6c8-b67748edf1f3",
                       "name": "Get My Profile",
                       "request": {
                         "name": "Get My Profile",
@@ -416,7 +416,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "3780caaf-2c9f-4fdf-bdab-f99d6fa679e2",
+                      "id": "16d67562-0e52-4e9e-86cc-43b5ac4ccb42",
                       "name": "Refresh Token",
                       "request": {
                         "name": "Refresh Token",
@@ -512,7 +512,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "5200ce08-d44d-490b-84b6-2caf5e109486",
+                      "id": "3340d90c-41d8-4c05-91e7-7dc9417fb149",
                       "name": "Register",
                       "request": {
                         "name": "Register",
@@ -626,7 +626,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "a8e577c1-3e76-417a-90db-24c5f5f01614",
+                  "id": "2d631df8-74d5-49fd-946b-a89d0f37eee3",
                   "name": "List application parameters",
                   "request": {
                     "name": "List application parameters",
@@ -709,7 +709,7 @@
                   }
                 },
                 {
-                  "id": "9b598aed-87df-4dce-bd41-dfa30c46afbe",
+                  "id": "005d7c50-a03c-4e82-bcbc-5a88b2676211",
                   "name": "Update application parameter by name",
                   "request": {
                     "name": "Update application parameter by name",
@@ -819,7 +819,7 @@
                   }
                 },
                 {
-                  "id": "dd37fb54-be64-44f3-be44-077def4441b3",
+                  "id": "1ccef1fe-4f0c-419d-b65a-d281e1c7c272",
                   "name": "Create application parameter",
                   "request": {
                     "name": "Create application parameter",
@@ -946,7 +946,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "f1747df7-2068-488c-9b0b-bd975b8357df",
+                      "id": "d5b85d4d-510a-4363-9a41-e0e3e1f2f0ec",
                       "name": "Get application parameter by ID",
                       "request": {
                         "name": "Get application parameter by ID",
@@ -1066,7 +1066,7 @@
                       }
                     },
                     {
-                      "id": "8c5539ca-6e6b-4633-b525-851db9140781",
+                      "id": "0d51d88f-6965-4077-a1bb-257e35cb0bb2",
                       "name": "05 Delete application parameter by ID",
                       "request": {
                         "name": "05 Delete application parameter by ID",
@@ -1174,7 +1174,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "71179e1b-9267-4b9a-a17c-62693fc9cef4",
+                      "id": "7efcdae8-1022-469d-a90c-e93f500e7258",
                       "name": "Get authenticated customer profile",
                       "request": {
                         "name": "Get authenticated customer profile",
@@ -1259,7 +1259,7 @@
                       }
                     },
                     {
-                      "id": "13784f2f-eafa-430b-89c0-8a8196c777bf",
+                      "id": "bda4a8b0-056d-472c-8468-376f366a51a1",
                       "name": "Update my customer data",
                       "request": {
                         "name": "Update my customer data",
@@ -1395,7 +1395,7 @@
                   ]
                 },
                 {
-                  "id": "6baed2a5-fb45-4581-8de1-6a3770b50052",
+                  "id": "79aa19cb-023b-4ffd-90b1-bbf7c010a06b",
                   "name": "List customers",
                   "request": {
                     "name": "List customers",
@@ -1502,7 +1502,7 @@
                   }
                 },
                 {
-                  "id": "488af72f-c87a-4c0b-a722-41a490eec399",
+                  "id": "4421c30b-b59b-4c7f-b597-7ce6b406cfd5",
                   "name": "Create a new customer",
                   "request": {
                     "name": "Create a new customer",
@@ -1674,7 +1674,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "3391c990-a5ba-424a-8c5f-a75df5dd8b14",
+                      "id": "e82d9536-b131-4c16-8880-3a0e950cc8d1",
                       "name": "Get customer by ID",
                       "request": {
                         "name": "Get customer by ID",
@@ -1772,7 +1772,7 @@
                       }
                     },
                     {
-                      "id": "5a2d4998-fde1-4229-aa1f-44ff8bcdd073",
+                      "id": "33d94c95-e10d-48db-bf5f-c2323198628d",
                       "name": "Update customer by ID",
                       "request": {
                         "name": "Update customer by ID",
@@ -1928,7 +1928,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "ca5fa0bc-11b1-44b9-8184-1423045233d7",
+                      "id": "ac9c7bbd-5775-4646-97bb-1ac3bd1b42a3",
                       "name": "Get authenticated user's wallet",
                       "request": {
                         "name": "Get authenticated user's wallet",
@@ -2013,7 +2013,7 @@
                       }
                     },
                     {
-                      "id": "89600498-37df-4d7e-a410-f665f88d60eb",
+                      "id": "2d10957d-38cd-4af6-9a15-e1655ccde1a6",
                       "name": "Update authenticated user's wallet",
                       "request": {
                         "name": "Update authenticated user's wallet",
@@ -2142,7 +2142,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "25f32f25-a4b3-469c-a1d8-999bbd500899",
+                          "id": "3c2a1606-ef60-4c60-876c-e34cbfb838b6",
                           "name": "List all wallets of the authenticated customer",
                           "request": {
                             "name": "List all wallets of the authenticated customer",
@@ -2233,7 +2233,7 @@
                   ]
                 },
                 {
-                  "id": "9bbf294a-09dd-4b52-925f-a472fe881000",
+                  "id": "20b8881e-2aeb-4764-96c9-b81caf6fa24e",
                   "name": "List wallets",
                   "request": {
                     "name": "List wallets",
@@ -2348,7 +2348,7 @@
                   }
                 },
                 {
-                  "id": "f037cbbe-b777-4c1c-b4f9-90bf42ca18b1",
+                  "id": "289fdcf4-653f-4f40-bc62-0106aa13b85f",
                   "name": "Create wallet",
                   "request": {
                     "name": "Create wallet",
@@ -2462,7 +2462,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "dc9005b3-ea50-4ec2-9cb6-8fb2f9b8b1f5",
+                      "id": "33d73f23-4a7b-4631-bd06-bd2cecc7d583",
                       "name": "Get wallet by ID",
                       "request": {
                         "name": "Get wallet by ID",
@@ -2560,7 +2560,7 @@
                       }
                     },
                     {
-                      "id": "89a594b3-de8b-4ef6-b1cd-d4277a6f46ec",
+                      "id": "d0f42ca2-10c4-44ac-b24d-e05e76385e01",
                       "name": "Update wallet",
                       "request": {
                         "name": "Update wallet",
@@ -2692,7 +2692,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "c6a4be82-bdcc-455e-84f6-19c5296c8c8f",
+                          "id": "988aca51-a0e8-4d06-86e2-2111aa3e991f",
                           "name": "Get wallets by customer",
                           "request": {
                             "name": "Get wallets by customer",
@@ -2806,7 +2806,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "3843202f-5516-4e38-befa-83679db35008",
+                      "id": "084c8101-f5ac-4841-a282-a4a943dd4810",
                       "name": "List my transactions",
                       "request": {
                         "name": "List my transactions",
@@ -2906,7 +2906,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "231096d6-4ab8-4416-a053-002635f709a7",
+                          "id": "6686f603-4e22-4087-9fbf-37f81363dee5",
                           "name": "Get details of my own transaction",
                           "request": {
                             "name": "Get details of my own transaction",
@@ -3012,7 +3012,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "fa888e55-75f7-4e84-b8fc-f6350063a9d4",
+                          "id": "6654a8eb-8fe5-4bb9-8fed-fb1afc983995",
                           "name": "List my last 150 deposits",
                           "request": {
                             "name": "List my last 150 deposits",
@@ -3105,7 +3105,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "57b9fb83-25d4-45f2-a8e9-a6f03c95a81e",
+                          "id": "de74e3d6-004d-4791-9dc8-ddb8f4ca466c",
                           "name": "List my last 150 withdraws",
                           "request": {
                             "name": "List my last 150 withdraws",
@@ -3198,7 +3198,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "1d0356b3-c4c1-4120-a7d9-3dcbb35bdae2",
+                          "id": "1801f52d-2e78-4f96-82b7-76f90ab8aff2",
                           "name": "List my last 150 sent transfers",
                           "request": {
                             "name": "List my last 150 sent transfers",
@@ -3291,7 +3291,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "60cb85b8-4af6-485d-89ef-87cf00ba9eb0",
+                          "id": "0ae7cb83-3067-49c4-b337-b1beede5a533",
                           "name": "List my last 150 received transfers",
                           "request": {
                             "name": "List my last 150 received transfers",
@@ -3386,7 +3386,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "5a87df90-4419-4079-9a64-3a37066a3bbb",
+                      "id": "d9021806-6ac8-4a52-bca5-146d5c797cda",
                       "name": "Deposit money",
                       "request": {
                         "name": "Deposit money",
@@ -3504,7 +3504,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "c9e481e5-af30-4fc9-99bf-87024444f9bf",
+                      "id": "489db591-087b-4386-b625-ee534c03d8db",
                       "name": "Withdraw money",
                       "request": {
                         "name": "Withdraw money",
@@ -3622,7 +3622,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "56662a99-8c58-46b4-81ea-fa9c5b48f2e5",
+                      "id": "14ad8106-606a-4bc5-8e16-c44eae9da1a1",
                       "name": "Transfer money",
                       "request": {
                         "name": "Transfer money",
@@ -3740,7 +3740,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "d6d4325c-3245-42ca-a462-683fee5980a7",
+                      "id": "feb7ef83-d5c1-430e-b753-6fa331e7bd5f",
                       "name": "Get transaction by ID (ADMIN)",
                       "request": {
                         "name": "Get transaction by ID (ADMIN)",
@@ -3848,7 +3848,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "e3aedab5-233f-40bb-a03d-326ac0218911",
+                          "id": "ccce5ec0-47ba-43f5-94ac-4cd30386d3af",
                           "name": "List transactions by wallet (ADMIN)",
                           "request": {
                             "name": "List transactions by wallet (ADMIN)",
@@ -3979,7 +3979,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "0c78458a-11a8-437d-84d5-5180999a8651",
+                          "id": "712cb3a5-e4b5-4929-82cf-eb88de64d823",
                           "name": "Get my recent transactions (all types)",
                           "request": {
                             "name": "Get my recent transactions (all types)",
@@ -4070,7 +4070,7 @@
                           "description": "",
                           "item": [
                             {
-                              "id": "00346dea-5d10-4f6e-9ded-9ddfe6b681f6",
+                              "id": "900ead44-729f-4cb4-b076-1f204ffc5ccf",
                               "name": "List my deposits",
                               "request": {
                                 "name": "List my deposits",
@@ -4165,7 +4165,7 @@
                           "description": "",
                           "item": [
                             {
-                              "id": "e7994c1d-9034-479b-bdeb-a0ac6b1954ee",
+                              "id": "65aef20a-56f0-4e96-9f3e-b92abadc9fde",
                               "name": "List my withdraws",
                               "request": {
                                 "name": "List my withdraws",
@@ -4260,7 +4260,7 @@
                           "description": "",
                           "item": [
                             {
-                              "id": "8c1a5816-edcd-4c25-96ab-54451657ab48",
+                              "id": "3470b1a5-2e41-4900-b1ff-405f86b6771e",
                               "name": "List my transfers sent",
                               "request": {
                                 "name": "List my transfers sent",
@@ -4355,7 +4355,7 @@
                           "description": "",
                           "item": [
                             {
-                              "id": "ef13e812-cef7-4d52-9d11-80ff9d5e3212",
+                              "id": "5cf7f2f9-7486-4ef5-9049-55867f40f0a9",
                               "name": "List my transfers received",
                               "request": {
                                 "name": "List my transfers received",
@@ -4450,7 +4450,7 @@
                           "description": "",
                           "item": [
                             {
-                              "id": "b7fd29fc-07ba-4c1b-b10e-49af81b684b0",
+                              "id": "8d473b22-fad2-459e-9389-b016e2922375",
                               "name": "Search my transactions by period",
                               "request": {
                                 "name": "Search my transactions by period",
@@ -4572,7 +4572,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "65cfaa7f-929e-411e-9826-7fd17f1b8a0c",
+                          "id": "eec4711e-32d8-458b-9e30-8f9cf947cdc4",
                           "name": "Admin: Upload customers CSV",
                           "request": {
                             "name": "Admin: Upload customers CSV",
@@ -4692,7 +4692,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "98e03675-3ee2-483c-b9e8-bb4daa1bd641",
+                          "id": "52c9b92c-ab44-4077-91f3-bd10c876b1db",
                           "name": "Admin: Upload transactions CSV",
                           "request": {
                             "name": "Admin: Upload transactions CSV",
@@ -4824,7 +4824,7 @@
                       "description": "",
                       "item": [
                         {
-                          "id": "54c2af85-dee8-4707-af15-1e5380e8c65c",
+                          "id": "196a5491-46eb-4b90-9397-d32f38557dae",
                           "name": "Run data seeder",
                           "request": {
                             "name": "Run data seeder",
@@ -4858,7 +4858,7 @@
                           },
                           "response": [
                             {
-                              "id": "4dd83c45-adf5-4174-8b24-5976d7a08d74",
+                              "id": "184d7524-906b-4824-ad39-ceab5e865d73",
                               "name": "OK",
                               "originalRequest": {
                                 "url": {
@@ -4917,7 +4917,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "a01bef17-0e88-4250-bb87-6ee4e5037076",
+                      "id": "c7261fe9-7125-4e08-9341-6f5cf5feeb36",
                       "name": "receive",
                       "request": {
                         "name": "receive",
@@ -4944,7 +4944,7 @@
                         "method": "POST",
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"status\": \"<string>\",\n  \"alerts\": [\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\",\n        \"key_2\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    },\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    }\n  ],\n  \"groupLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\",\n    \"key_2\": \"<string>\"\n  },\n  \"commonLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"commonAnnotations\": {\n    \"key_0\": \"<string>\"\n  },\n  \"externalURL\": \"<string>\",\n  \"version\": \"<string>\"\n}",
+                          "raw": "{\n  \"status\": \"<string>\",\n  \"alerts\": [\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    },\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\",\n        \"key_2\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    }\n  ],\n  \"groupLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"commonLabels\": {\n    \"key_0\": \"<string>\"\n  },\n  \"commonAnnotations\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"externalURL\": \"<string>\",\n  \"version\": \"<string>\"\n}",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -4956,7 +4956,7 @@
                       },
                       "response": [
                         {
-                          "id": "811b7a69-1983-4777-b54a-0dad3a0a8655",
+                          "id": "ea235972-bc8f-48a5-b2b0-8c4151eda4a8",
                           "name": "OK",
                           "originalRequest": {
                             "url": {
@@ -4981,7 +4981,7 @@
                             "method": "POST",
                             "body": {
                               "mode": "raw",
-                              "raw": "{\n  \"status\": \"<string>\",\n  \"alerts\": [\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\",\n        \"key_2\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    },\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    }\n  ],\n  \"groupLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\",\n    \"key_2\": \"<string>\"\n  },\n  \"commonLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"commonAnnotations\": {\n    \"key_0\": \"<string>\"\n  },\n  \"externalURL\": \"<string>\",\n  \"version\": \"<string>\"\n}",
+                              "raw": "{\n  \"status\": \"<string>\",\n  \"alerts\": [\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    },\n    {\n      \"status\": \"<string>\",\n      \"labels\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\",\n        \"key_2\": \"<string>\"\n      },\n      \"annotations\": {\n        \"key_0\": \"<string>\"\n      },\n      \"startsAt\": \"<dateTime>\",\n      \"endsAt\": \"<dateTime>\",\n      \"generatorURL\": \"<string>\",\n      \"fingerprint\": \"<string>\"\n    }\n  ],\n  \"groupLabels\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"commonLabels\": {\n    \"key_0\": \"<string>\"\n  },\n  \"commonAnnotations\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\"\n  },\n  \"externalURL\": \"<string>\",\n  \"version\": \"<string>\"\n}",
                               "options": {
                                 "raw": {
                                   "headerFamily": "json",
@@ -5343,14 +5343,14 @@
     }
   ],
   "info": {
-    "_postman_id": "4b8e0285-0aa7-40a2-8190-c53e39383fa4",
-    "name": "Wallet Service API - v1.0.5-SNAPSHOT",
+    "_postman_id": "e11817b7-ad1b-4391-9cfb-c481389a24c7",
+    "name": "Wallet Service API - v1.0.7-SNAPSHOT",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": {
       "content": "Documentação da API de Carteira de Clientes.\n\n---\n\n### 🔑 Autenticação (A partir da v0.2.4)\n\nA autenticação agora utiliza **JSON Web Tokens (JWT)**. Para acessar os endpoints protegidos, siga os passos abaixo:\n\n1.  **Obter o Token:**\n    * Execute o endpoint de login: **`POST /api/auth/login`**.\n    * Use suas credenciais de usuário e senha no corpo da requisição (Request Body).\n\n2.  **Autorizar o Swagger (OpenAPI):**\n    * Copie o **token JWT** retornado no campo `access_token`.\n    * Clique no botão **\"Authorize\"** (Autorizar) no topo da página.\n    * Cole o token no campo de autenticação (Geralmente no formato **`Bearer SeuTokenAqui`**).\n\n3.  **Executar Métodos:**\n    * Com o token configurado no Swagger, você pode executar todos os métodos protegidos.\n\n---\n\n**Credenciais de Teste:**\n* **Usuário:** `wallet_user`\n* **Senha:** `wallet_pass`\n",
       "type": "text/plain"
     },
-    "version": "1.0.5-SNAPSHOT"
+    "version": "1.0.7-SNAPSHOT"
   },
   "auth": {
     "type": "bearer",

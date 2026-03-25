@@ -12,9 +12,9 @@ MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
 
 
 app:
-  api-prefix: /api/v1
+
   seeder:
-    enabled: true # Mude para true para executar a carga na inicialização
+    enabled: false # Mude para true para executar a carga na inicialização
 
 
 spring:
@@ -74,3 +74,7 @@ spring:
       roles:
         - ADMIN
         - USER
+
+logging:
+  file:
+    name: logs/${APP_NAME:wallet-service-api}-dev.log

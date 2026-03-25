@@ -9,14 +9,12 @@ global:
     app: "wallet-service-api"
     service_name: "wallet-service-api"
     service: "wallet-service-api"
-    #instance: "wallet-api-local-ide"
 
 rule_files:
   - /etc/prometheus/rules/*.yml
-  #- /etc/prometheus/rules/http_otel_compat.yml
-
 
 scrape_configs:
+  # --- SEUS JOBS ORIGINAIS (PRESERVADOS) ---
   - job_name: "otel-collector-metrics"
     scrape_interval: 5s
     static_configs:
@@ -55,6 +53,36 @@ scrape_configs:
       - { target_label: namespace, replacement: "env-local" }
       - { target_label: application, replacement: "grafana" }
 
+  # --- NOVOS JOBS DE INFRA (SEGUINDO SEU PADRÃO) ---
+  - job_name: "loki"
+    static_configs:
+      - targets: ["loki:3100"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "loki" }
+      - { target_label: service_name, replacement: "loki" }
+
+  - job_name: "tempo"
+    static_configs:
+      - targets: ["tempo:3200"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "tempo" }
+      - { target_label: service_name, replacement: "tempo" }
+
+  - job_name: "vault"
+    metrics_path: "/v1/sys/metrics"
+    params:
+      format: ["prometheus"]
+    static_configs:
+      - targets: ["vault:8200"]
+    relabel_configs:
+      - { target_label: environment, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: application, replacement: "vault" }
+
   - job_name: "jaeger"
     static_configs:
       - targets: ["jaeger:14269"]
@@ -85,27 +113,20 @@ scrape_configs:
   - job_name: "cadvisor"
     static_configs:
       - targets: ["cadvisor:8080"]
-    # (B) metric_relabel_configs: labels das séries (onde criamos "name")
     metric_relabel_configs:
-      # Docker Desktop fallback: quando cAdvisor expoe apenas id="/"
       - source_labels: [id]
         regex: '^/$'
         target_label: name
         replacement: 'docker-host'
         action: replace
-      # Remove agregados que não são containers
       - source_labels: [id]
         regex: '^/docker$|^/restricted$|^/docker/buildkit$'
         action: drop
-
-      # Se existir label do docker-compose, usa como "name" (bonito)
       - source_labels: [container_label_com_docker_compose_service]
         regex: '(.+)'
         target_label: name
         replacement: '$1'
         action: replace
-
-      # Fallback garantido no Docker Desktop: cria name do id (/docker/<hash>)
       - source_labels: [id]
         regex: '^/docker/([0-9a-f]{12,64}).*$'
         target_label: name

@@ -14,7 +14,7 @@
 
     <groupId>com.gugawallet</groupId>
     <artifactId>wallet-service-api</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
     <name>wallet-service-api</name>
     <description>Spring Boot Project for Digital Wallet Features</description>
 
@@ -37,25 +37,16 @@
     </properties>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -261,6 +252,30 @@
                     <argLine>${argLine} -Xmx1024m</argLine>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>download-otel-agent</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.basedir}/lib"/>
+                                <get src="https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar"
+                                    dest="${project.basedir}/lib/opentelemetry-javaagent.jar"
+                                    skipexisting="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
 
             <plugin>
                 <groupId>org.jacoco</groupId>

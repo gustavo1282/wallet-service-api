@@ -1,10 +1,3 @@
-# act -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:full-latest
-# act -j sonar
-# act -j build_test
-# act -j build_test   
-# if: false     # pular coisas específicas
-# if: github.event_name == 'workflow_dispatch'    # criar modo debug
-
 name: Pipeline > wallet-service-api
 
 on:
@@ -18,51 +11,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_test:
-    name: Build & Test (Java 21)
+  # -------------------------------------------------------------------------
+  # JOB 1: BUILD, TEST & CODE QUALITY (SONAR)
+  # -------------------------------------------------------------------------
+  build_verify_analyze:
+    name: Build, Test & Sonar (Java 21)
     runs-on: ubuntu-latest
-
-    outputs:
-      build-done: true
-
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          cache: maven
-
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
-
-      # 🔥 REMOVIDO clean → ganho de tempo
-      - name: Maven Verify (tests + checks)
-        run: |
-          ./mvnw -B -T 1C verify \
-            -DfailIfNoTests=false \
-            -Dsurefire.useFile=false \
-            -Dfailsafe.useFile=false
-
-      # 🔥 MANTIDO, mas só se necessário (ex: debug ou histórico)
-      - name: Upload JaCoCo report (artifact)
-        if: false  # 👈 desativado por padrão (remove overhead)
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: target/site/jacoco/
-          retention-days: 1
-
-  sonar:
-    name: SonarQube / SonarCloud
-    runs-on: ubuntu-latest
-    needs: [build_test]
-
-    steps:
-      - name: Checkout (full history)
+      - name: Checkout (full history for Sonar)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -77,7 +34,11 @@ jobs:
       - name: Make mvnw executable
         run: chmod +x ./mvnw
 
-      # 🔥 REMOVIDO download de artifact (não precisamos mais)
+      - name: Maven Build & Verify
+        run: |
+          ./mvnw -B -V -T 1C verify \
+            -DfailIfNoTests=false \
+            -Dsurefire.useFile=false
 
       - name: Cache Sonar
         uses: actions/cache@v4
@@ -86,25 +47,26 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      # 🔥 NÃO rebuilda tudo → usa skipTests e evita custo pesado
       - name: Analyze (Sonar)
+        # Só executa se o token estiver configurado (evita quebra em PRs externos)
+        if: env.SONAR_TOKEN != null
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./mvnw -B -T 1C compile sonar:sonar \
-            -DskipTests \
+          ./mvnw -B sonar:sonar \
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
+  # -------------------------------------------------------------------------
+  # JOB 2: DOCKER SECURITY & DELIVERY (LOCAL OU REMOTO)
+  # -------------------------------------------------------------------------
   docker:
-    name: Docker Build & Push
+    name: Docker Security & Delivery
     runs-on: ubuntu-latest
-    needs: [build_test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
+    needs: [build_verify_analyze]
     permissions:
       contents: read
       packages: write
@@ -113,29 +75,52 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 1️⃣ Build Único para Scan (Independente do ambiente)
+      - name: Build for Security Scan
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true 
+          tags: wallet-service-api:test-scan
+          cache-from: type=gha
+
+      # 2️⃣ Scan de Segurança (Trivy)
+      # Se houver vulnerabilidade CRITICAL, o pipeline para aqui
+      - name: Run Trivy Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'wallet-service-api:test-scan'
+          format: 'table'
+          exit-code: '1' 
+          severity: 'CRITICAL,HIGH'
+
+      # 3️⃣ ENTREGA LOCAL (Apenas via ACT / Docker Desktop)
+      - name: Delivery to Docker Desktop (Local)
+        if: ${{ env.ACT == 'true' }}
+        run: |
+          docker tag wallet-service-api:test-scan wallet-service-api:latest
+          echo "🚀 Sucesso! Imagem 'wallet-service-api:latest' disponível no seu Docker Desktop."
+
+      # 4️⃣ ENTREGA REMOTA (Apenas GitHub Real + Branch Main)
       - name: Login to GHCR
+        if: ${{ env.ACT != 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set Docker metadata (tags)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/wallet-service-api
-          tags: |
-            type=raw,value=latest
-            type=sha,format=short
-            type=raw,value=build-${{ github.run_number }}
-
-      - name: Build and push
+      - name: Build and Push to Registry (Prod)
+        if: ${{ env.ACT != 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ghcr.io/${{ github.repository }}/wallet-service-api:latest
+            ghcr.io/${{ github.repository }}/wallet-service-api:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

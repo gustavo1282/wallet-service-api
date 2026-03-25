@@ -36,16 +36,22 @@ up_bld(){ docker compose up -d --build "$@"; }
 # ------------------------------------------------------------
 run_maven_verify() {
   if [[ "${SKIP_VERIFY:-false}" == "true" ]]; then
-    echo "SKIP_VERIFY=true - pulando Maven verify"
+    echo "SKIP_VERIFY=true - pulando Maven build"
     return 0
   fi
 
   local mvn="./mvnw"
   if [[ ! -f "$mvn" ]]; then mvn="mvn"; fi
 
-  echo "Rodando Maven: clean verify (tests + JaCoCo + jar)"
-  mvn -U -B clean verify -DskipTests=true
-  echo "Maven OK"
+  echo "🚀 Rodando Maven Otimizado (Modo Offline)..."
+  
+  # Removido -U (update)
+  # Adicionado -o (offline)
+  # Trocado verify por package para velocidade
+  # -T 1C: Usa 1 core por CPU para build paralelo (se o seu projeto permitir)
+  $mvn -o -T 1C -B clean package -DskipTests=true
+  
+  echo "✅ Maven OK (Build local finalizado)"
 }
 
 case "$TARGET" in
