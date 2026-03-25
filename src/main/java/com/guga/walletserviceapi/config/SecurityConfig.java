@@ -24,6 +24,7 @@ import com.guga.walletserviceapi.security.handler.CustomAuthenticationEntryPoint
 import lombok.RequiredArgsConstructor;
 
 @Configuration
+//@EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {

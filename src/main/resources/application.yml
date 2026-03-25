@@ -35,7 +35,7 @@ spring:
   config:
     import: 
       - "optional:classpath:security-matchers.yml"
-      ##- "optional:vault://secret/${APP_NAME}/${PROFILE}"
+      ##- "optional:vault://v1/secret/data/${APP_NAME}/${PROFILE}"
       ##- "optional:vault://secret/${APP_NAME}/${PROFILE}"
     active:
       on-profile: local
@@ -75,6 +75,13 @@ spring:
         "[order_inserts]": true
         "[order_updates]": true
         jdbc.batch_versioned_data: true
+  otlp:
+    logs:
+      enabled: true # Força o auto-appender
+      endpoint: http://otel-collector:4318/v1/logs # Endpoint específico de logs
+  threads:
+    virtual:
+      enabled: true # Opcional, mas recomendado para Java 21+
   #mvc:
     #servlet:
       #path: /api/v1
@@ -155,99 +162,71 @@ management:
   endpoints:
     web:
       exposure:
-        include: "startup,health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges,env"
-      base-path: /actuator
+        include: "*" # Cuidado em prod, mas perfeito para local/debug
   endpoint:
-    startup:
-      enabled: true
     health:
       show-details: always
     prometheus:
       enabled: true
-    info:
-      enabled: true
-    metrics:
-      enabled: true
-  info:
-    build:
-      enabled: true # Expõe versão, artifactId, time do build
-    git:
-      mode: full    # Expõe commit hash, branch, mensagem
-    env:
-      enabled: true # Expõe variáveis de ambiente seguras (opcional)
-  observations:
-    key-values:
-      application: ${APP_NAME}
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  otlp:
-    logging:
-      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/logs
-      timeout: 90s
-    tracing:
-      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/traces
-      timeout: 90s
-    metrics:
-      export:
-        enabled: false
   metrics:
-    distribution:
-      percentiles-histogram:
-        "[http.server.requests]": true
-    enable:
-      process: true
-      jvm: true
-    tags:
-      application: ${APP_NAME}
-  tracing:
-    enabled: true
-    sampling:
-      probability: 1.0
-    skip-pattern: /actuator/**, /swagger-ui/**, /v3/api-docs/**
+    export:
+      prometheus:
+        enabled: true
+  # --- Configuração OTLP (Logs, Traces e Metrics) ---
+  otlp:
+    logs:
+      endpoint: "http://otel-collector:4318/v1/logs"
+    tracing:
+      endpoint: "http://otel-collector:4318/v1/traces"
+    metrics:
+      export:
+        url: "http://otel-collector:4318/v1/metrics"
+        step: 10s
+
+
 
 logging:
-  # Garante que o log saia no terminal/console do seu IDE
+  # Mantive seus redirecionamentos de saída
   stderr:
     level: DEBUG
   stdout:
     level: DEBUG
   file:
     name: logs/${APP_NAME:wallet-service-api}.log
-  exception-conversion-word: "%wEx{5}"
+  exception-conversion-word: "%wEx{5}"  
   level:
     # --- Raiz e Projeto ---
     root: DEBUG
     com.guga.walletserviceapi: DEBUG
     com.guga.walletserviceapi.security: DEBUG
 
-    # --- Silencia os logs de /actuator/prometheus ---
-    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR
-    #org.apache.tomcat.util.http.Parameters: ERROR    # Se quiser silenciar o log de acesso do servidor (se estiver ativado)
+    # --- opentelemetry --
+    io.opentelemetry: DEBUG
+    io.opentelemetry.exporter.otlp: DEBUG
 
-    # --- Spring Web e Endpoints ---
+    # --- Silenciamento (Actuator/Tomcat) ---
+    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR
+    org.apache.tomcat.util.http.Parameters: ERROR
+
+    # --- Spring Web e Endpoints (Seus Debugs Específicos) ---
     org.springframework.web: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
 
-    # --- Spring Security ---
+    # --- Spring Security (Sua rastreabilidade de filtros) ---
     org.springframework.security: DEBUG
     org.springframework.security.web.FilterChainProxy: DEBUG
-    org.springframework.security.web.authentication.AnonymousAuthenticationFilter: DEBUG    
+    org.springframework.security.web.authentication.AnonymousAuthenticationFilter: DEBUG
 
     # --- Infraestrutura e Testes ---
     org.springframework.test: DEBUG
     org.springframework.core.env: DEBUG
     org.hibernate: INFO
 
-    # --- Cloud e Vault ---
+    # --- Cloud, Vault e OTel (Corrigidos para o nível certo) ---
     org.springframework.cloud.vault: DEBUG
     org.springframework.vault: DEBUG
+    org.springframework.boot.actuate.autoconfigure.logging.otlp: DEBUG
 
-
-    # Silencia o SEU filtro customizado (JwtAuthenticationFilter)
-    # Substitua o pacote pelo caminho real da sua classe
-    # logging.level.com.github.w.s.f.JwtAuthenticationFilter: ERROR
-
-
+    # --- Seu Filtro Customizado (Jwt) ---
+    # com.guga.walletserviceapi.security.JwtAuthenticationFilter: ERROR

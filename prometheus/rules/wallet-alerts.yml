@@ -1,60 +1,51 @@
 groups:
-  - name: wallet-service-alerts
+  - name: infrastructure-availability-alerts
     rules:
-      - alert: WalletServiceDown
-        expr: up{job="wallet-service-direct"} == 0
-        for: 1m
-        labels:
-          severity: P1
-        annotations:
-          summary: "Wallet Service está fora do ar"
-          description: "O serviço wallet-service está indisponível há mais de 1 minuto."
-
-      - alert: High5xxRate
-        # Adicionado 0.05 (5%) ao final
-        expr: (sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_count[5m]))) > 0.05
+      # --- ALERTA GENÉRICO PARA QUALQUER SERVIÇO DA STACK ---
+      # Este alerta dispara se qualquer job definido no seu prometheus.yml ficar 'down'
+      - alert: InfrastructureServiceDown
+        expr: up == 0
         for: 2m
         labels:
-          severity: P1
+          severity: critical
+          env: "env-local"
         annotations:
-          summary: "Alta taxa de erro 5xx"
-          description: "Mais de 5% das requisições estão retornando erro 5xx."
+          summary: "Serviço Crítico Indisponível: {{ $labels.job }}"
+          description: "O serviço {{ $labels.job }} (instância {{ $labels.instance }}) está fora do ar há mais de 2 minutos."
 
-      - alert: HighLatencyP95
-        # Adicionado 2 (segundos) ao final
-        expr: histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{job="wallet-service-direct"}[5m]))) > 2
+  - name: wallet-service-performance-alerts
+    rules:
+      # --- ALERTA ESPECÍFICO PARA A APLICAÇÃO (LATÊNCIA) ---
+      - alert: WalletApiHighLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{application="wallet-service-api"}[5m]))) > 2
         for: 3m
         labels:
-          severity: P2
+          severity: warning
         annotations:
-          summary: "Latência alta no wallet-service"
-          description: "O p95 está acima de 2 segundos."
+          summary: "Latência Alta na Wallet API"
+          description: "95% das requisições estão demorando mais de 2s (Valor atual: {{ $value | printf \"%.2f\" }}s)."
 
-      - alert: PostgresDown
-        # Corrigido: Se o alerta é "Postgres fora do ar", a métrica 'up' é mais adequada
-        expr: up{job="postgres"} == 0
-        for: 1m
+      # --- ALERTA DE ERROS NA API ---
+      - alert: WalletApiHighErrorRate
+        expr: |
+          sum(rate(http_server_requests_seconds_count{application="wallet-service-api", status=~"5.."}[5m])) 
+          / 
+          sum(rate(http_server_requests_seconds_count{application="wallet-service-api"}[5m])) > 0.10
+        for: 2m
         labels:
-          severity: P1
+          severity: critical
         annotations:
-          summary: "Postgres fora do ar"
-          description: "postgres_exporter não consegue conectar no Postgres há mais de 1 minuto."
+          summary: "Taxa de Erro 5xx elevada na Wallet API"
+          description: "A API está com mais de 10% de erros 5xx (Atual: {{ $value | printf \"%.2f\" }}%)."
 
-      - alert: PostgresExporterDown
-        # Se você usa o job "postgres" para o banco, mude o nome aqui para evitar confusão se for outro job
-        expr: up{job="postgres-exporter"} == 0
-        for: 1m
-        labels:
-          severity: P1
-        annotations:
-          summary: "Postgres exporter fora do ar"
-          description: "Prometheus não consegue coletar métricas do postgres_exporter há mais de 1 minuto."
-
-      - alert: PostgresHighConnections
-        expr: (pg_stat_activity_count / pg_settings_max_connections) > 0.8
+  - name: database-alerts
+    rules:
+      # --- ALERTA DE CONEXÕES NO POSTGRES ---
+      - alert: PostgresTooManyConnections
+        expr: pg_stat_activity_count{application="postgres"} > 15
         for: 5m
         labels:
-          severity: P2
+          severity: warning
         annotations:
-          summary: "Conexões do Postgres altas"
-          description: "Uso de conexões acima de 80% por 5 minutos."
+          summary: "Postgres próximo ao limite de conexões"
+          description: "O Postgres está com {{ $value }} conexões. O limite configurado no seu compose é 20."

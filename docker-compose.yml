@@ -8,6 +8,11 @@ x-configs: &wallet-variables
   WALLET_USER: ${WALLET_USER}
   WALLET_PASS: ${WALLET_PASS}
   MANAGEMENT_OTLP_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}
+  OTEL_LOGS_EXPORTER: otlp
+  # FORCE o endpoint específico de logs para o protocolo HTTP/Protobuf que você definiu
+  OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
+  OTEL_EXPORTER_OTLP_LOGS_PROTOCOL: http/protobuf
+  
 
 services:
   # ======================================================================
@@ -69,15 +74,18 @@ services:
       - wallet_network
 
   loki:
-    image: grafana/loki:2.9.0
+    image: grafana/loki:3.5.0
     container_name: cont-wallet-loki
     restart: unless-stopped
-    environment:
-      <<: *wallet-variables
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: 
+      - "-config.file=/etc/loki/local-config.yaml"
+      - "-config.expand-env=true"
+    environment:
+      - LOKI_OTLP_ENABLED=true # Habilita o OTLP via Env (Best Practice)
     volumes:
+      - ./config/loki/local-config.yaml:/etc/loki/local-config.yaml
       - loki_data:/loki
     networks:
       - wallet_network
@@ -144,7 +152,9 @@ services:
     restart: unless-stopped
     environment:
       <<: *wallet-variables
+      JAVA_TOOL_OPTIONS: -javaagent:/otel/opentelemetry-javaagent.jar
       SPRING_PROFILES_ACTIVE: ${PROFILE}
+
       SPRING_CLOUD_VAULT_ENABLED: "true"
       SPRING_CLOUD_VAULT_URI: http://vault:8200
       SPRING_CLOUD_VAULT_TOKEN: root
@@ -152,11 +162,23 @@ services:
       SPRING_CLOUD_VAULT_KV_BACKEND: secret
       SPRING_CLOUD_VAULT_KV_APPLICATION_NAME: ${APP_NAME}
       SPRING_CLOUD_VAULT_KV_PROFILES: ${PROFILE}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}/traces
-      MANAGEMENT_OTLP_LOGGING_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}/logs
-      MANAGEMENT_OTLP_TRACING_ENDPOINT: ${MANAGEMENT_OTLP_ENDPOINT}/traces
+
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318      
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf  # 2. PROTOCOLO OBRIGATÓRIO PARA A PORTA 4318 (HTTP)      
+      OTEL_LOGS_EXPORTER: otlp  # 3. HABILITAÇÃO DOS EXPORTADORES NO AGENTE
+      OTEL_TRACES_EXPORTER: otlp  # 3. HABILITAÇÃO DOS EXPORTADORES NO AGENTE
+      OTEL_METRICS_EXPORTER: none # 3. HABILITAÇÃO DOS EXPORTADORES NO AGENTE      
+      OTEL_SERVICE_NAME: ${APP_NAME}  # 4. IDENTIFICAÇÃO DO SERVIÇO (Aparecerá assim no Loki/Tempo)
+      OTEL_RESOURCE_ATTRIBUTES: service.name=${APP_NAME},env=env-${PROFILE},environment=env-${PROFILE}
+      OTEL_LOGS_ENABLED: true
+      OTEL_JAVAAGENT_DEBUG: true
+
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,loggers,prometheus,metrics,caches,cache,threaddump,httpexchanges"
+
+      LOGGING_CONFIG: /app/logback-spring.xml
+      ##MANAGEMENT_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
+
     ports:
       - "8080:8080"
     healthcheck:
@@ -169,6 +191,7 @@ services:
       - wallet_service_data:/app/data
       - wallet_service_logs:/app/logs
       - ./data/seed:/app/data/seed:ro
+      - ./src/main/resources/logback-spring.xml:/app/logback-spring.xml
       ##- ./security-matchers.yml:/app/config/security-matchers.yml:ro
       - type: bind
         source: ./security-matchers.yml
@@ -256,21 +279,20 @@ services:
   # 7. TEMPO - TRACING BACKEND
   # ======================================================================
   tempo:
-    image: grafana/tempo:latest
-    container_name: cont-wallet-tempo
-    restart: unless-stopped
-    ports:
-      - "3200:3200"
-    command: >
-      -config.file=/etc/tempo.yaml
-      -target=all
-      -storage.trace.backend=local
-      -storage.trace.local.path=/tmp/tempo/traces
-    volumes:
-      - ./grafana-tempo/tempo.yaml:/etc/tempo.yaml:ro
-      - tempo_traces:/tmp/tempo/traces
-    networks:
-      - wallet_network
+      image: grafana/tempo:2.10.3
+      container_name: cont-wallet-tempo
+      user: "0:0"  # <--- Adicione isso para rodar como root e ter permissão de escrita
+      restart: unless-stopped
+      ports:
+        - "3200:3200"
+        #- "4317:4317"  # Adicione para sua App enviar traces via gRPC
+        #- "4318:4318"  # Adicione para sua App enviar traces via HTTP
+      command: [ "-config.file=/etc/tempo.yaml" ] # Simplificado: o YAML resolve o resto
+      volumes:
+        - ./grafana-tempo/tempo.yaml:/etc/tempo.yaml:ro
+        - tempo_data:/tmp/tempo
+      networks:
+        - wallet_network
 
   # ======================================================================
   # SONAR QUBE
@@ -327,7 +349,7 @@ volumes:
   jaeger_tracing_data:
   loki_data:
   grafana_data:
-  tempo_traces:
+  tempo_data:
   wallet_service_data:
   wallet_service_logs:
   pgadmin_data:

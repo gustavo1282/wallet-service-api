@@ -1,48 +1,91 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# garante rodar no diretório do wrapper (evita problema no Task Scheduler)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-
-# --- helpers ---
 ts() { date '+%Y-%m-%d %H:%M:%S.%3N'; }
 
-# RUN_ID único desta execução (fixo)
-RUN_ID="$(date +%Y%m%d%H%M%S%3N)"   # ex: 20260225110619943
+RUN_ID="${RUN_ID:-RUN_$(date +%Y%m%d%H%M%S%3N)}"
 
 log() { echo "[$(ts)] $RUN_ID $*"; }
 
-BASE_SCRIPT="$SCRIPT_DIR/newman_run_docker.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_SCRIPT="$SCRIPT_DIR/newman_register_and_run.sh"
 
-# pasta de logs
-LOG_DIR="$SCRIPT_DIR/newman/logs"
+LOG_DIR="$SCRIPT_DIR/newman/logs/$RUN_ID"
 mkdir -p "$LOG_DIR"
 
-# timestamp file-safe (Windows friendly)
-FILE_TS="$(date +%Y%m%d_%H%M%S)"
-LOG_FILE="$LOG_DIR/newman_run_${FILE_TS}.log"
+LOG_FILE="$LOG_DIR/execution.log"
 
-# tudo que rodar daqui pra frente vai pro log (stdout + stderr)
-exec > >(tee -a "$LOG_FILE") #2>&1
-
-log "BASE_SCRIPT=$BASE_SCRIPT"
-log "LOG_DIR=$LOG_DIR"
-log "LOG_FILE=$LOG_FILE"
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 log "================================="
-log "Random Newman Execution"
-log "Repo: $(pwd)"
+log "Newman Scheduler"
+log "RUN_ID=$RUN_ID"
 log "================================="
 
-# MODE aleatório 1..3
-MODE=$(( (RANDOM % 3) + 1 ))
-log "Selected MODE=$MODE"
+#MODE="${MODE:-$(( (RANDOM % 3) + 1 ))}"
 
-# executa
-#MODE="$MODE" "$BASE_SCRIPT"
-RUN_ID="$RUN_ID" MODE="$MODE" bash "$BASE_SCRIPT"
+show_menu() {
+  echo "=============================================="
+  echo " Newman Load Profiles"
+  echo "=============================================="
+  echo "1) Carga leve    (CONCURRENCY=5,  RUNS=20)"
+  echo "2) Moderado      (CONCURRENCY=10, RUNS=30)"
+  echo "3) Pancada curta (CONCURRENCY=20, RUNS=10)"
+  echo "4) Custom"
+  echo "q) Sair"
+  echo "----------------------------------------------"
+}
+# se não veio MODE, mostra menu
+if [[ -z "${MODE:-}" ]]; then
+  if [[ -t 0 ]]; then
+    show_menu
+    read -r -p "Escolha [1-4/q]: " MODE
 
-log "Finished execution"
-log "$(date)"
-log "Log file: $LOG_FILE"
+    if [[ "$MODE" == "q" || "$MODE" == "Q" ]]; then
+      echo "Saindo..."
+      exit 0
+    fi
+
+    if [[ "$MODE" == "4" ]]; then
+      read -r -p "CONCURRENCY [5]: " inp
+      CONCURRENCY="${inp:-5}"
+
+      read -r -p "RUNS [20]: " inp
+      RUNS="${inp:-20}"
+    fi
+  else
+    MODE=1
+  fi
+fi
+
+
+case "$MODE" in
+  1) CONCURRENCY=5 RUNS=20 ;;
+  2) CONCURRENCY=10 RUNS=30 ;;
+  3) CONCURRENCY=20 RUNS=10 ;;
+esac
+
+BATCH_RUNS="${BATCH_RUNS:-1}"
+
+log "MODE=$MODE"
+log "CONCURRENCY=$CONCURRENCY RUNS=$RUNS"
+
+FAIL=0
+
+for i in $(seq 1 "$BATCH_RUNS"); do
+  log "---- Batch $i/$BATCH_RUNS ----"
+
+  if RUN_ID="$RUN_ID" CONCURRENCY="$CONCURRENCY" RUNS="$RUNS" bash "$BASE_SCRIPT"; then
+    log "Batch $i OK"
+  else
+    log "Batch $i FAILED"
+    FAIL=$((FAIL+1))
+  fi
+done
+
+log "================================="
+log "FINAL SUMMARY"
+log "Failures: $FAIL"
+log "================================="
+
+exit "$FAIL"
