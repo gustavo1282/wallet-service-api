@@ -61,3 +61,4 @@ data/postman/postman_merged_final__v*.json
 data/postman/reports/
 data/postman/newman/
 grafana/data/grafana.db
+data/postgres/backup/
