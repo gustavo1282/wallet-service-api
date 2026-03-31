@@ -1,0 +1,65 @@
+# =========================
+# Vars usadas por placeholders (bootstrapping)
+# =========================
+APP_NAME: wallet-service-api
+PROFILE: docker
+API_PREFIX: /api/v1
+ENV: env-docker
+WALLET_USER: wallet_user
+WALLET_PASS: wallet_pass
+JWT_SECRET: mock.jwt_token.appconfig.docker.859jg89045j9045i
+MANAGEMENT_OTLP_ENDPOINT: http://otel-collector:4318
+
+app:
+  seeder:
+    enabled: true # Mude para true para executar a carga na inicialização
+
+spring:
+  config:
+    import: 
+      - "optional:classpath:security-matchers.yml"
+      - "optional:vault:8200/v1/secret/data/${APP_NAME}/${PROFILE}"
+  cloud:
+    vault:
+      enabled: true
+      uri: http://vault:8200
+      kv:
+        backend: secret
+        application-name: wallet-service-api
+    bootstrap:
+      enabled: false
+
+
+  datasource:
+    # Configuração para POSTGRES via arquivo
+    url: jdbc:postgresql://host.docker.internal:5432/wallet_db
+    driver-class-name: org.postgresql.Driver
+    username: wallet_user
+    password: wallet_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  security:
+    user:
+      name: ${WALLET_USER:wallet_user}
+      password: ${WALLET_PASS:wallet_pass}
+      roles:
+        - ADMIN
+        - USER
+
+management:
+  otlp:
+    logs:
+      endpoint: "http://otel-collector:4318/v1/logs"
+  logs:
+    export:
+      enabled: true # FORÇA a exportação dos logs via OTLP
+logging:
+  file:
+    name: logs/${APP_NAME:wallet-service-api}-docker.log
+  level:
+    io.opentelemetry: DEBUG # Veremos o SDK tentando conectar no Collector

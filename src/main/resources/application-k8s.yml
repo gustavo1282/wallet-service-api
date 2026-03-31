@@ -1,0 +1,74 @@
+# =========================
+# Vars usadas por placeholders (bootstrapping)
+# =========================
+APP_NAME: wallet-service-api
+PROFILE: k8s
+API_PREFIX: /api/v1
+ENV: env-k8s
+WALLET_USER: wallet_user
+WALLET_PASS: wallet_pass
+JWT_SECRET: mock.jwt_token.appconfig.k8s.859jg89045j9045i
+MANAGEMENT_OTLP_ENDPOINT: http://otel-collector:4318
+
+app:
+  seeder:
+    enabled: true # Mude para true para executar a carga na inicialização
+server:
+  address: 0.0.0.0
+  port: 8081
+  servlet:
+    context-path: /${APP_NAME}
+
+spring:
+  config:
+    import: 
+      - "optional:classpath:security-matchers.yml"
+      #- "optional:vault:8200/v1/secret/data/${APP_NAME}/${PROFILE}"
+  cloud:
+    vault:
+      enabled: true
+      uri: http://vault:8200
+      authentication: TOKEN
+      token: root
+      scheme: http
+      kv:
+        enabled: true
+        backend: secret
+        version: 2
+        #authentication: TOKEN
+        default-context: wallet-service-api
+        profiles: k8s
+    bootstrap:
+      enabled: false
+
+
+  datasource:
+    # Configuração para POSTGRES via arquivo
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/wallet_db
+    username: wallet_user
+    password: wallet_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  security:
+    user:
+      name: ${WALLET_USER:wallet_user}
+      password: ${WALLET_PASS:wallet_pass}
+      roles:
+        - ADMIN
+        - USER
+
+management:
+  otlp:
+    logs:
+      endpoint: "http://otel-collector:4318/v1/logs"
+  logs:
+    export:
+      enabled: true # FORÇA a exportação dos logs via OTLP
+
+

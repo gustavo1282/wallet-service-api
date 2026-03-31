@@ -1,0 +1,56 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallet-service
+  labels:
+    app: wallet
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wallet
+  template:
+    metadata:
+      labels:
+        app: wallet
+    spec:
+      containers:
+      - name: wallet-api
+        image: wallet-service-api:latest
+        imagePullPolicy: Never
+        # Comente a linha abaixo quando quiser que a aplicaÃ§Ã£o suba de fato.
+        #command: ["sleep", "3600"] 
+        ports:
+        - containerPort: 8080
+        env:
+        # ðŸ”µ TRADUÃ‡ÃƒO DO SEU SCRIPT DE EXPORTS
+        - name: SPRING_PROFILES_ACTIVE
+          value: "k8s"
+        - name: TZ
+          value: "America/Sao_Paulo"
+        - name: ENV
+          value: "env-k8s"
+        - name: ENVIRONMENT
+          value: "env-k8s"
+        - name: NAMESPACE
+          value: "env-k8s"
+        - name: APP_NAME
+          value: "wallet-service-api"
+        - name: APPLICATION_NAME
+          value: "wallet-service-api"
+        - name: SERVICE_NAME
+          value: "wallet-service-api"
+        - name: WALLET_USER
+          value: "wallet_user"
+        - name: WALLET_PASS
+          value: "wallet_pass"
+        - name: VAULT_TOKEN
+          value: "root"
+        - name: VAULT_ADDR
+          value: "http://vault:8200"
+        - name: VAULT_SECRET_PATH
+          value: "secret/wallet-service-api/k8s"
+        - name: JWT_SECRET
+          value: "mock.jwt.secret.docker.k8s.value_8235hu23523h523h57823h58723h823"
+        - name: MANAGEMENT_OTLP_ENDPOINT
+          value: "http://otel-collector:4318"

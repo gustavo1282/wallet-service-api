@@ -15,7 +15,7 @@ app:
     crypto:
       strength: 4
   seeder:
-    enabled: false # Mude para true para executar a carga na inicialização
+    enabled: true # Mude para true para executar a carga na inicialização
 
 server:
   address: 0.0.0.0
@@ -53,11 +53,19 @@ spring:
       - "optional:classpath:security-matchers.yml"
       - "optional:vault://secret/wallet-service-api/local"
 
+  #datasource:
+  #  url: jdbc:h2:file:./data/h2/wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+  #  driver-class-name: org.h2.Driver
+  #  username: ${WALLET_USER:wallet_user}
+  #  password: ""
+
   datasource:
-    url: jdbc:h2:file:./data/h2/wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    driver-class-name: org.h2.Driver
-    username: ${WALLET_USER:wallet_user}
-    password: ""
+    # Configuração para POSTGRES via arquivo
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres:5432/wallet_db
+    username: wallet_user
+    password: wallet_pass
+
 
   h2:
     console:
@@ -73,8 +81,6 @@ spring:
   sql:
       init:
         mode: always
-
-
 
 management:
   endpoints:

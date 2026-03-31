@@ -19,7 +19,7 @@ MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
 app:
   api-prefix: ${API_PREFIX}
   seeder:
-    enabled: false # Mude para true para executar a carga na inicialização
+    enabled: true # Mude para true para executar a carga na inicialização
 
 server:
   address: 0.0.0.0
@@ -38,7 +38,7 @@ spring:
       ##- "optional:vault://v1/secret/data/${APP_NAME}/${PROFILE}"
       ##- "optional:vault://secret/${APP_NAME}/${PROFILE}"
     active:
-      on-profile: local
+      on-profile: ${PROFILE}
   cloud:
     bootstrap:
       enabled: false  # Desativa o carregamento do bootstrap.yml
@@ -46,13 +46,7 @@ spring:
       enabled: false
       ssl:
         enabled: false
-      #authentication: TOKEN
-      #kv:
-      #  enabled: true
-      #  backend: secret
-      #  version: 2
-      #  default-context: ${APP_NAME}
-      #  profiles: ${PROFILE:local}
+
   data:
     web:
       pageable:
@@ -82,9 +76,6 @@ spring:
   threads:
     virtual:
       enabled: true # Opcional, mas recomendado para Java 21+
-  #mvc:
-    #servlet:
-      #path: /api/v1
 
 springdoc:
   #paths-to-match: "${API_PREFIX}/**"
@@ -153,10 +144,6 @@ springdoc:
     try-it-out-enabled: 'false'
     operationsSorter: operationId # Define a ordenação por operationId
     custom-js: /swagger-ui/custom.js
-    #tagsSorter: none
-    ## groups-order: ASC
-  #use-root-path: true
-
 
 management:
   endpoints:
@@ -168,10 +155,12 @@ management:
       show-details: always
     prometheus:
       enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true # novo padrão recomendado
+
   # --- Configuração OTLP (Logs, Traces e Metrics) ---
   otlp:
     logs:
@@ -183,8 +172,6 @@ management:
         url: "http://otel-collector:4318/v1/metrics"
         step: 10s
 
-
-
 logging:
   # Mantive seus redirecionamentos de saída
   stderr:
@@ -192,7 +179,7 @@ logging:
   stdout:
     level: DEBUG
   file:
-    name: logs/${APP_NAME:wallet-service-api}.log
+    name: logs/${APP_NAME:wallet-service-api}-${PROFILE}.log
   exception-conversion-word: "%wEx{5}"  
   level:
     # --- Raiz e Projeto ---

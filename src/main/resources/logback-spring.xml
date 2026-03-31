@@ -32,9 +32,26 @@
         <captureContextDataAttributes>true</captureContextDataAttributes>
     </appender>
 
+
+    <!-- FILE -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        
+        <file>logs/${APP_NAME:-wallet-service-api}-${PROFILE:-local}.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/wallet-service-api-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{trace_id}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- Root -->
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
         <appender-ref ref="OTEL"/>
     </root>
 

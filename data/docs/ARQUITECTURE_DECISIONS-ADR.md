@@ -1,4 +1,4 @@
-﻿﻿# Architecture Decisions (ADR) — Wallet Service API
+﻿# Architecture Decisions (ADR) — Wallet Service API
 
 Este documento registra decisões técnicas relevantes tomadas ao longo da evolução do projeto.
 Objetivo: preservar contexto, alternativas e trade-offs para manter coerência arquitetural e facilitar manutenção.

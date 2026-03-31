@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      # Coleta métricas do OTel Collector (que por sua vez recebe da sua API)
+      - job_name: 'otel-collector'
+        static_configs:
+          - targets: ['otel-collector:8889']
+
+      # Coleta métricas direto da sua Wallet API via Actuator
+      - job_name: 'wallet-api'
+        metrics_path: '/wallet-service-api/actuator/prometheus'
+        static_configs:
+          - targets: ['wallet-api:8080']
+          
+      # Coleta métricas do Postgres Exporter
+      - job_name: 'postgres-exporter'
+        static_configs:
+          - targets: ['postgres-exporter:9187']
