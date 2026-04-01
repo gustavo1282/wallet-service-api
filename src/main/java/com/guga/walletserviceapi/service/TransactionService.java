@@ -11,10 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.guga.walletserviceapi.controller.TransactionController;
 import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.TransactionUtils;
@@ -50,56 +50,79 @@ public class TransactionService implements IWalletApiService {
     private final ParamAppService paramAppService;
     private final DataPersistenceService importService;
 
-    private static final Logger LOGGER = LogManager.getLogger(TransactionController.class);
+    private static final Logger LOGGER = LogManager.getLogger(TransactionService.class);
 
+    @Transactional(readOnly = true)
     public Transaction getTransactionById(Long id) {
-        return transactionRepository.findById(id)
-                .orElseThrow(() -> 
-                    new ResourceNotFoundException("Transaction not found with id: " + String.valueOf(id)));
+        LOGGER.info("TRANSACTION_SERVICE_GET_BY_ID_ENTRY | transactionId={}", id);
+        Transaction trn = transactionRepository.findById(id).orElse(null);
+        if (trn == null) {
+            LOGGER.warn("TRANSACTION_SERVICE_GET_BY_ID_DECISION | transactionId={} decision=NOT_FOUND", id);
+            throw new ResourceNotFoundException("Transaction not found with id: " + String.valueOf(id));
+        }
+        LOGGER.info("TRANSACTION_SERVICE_GET_BY_ID_SUCCESS | transactionId={}", trn.getTransactionId());
+        return trn;
     }
 
+    @Transactional(readOnly = true)
     public Page<Transaction> getTransactionByWalletId(Long id, Pageable pageable) {
+        LOGGER.info("TRANSACTION_SERVICE_LIST_BY_WALLET_ENTRY | walletId={} page={} size={} sort={}",
+            id, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         Page<Transaction> findResult = transactionRepository.findByWalletId(id, pageable);
 
         if (findResult.isEmpty() || !findResult.hasContent()) {
+            LOGGER.warn("TRANSACTION_SERVICE_LIST_BY_WALLET_DECISION | walletId={} decision=EMPTY_RESULT", id);
             throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(id));
         }
 
+        LOGGER.info("TRANSACTION_SERVICE_LIST_BY_WALLET_SUCCESS | walletId={} rows={}", id, findResult.getNumberOfElements());
         return findResult;
     }
 
+    @Transactional(readOnly = true)
     public Page<Transaction> getTransactionsByLimitMax(Long walletId, Pageable pageable) {
+        LOGGER.info("TRANSACTION_SERVICE_LIST_LIMIT_ENTRY | walletId={} page={} size={} sort={}",
+            walletId, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
         Page<Transaction> findResult = transactionRepository
             .findByWalletId(walletId, pageable);
 
         if (findResult.isEmpty()) {
+            LOGGER.warn("TRANSACTION_SERVICE_LIST_LIMIT_DECISION | walletId={} decision=EMPTY_RESULT", walletId);
             throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(walletId));
         }
 
+        LOGGER.info("TRANSACTION_SERVICE_LIST_LIMIT_SUCCESS | walletId={} rows={}", walletId, findResult.getNumberOfElements());
         return findResult;
     }
 
+    @Transactional(readOnly = true)
     public Page<Transaction> findByWalletIdAndCreatedAtBetween(
         Long walletId, 
         LocalDateTime startDate, 
         LocalDateTime endDate, 
         Pageable pageable) 
     { 
+        LOGGER.info("TRANSACTION_SERVICE_LIST_PERIOD_ENTRY | walletId={} start={} end={} page={} size={}",
+            walletId, startDate, endDate, pageable.getPageNumber(), pageable.getPageSize());
         Page<Transaction> findResult = transactionRepository
             .findByWalletIdAndCreatedAtBetween(walletId, startDate, endDate, pageable);
 
         if (findResult.isEmpty() || !findResult.hasContent()) {
+            LOGGER.warn("TRANSACTION_SERVICE_LIST_PERIOD_DECISION | walletId={} decision=EMPTY_RESULT", walletId);
             throw new ResourceNotFoundException("Transaction not found by wallet id: " + String.valueOf(walletId));
         }
 
+        LOGGER.info("TRANSACTION_SERVICE_LIST_PERIOD_SUCCESS | walletId={} rows={}", walletId, findResult.getNumberOfElements());
         return findResult;
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
     public DepositMoney saveDepositMoney(Long walletId, BigDecimal amount, String cpfSender,
                                          String terminalId, String senderName)
     {
+        LOGGER.info("TRANSACTION_SERVICE_DEPOSIT_ENTRY | walletId={} amount={}", walletId, amount);
         Wallet wallet = walletService.getWalletById(walletId);
 
         DepositMoney depositMoney = TransactionUtils.generateDepositMoney(wallet, amount, 
@@ -108,6 +131,8 @@ public class TransactionService implements IWalletApiService {
         DepositMoney depositMoneySaved = transactionRepository.save(depositMoney);
 
         if (!depositMoney.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            LOGGER.warn("TRANSACTION_SERVICE_DEPOSIT_DECISION | walletId={} decision=BUSINESS_RULE_FAILED status={}",
+                walletId, depositMoney.getStatusTransaction());
             throw new ResourceBadRequestException("Invalid Business Rules - "
                     .concat(depositMoney.getStatusTransaction().name())
             );
@@ -133,6 +158,8 @@ public class TransactionService implements IWalletApiService {
 
         }
 
+        LOGGER.info("TRANSACTION_SERVICE_DEPOSIT_SUCCESS | transactionId={} walletId={}",
+            depositMoneySaved.getTransactionId(), walletId);
         return depositMoneySaved;
     }
 
@@ -149,10 +176,13 @@ public class TransactionService implements IWalletApiService {
      * @param amount
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public WithdrawMoney saveWithdrawMoney(Long walletId, BigDecimal amount) {
+        LOGGER.info("TRANSACTION_SERVICE_WITHDRAW_ENTRY | walletId={} amount={}", walletId, amount);
 
         Wallet wallet = walletService.getWalletById(walletId);
         if (wallet == null || wallet.getWalletId() == null) {
+            LOGGER.warn("TRANSACTION_SERVICE_WITHDRAW_DECISION | walletId={} decision=INVALID_WALLET", walletId);
             throw new ResourceBadRequestException("The transaction does not contain a valid wallet");
         }
 
@@ -161,6 +191,8 @@ public class TransactionService implements IWalletApiService {
         WithdrawMoney withdrawSaved = transactionRepository.save(withdraw);
 
         if (!withdraw.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            LOGGER.warn("TRANSACTION_SERVICE_WITHDRAW_DECISION | walletId={} decision=BUSINESS_RULE_FAILED status={}",
+                walletId, withdraw.getStatusTransaction());
             throw new ResourceBadRequestException("Invalid Business Rules - "
                     .concat(withdraw.getStatusTransaction().name())
             );
@@ -178,10 +210,15 @@ public class TransactionService implements IWalletApiService {
 
         }
 
+        LOGGER.info("TRANSACTION_SERVICE_WITHDRAW_SUCCESS | transactionId={} walletId={}",
+            withdrawSaved.getTransactionId(), walletId);
         return withdrawSaved;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public TransferMoneySend saveTransferMoneySend(Long walletIdSend, Long walletIdReceived, BigDecimal amount) {
+        LOGGER.info("TRANSACTION_SERVICE_TRANSFER_ENTRY | walletIdSend={} walletIdReceived={} amount={}",
+            walletIdSend, walletIdReceived, amount);
 
         Wallet walletSend = walletService.getWalletById(walletIdSend);
 
@@ -198,6 +235,8 @@ public class TransactionService implements IWalletApiService {
 
         if (!transferSend.getStatusTransaction().equals(StatusTransaction.SUCCESS) ||
                 !transferReceived.getStatusTransaction().equals(StatusTransaction.SUCCESS)) {
+            LOGGER.warn("TRANSACTION_SERVICE_TRANSFER_DECISION | walletIdSend={} decision=BUSINESS_RULE_FAILED status={}",
+                walletIdSend, transferSend.getStatusTransaction());
             throw new ResourceBadRequestException("Invalid Business Rules - "
                     .concat(transferSend.getStatusTransaction().name())
             );
@@ -227,9 +266,12 @@ public class TransactionService implements IWalletApiService {
 
         }
 
+        LOGGER.info("TRANSACTION_SERVICE_TRANSFER_SUCCESS | transactionId={} walletIdSend={} walletIdReceived={}",
+            transferSendSaved.getTransactionId(), walletIdSend, walletIdReceived);
         return transferSendSaved;
     }
 
+    @Transactional(readOnly = true)
     public Page<Transaction> filterTransactionByWalletIdAndProcessType(Long walletId, StatusTransaction typeTransaction,
                                                                        Pageable pageable) {
         List<Specification<Transaction>> specs = new ArrayList<>();
@@ -255,7 +297,10 @@ public class TransactionService implements IWalletApiService {
         }
 
         // 4. Executa a consulta paginada
-        return transactionRepository.findAll(combinedSpec, pageable);
+        Page<Transaction> result = transactionRepository.findAll(combinedSpec, pageable);
+        LOGGER.info("TRANSACTION_SERVICE_FILTER_PROCESS_SUCCESS | walletId={} type={} rows={}",
+            walletId, typeTransaction, result.getNumberOfElements());
+        return result;
 
     }
 
@@ -343,6 +388,7 @@ public class TransactionService implements IWalletApiService {
      * @param pageable Configuração de paginação (no seu caso, fixado em 150 registros)
      * @return Página de transações filtradas
      */
+    @Transactional(readOnly = true)
     public Page<Transaction> filterTransactionByWalletIdAndOperationType(
             Long walletId, 
             OperationType operation, 
@@ -353,11 +399,13 @@ public class TransactionService implements IWalletApiService {
         // Chamada ao Repository
         Page<Transaction> trnResult = transactionRepository.findByWalletIdAndOperationType(walletId, operation, pageable);
         if (trnResult == null || trnResult.isEmpty()) {
-            String msgTrow = String.format("No transactions found for walletId={%n} and operation={%s}", walletId, operation);
+            String msgTrow = String.format("No transactions found for walletId={%s} and operation={%s}", walletId, operation);
             LOGGER.debug(msgTrow);
-            throw new ResourceNotFoundException("msgTrow");
+            throw new ResourceNotFoundException(msgTrow);
         }
 
+        LOGGER.debug("Service: Filtering transactions success | walletId={} | operation={} | rows={}",
+            walletId, operation, trnResult.getNumberOfElements());
         return trnResult;
     }
 

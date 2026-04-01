@@ -71,7 +71,10 @@ public class WalletController {
             walletId, auditCtx.getUsername()
         );
 
-        AuditLogger.log("WALLET_GET_ME", auditCtx);
+        AuditLogger.log(
+            "WALLET_GET_ME",
+            auditCtx.toBuilder().info("walletId=" + walletId).build()
+        );
 
         return ResponseEntity.ok(
             walletMapper.toDto(walletService.getWalletById(walletId))
@@ -98,13 +101,15 @@ public class WalletController {
             customerId, auditCtx.getUsername()
         );
 
-        AuditLogger.log("WALLET_GET_MY_LIST", auditCtx);
-
         Pageable pageable = GlobalHelper.getDefaultPageable();
-
-        return ResponseEntity.ok(
-            walletService.getWalletByCustomerId(customerId, pageable).map(walletMapper::toDto)
+        Page<WalletResponseDTO> result = walletService
+            .getWalletByCustomerId(customerId, pageable)
+            .map(walletMapper::toDto);
+        AuditLogger.log(
+            "WALLET_GET_MY_LIST",
+            auditCtx.toBuilder().info("rows=" + result.getNumberOfElements()).build()
         );
+        return ResponseEntity.ok(result);
     }
 
     @Operation(
@@ -130,7 +135,10 @@ public class WalletController {
         Wallet walletUpdate = walletMapper.toEntity(dto);
         Wallet updatedWallet = walletService.updateWallet(walletId, walletUpdate);
 
-        AuditLogger.log("WALLET_UPDATE_ME [SUCCESS]", auditCtx);
+        AuditLogger.log(
+            "WALLET_UPDATE_ME [SUCCESS]",
+            auditCtx.toBuilder().info("walletId=" + updatedWallet.getWalletId()).build()
+        );
 
         return ResponseEntity.ok(walletMapper.toDto(updatedWallet));
     }
@@ -153,13 +161,15 @@ public class WalletController {
             status, auditCtx.getUsername()
         );
 
-        AuditLogger.log("WALLET_LIST", auditCtx);
-
         Pageable pageable = GlobalHelper.getDefaultPageable();
-
-        return ResponseEntity.ok(
-            walletService.getAllWallets(status, pageable).map(walletMapper::toDto)
+        Page<WalletResponseDTO> result = walletService
+            .getAllWallets(status, pageable)
+            .map(walletMapper::toDto);
+        AuditLogger.log(
+            "WALLET_LIST",
+            auditCtx.toBuilder().info("rows=" + result.getNumberOfElements()).build()
         );
+        return ResponseEntity.ok(result);
     }
 
 
@@ -197,7 +207,10 @@ public class WalletController {
             .buildAndExpand(createdWallet.getWalletId())
             .toUri();
 
-        AuditLogger.log("WALLET_CREATE [SUCCESS]", auditCtx);
+        AuditLogger.log(
+            "WALLET_CREATE [SUCCESS]",
+            auditCtx.toBuilder().info("walletId=" + createdWallet.getWalletId()).build()
+        );
 
         return ResponseEntity.created(location).body(walletMapper.toDto(createdWallet));
     }
@@ -222,7 +235,10 @@ public class WalletController {
             id, auditCtx.getUsername()
         );
 
-        AuditLogger.log("WALLET_GET_BY_ID", auditCtx);
+        AuditLogger.log(
+            "WALLET_GET_BY_ID",
+            auditCtx.toBuilder().info("walletId=" + id).build()
+        );
 
         return ResponseEntity.ok(
             walletMapper.toDto(walletService.getWalletById(id))
@@ -237,7 +253,7 @@ public class WalletController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<WalletResponseDTO> updateWallet(
-        @PathVariable Long walletId,
+        @PathVariable("id") Long walletId,
         @RequestBody @Valid WalletUpdateDTO dto
     ) {
 
@@ -253,7 +269,10 @@ public class WalletController {
         Wallet walletUpdate = walletMapper.toEntity(dto);
         Wallet wallet = walletService.updateWallet(walletId, walletUpdate);
 
-        AuditLogger.log("WALLET_UPDATE [SUCCESS]", auditCtx);
+        AuditLogger.log(
+            "WALLET_UPDATE [SUCCESS]",
+            auditCtx.toBuilder().info("walletId=" + wallet.getWalletId()).build()
+        );
 
         return ResponseEntity.ok(walletMapper.toDto(wallet));
     }
@@ -277,13 +296,15 @@ public class WalletController {
             id, auditCtx.getUsername()
         );
 
-        AuditLogger.log("WALLET_GET_BY_CUSTOMER", auditCtx);
-
         Pageable pageable = GlobalHelper.getDefaultPageable();
-
-        return ResponseEntity.ok(
-            walletService.getWalletByCustomerId(id, pageable).map(walletMapper::toDto)
+        Page<WalletResponseDTO> result = walletService
+            .getWalletByCustomerId(id, pageable)
+            .map(walletMapper::toDto);
+        AuditLogger.log(
+            "WALLET_GET_BY_CUSTOMER",
+            auditCtx.toBuilder().info("customerId=" + id + ",rows=" + result.getNumberOfElements()).build()
         );
+        return ResponseEntity.ok(result);
     }
 
 }

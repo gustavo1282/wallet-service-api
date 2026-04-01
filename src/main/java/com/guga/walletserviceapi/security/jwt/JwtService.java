@@ -30,7 +30,7 @@ public class JwtService {
     private static final long ACCESS_TOKEN_VALIDITY = 25 * 60 * 1000;             // 25 minutos
     private static final long REFRESH_TOKEN_VALIDITY = 1 * 1 * 60 * 60 * 1000;    // 1 hora
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.secret:${JWT_SECRET:}}")
     private String jwtSecret;
 
     // 4. Descomentar e usar este método para inicializar a chave APÓS a injeção do @Value
@@ -38,7 +38,7 @@ public class JwtService {
     public void init() {
         if (jwtSecret == null || jwtSecret.isEmpty()) {
              // Isso garante um erro claro se a variável não for encontrada no Vault ou no ambiente
-            throw new IllegalArgumentException("JWT_SECRET property is not set or is empty!");
+            throw new IllegalArgumentException("jwt.secret/JWT_SECRET property is not set or is empty!");
         }
         // A chave precisa ter pelo menos 256 bits (32 bytes)
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));

@@ -3,10 +3,13 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
+    <property name="LOG_LEVEL" value="${LOGGING_LEVEL_ROOT:-TRACE}"/>
+    <property name="ACTIVE_PROFILE" value="${SPRING_PROFILES_ACTIVE:-k8s}"/>
+
     <!-- Console (debug local + docker logs) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>${LOG_LEVEL}</level>
         </filter>
 
         <!-- Evita poluir com scraping do Prometheus -->
@@ -32,9 +35,26 @@
         <captureContextDataAttributes>true</captureContextDataAttributes>
     </appender>
 
+
+    <!-- FILE -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        
+        <file>logs/${APP_NAME:-wallet-service-api}-${ACTIVE_PROFILE}.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/wallet-service-api-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{trace_id}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- Root -->
-    <root level="INFO">
+    <root level="${LOG_LEVEL}">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
         <appender-ref ref="OTEL"/>
     </root>
 

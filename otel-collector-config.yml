@@ -11,22 +11,17 @@ processors:
 
   memory_limiter:
     check_interval: 5s
-    limit_mib: 500
+    limit_mib: 400
     spike_limit_mib: 100
 
+  # Adiciona metadados úteis para você filtrar no Grafana depois
   resource:
     attributes:
       - key: service.name
         value: wallet-service-api
         action: insert
-      - key: job
-        value: "cont-${APP_NAME}"
-        action: insert
-      - key: container_name
-        value: "cont-${APP_NAME}"
-        action: insert
-      - key: env
-        value: "env-local"
+      - key: deployment.environment
+        value: "kind-local"
         action: insert
 
 connectors:
@@ -45,37 +40,26 @@ exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
 
+  # Jaeger via OTLP/HTTP (Porta 4318)
   otlphttp/jaeger:
     endpoint: "http://jaeger:4318"
     tls:
       insecure: true
 
-  loki:
-    endpoint: "http://loki:3100/loki/api/v1/push"
-    default_labels_enabled:
-      exporter: true
-      job: true
-      instance: true
-
-  logging:
-    verbosity: detailed
-
-  # Exporta traces pro Tempo via OTLP gRPC na rede Docker.
-  # Use o NOME DO SERVIÇO/CONTAINER que está na mesma network do collector.
-  otlphttp/tempo:
-    endpoint: http://tempo:4318
+  # Loki (Versão moderna via OTLP)
+  otlphttp/loki:
+    endpoint: "http://loki:3100/otlp/v1/logs"
     tls:
       insecure: true
-    retry_on_failure:
-      enabled: true
-      initial_interval: 5s
-      max_interval: 30s
-      max_elapsed_time: 300s
 
-  #otlp/tempo:
-  #  endpoint: tempo:4317
-  #  tls:
-  #    insecure: true
+  # Tempo via OTLP/HTTP (Porta 4318)
+  otlphttp/tempo:
+    endpoint: "http://tempo:4318"
+    tls:
+      insecure: true
+
+  logging:
+    verbosity: basic # Troque para 'detailed' se precisar debugar a chegada dos dados
 
 service:
   telemetry:
@@ -96,5 +80,4 @@ service:
     logs:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [loki, logging]
-
+      exporters: [otlphttp/loki, logging]

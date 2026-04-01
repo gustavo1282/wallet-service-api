@@ -47,6 +47,7 @@ class InicializeDataTest {
 
     protected static final Logger LOGGER = LogManager.getLogger(InicializeDataTest.class);
     protected static final boolean CREATE_JSON_MOCKS = true;
+    protected static final boolean LOAD_JSON_MOCKS = true;
 
     @Autowired
     protected DataPersistenceService dtPersistenceService;
@@ -92,7 +93,9 @@ class InicializeDataTest {
             dtPersistenceService.exportToJson(trnMockResult.getTransactions(), FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_TRANSACTION);
             dtPersistenceService.exportToJson(trnMockResult.getMovements(), FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_MOVIMENT);
             dtPersistenceService.exportToJson(trnMockResult.getDepositSenders(), FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_DEPOSIT_SENDER);
+        }
 
+        if (LOAD_JSON_MOCKS) {
             runDatabaseSeeder();                
         }
     }

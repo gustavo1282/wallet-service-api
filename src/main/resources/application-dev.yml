@@ -47,12 +47,6 @@ spring:
     username: ${WALLET_USER:wallet_user}
     password: ""
     #password: ${WALLET_PASS:wallet_pass}
-    
-    # Configuração para POSTGRES via arquivo
-    #url: jdbc:postgresql://host.docker.internal:5432/wallet_db
-    #driver-class-name: org.postgresql.Driver
-    #username: wallet_user
-    #password: wallet_pass
 
   h2:
     console:

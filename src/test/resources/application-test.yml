@@ -1,32 +1,26 @@
-# =========================
-# Vars usadas por placeholders (bootstrapping)
-# =========================
-APP_NAME: wallet-service-api
-PROFILE: test
-ENV: env-test
-WALLET_USER: wallet_user
-WALLET_PASS: wallet_pass
-JWT_SECRET: mock.jwt_token.profile_test.859jg89045j9045i
-MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
+# ===================================================================
+# APPLICATION-TEST.YML - AMBIENTE DE TESTE / DESENVOLVIMENTO LOCAL
+# Prioridade de Resolução: 
+# 1. vmArgs (-Dspring.jmx.enabled=false)
+# 2. env (Variaveis do launch.json)
+# 3. Valores default abaixo (:valor)
+# ===================================================================
 
 app:
-  api-prefix: /api/v1
+  api-prefix: ${API_PREFIX:/api/v1}
   security:
     crypto:
       strength: 4
   seeder:
-    enabled: false # Mude para true para executar a carga na inicialização
+    enabled: true
 
 server:
-  address: 0.0.0.0
-  port: 8080
-  #servlet:
-  #  context-path: /${APP_NAME}
+  port: 0 # Porta aleatória para evitar conflitos de 'Address already in use'
 
 spring:
   main:
     allow-bean-definition-overriding: true
-    lazy-initialization: true
+    lazy-initialization: false 
 
   autoconfigure:
     exclude:
@@ -44,72 +38,67 @@ spring:
 
   cloud:
     vault:
-      enabled: false
+      enabled: false # DESATIVADO: Evita travamento por falta de Telepresence
     bootstrap:
       enabled: false
 
   config:
     import: 
       - "optional:classpath:security-matchers.yml"
-      - "optional:vault://secret/wallet-service-api/local"
+      # SINALIZADO: Import de Vault comentado para garantir execução offline
+      # - "optional:vault://secret/wallet-service-api/local" 
 
   datasource:
-    url: jdbc:h2:file:./data/h2/wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    # PADRONIZADO: Uso de H2 para independência total de infraestrutura externa
     driver-class-name: org.h2.Driver
-    username: ${WALLET_USER:wallet_user}
+    url: jdbc:h2:mem:wallet_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
     password: ""
 
   h2:
     console:
-      enabled: true
-      path: /h2-console
+      enabled: false 
+
+  jmx:
+    enabled: false # DESATIVADO: Elimina exceções de RMI/JMX no console da IDE
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop 
     show-sql: true
+    properties:
+      hibernate.format_sql: true
 
   sql:
-      init:
-        mode: always
-
-
+    init:
+      mode: always
 
 management:
   endpoints:
-    enabled-by-default: false
-    web:
+    enabled-by-default: false 
+    jmx:
       exposure:
-        include: "*"
-      base-path: /actuator 
+        exclude: "*" 
   otlp:
     logging:
       enabled: false
-      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/logs
-      timeout: 90s
     tracing:
       enabled: false
-      endpoint: ${MANAGEMENT_OTLP_ENDPOINT}/traces
-      timeout: 90s
     metrics:
       export:
         enabled: false
-        otpl:
-          enabled: false
+  observations:
+    enabled: false # DESATIVADO: Remove overhead de telemetria nos testes
 
 logging:
+  level:
+    root: INFO
+    com.guga.walletserviceapi: DEBUG
   file:
+    # Resolve APP_NAME do launch.json ou usa o default
     name: logs/${APP_NAME:wallet-service-api}-test.log
-#  exception-conversion-word: "%wEx{5}"
-#  level:
-    # root: INFO
-    # #error:
-    # #  include-stacktrace: on-param
-    # com.guga.walletserviceapi: DEBUG
-    # org.springframework.web: DEBUG
-    # org.springframework.security: DEBUG
-    # org.springframework.beans.factory.support: DEBUG
 
 jwt:
-  secret: "${JWT_SECRET}"
+  # Resolve JWT_SECRET do launch.json ou usa o mock de teste
+  secret: "${JWT_SECRET:mock.jwt_token.profile_test.859jg89045j9045i}"

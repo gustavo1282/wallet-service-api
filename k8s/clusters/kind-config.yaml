@@ -1,0 +1,29 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30001
+    hostPort: 8080   # Wallet API
+  - containerPort: 30002
+    hostPort: 3000   # Grafana
+  - containerPort: 30003
+    hostPort: 8200   # Vault
+  - containerPort: 30004
+    hostPort: 16686  # Jaeger UI
+  - containerPort: 30005
+    hostPort: 5432   # Postgres (Direto p/ DBeaver)
+  - containerPort: 30006
+    hostPort: 5050   # pgAdmin (Interface Web do Banco)
+  - containerPort: 30090
+    hostPort: 9090   # Prometheus UI
+  - containerPort: 30093
+    hostPort: 9093   # Alertmanager UI
+  - containerPort: 30100
+    hostPort: 3100   # Loki API/UI
+  - containerPort: 30032
+    hostPort: 3200   # Tempo UI/API
+  - containerPort: 30087
+    hostPort: 9187   # Postgres Exporter metrics
+  - containerPort: 30069
+    hostPort: 14269  # Jaeger metrics
