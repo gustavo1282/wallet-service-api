@@ -1,4 +1,4 @@
-package com.guga.walletserviceapi.controller;
+﻿package com.guga.walletserviceapi.controller;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,10 +49,6 @@ public class WalletOperatorController {
     private final JwtAuthenticatedUserProvider authUserProvider;
     private final TransactionMapper transactionMapper;
 
-    // =====================================================
-    // ME CONTEXT - TRANSACTION EXTRACTS
-    // =====================================================
-
     @Operation(
         operationId = "walletoperator_01_get_my_recent_transactions",
         summary = "Get my recent transactions (all types)",
@@ -62,15 +58,21 @@ public class WalletOperatorController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<TransactionResponseDTO>> getMyRecentTransactions() {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-        AuditLogger.log("TRANSACTION_LIST_ALL_ME", auditCtx);
+        LOGGER.info(LogMarkers.LOG, "WALLET_OPERATOR_LIST_RECENT | walletId={}", auditCtx.getWalletId());
 
         Pageable pageable = GlobalHelper.getDefaultPageable();
-
         Page<Transaction> trnResult = transactionService.getTransactionsByLimitMax(auditCtx.getWalletId(), pageable);
 
-        return (trnResult != null)
-            ? ResponseEntity.ok(trnResult.map(transactionMapper::toDto))
-            : ResponseEntity.ok(Page.empty());
+        Page<TransactionResponseDTO> response = (trnResult != null)
+            ? trnResult.map(transactionMapper::toDto)
+            : Page.empty();
+
+        AuditLogger.log(
+            "TRANSACTION_LIST_ALL_ME",
+            auditCtx.toBuilder().info("rows=" + response.getNumberOfElements()).build()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -120,8 +122,7 @@ public class WalletOperatorController {
     @Operation(
         operationId = "walletoperator_06_search_my_transactions_by_period",
         summary = "Search my transactions by period",
-        description = "Searches transactions for the authenticated user's wallet between startDate and endDate. "
-                    + "If endDate is not provided, it defaults to now."
+        description = "Searches transactions for the authenticated user's wallet between startDate and endDate. If endDate is not provided, it defaults to now."
     )
     @GetMapping("/me/transactions/period")
     @PreAuthorize("hasRole('USER')")
@@ -133,19 +134,22 @@ public class WalletOperatorController {
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : LocalDateTime.now();
 
-        Pageable pageable = GlobalHelper.getDefaultPageable();
-
-        AuditLogger.log("TRANSACTION_LIST_PERIOD_ME", auditCtx);
-        return ResponseEntity.ok(
-            transactionService
-                .findByWalletIdAndCreatedAtBetween(auditCtx.getWalletId(), start, end, pageable)
-                .map(transactionMapper::toDto)
+        LOGGER.info(LogMarkers.LOG, "WALLET_OPERATOR_LIST_PERIOD | walletId={} start={} end={}",
+            auditCtx.getWalletId(), start, end
         );
-    }
 
-    // =====================================================
-    // ADMIN CONTEXT - MAINTENANCE & UPLOADS (ROLE_ADMIN)
-    // =====================================================
+        Pageable pageable = GlobalHelper.getDefaultPageable();
+        Page<TransactionResponseDTO> result = transactionService
+            .findByWalletIdAndCreatedAtBetween(auditCtx.getWalletId(), start, end, pageable)
+            .map(transactionMapper::toDto);
+
+        AuditLogger.log(
+            "TRANSACTION_LIST_PERIOD_ME",
+            auditCtx.toBuilder().info("start=" + start + ",end=" + end + ",rows=" + result.getNumberOfElements()).build()
+        );
+
+        return ResponseEntity.ok(result);
+    }
 
     @Operation(
         operationId = "walletoperator_07_admin_upload_customers_csv",
@@ -155,7 +159,23 @@ public class WalletOperatorController {
     @PostMapping("/uploads/customers")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> uploadCustomers(@RequestParam MultipartFile file) {
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+
+        LOGGER.info(LogMarkers.LOG, "WALLET_OPERATOR_UPLOAD_CUSTOMERS | admin={} file={}",
+            auditCtx.getUsername(), file.getOriginalFilename()
+        );
+        AuditLogger.log(
+            "WALLET_OPERATOR_UPLOAD_CUSTOMERS [START]",
+            auditCtx.toBuilder().info("file=" + file.getOriginalFilename()).build()
+        );
+
         customerService.importCustomers(file);
+
+        AuditLogger.log(
+            "WALLET_OPERATOR_UPLOAD_CUSTOMERS [SUCCESS]",
+            auditCtx.toBuilder().info("file=" + file.getOriginalFilename()).build()
+        );
+
         return ResponseEntity.ok("Customers uploaded successfully");
     }
 
@@ -167,29 +187,47 @@ public class WalletOperatorController {
     @PostMapping("/uploads/transactions")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> uploadTransactions(@RequestParam MultipartFile file) {
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+
+        LOGGER.info(LogMarkers.LOG, "WALLET_OPERATOR_UPLOAD_TRANSACTIONS | admin={} file={}",
+            auditCtx.getUsername(), file.getOriginalFilename()
+        );
+        AuditLogger.log(
+            "WALLET_OPERATOR_UPLOAD_TRANSACTIONS [START]",
+            auditCtx.toBuilder().info("file=" + file.getOriginalFilename()).build()
+        );
+
         transactionService.importTransactions(file);
+
+        AuditLogger.log(
+            "WALLET_OPERATOR_UPLOAD_TRANSACTIONS [SUCCESS]",
+            auditCtx.toBuilder().info("file=" + file.getOriginalFilename()).build()
+        );
+
         return ResponseEntity.ok("Transactions uploaded successfully");
     }
 
-    // =====================================================
-    // PRIVATE HELPERS
-    // =====================================================
-
     private ResponseEntity<Page<TransactionResponseDTO>> listMyTransactionsByOperation(OperationType operation) {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-        AuditLogger.log("TRANSACTION_LIST_" + operation.name() + "_ME", auditCtx);
 
         Pageable pageable = GlobalHelper.getDefaultPageable();
-
         Page<Transaction> trnResult = transactionService.filterTransactionByWalletIdAndOperationType(
             auditCtx.getWalletId(), operation, pageable
         );
 
-        // (Opcional) log: como é um endpoint "hub", pode ser útil
-        LOGGER.info(LogMarkers.LOG, "WALLET_OPERATOR_LIST | walletId={} operation={}", auditCtx.getWalletId(), operation);
+        LOGGER.info(LogMarkers.LOG, "WALLET_OPERATOR_LIST | walletId={} operation={}",
+            auditCtx.getWalletId(), operation
+        );
 
-        return (trnResult != null)
-            ? ResponseEntity.ok(trnResult.map(transactionMapper::toDto))
-            : ResponseEntity.ok(Page.empty());
+        Page<TransactionResponseDTO> response = (trnResult != null)
+            ? trnResult.map(transactionMapper::toDto)
+            : Page.empty();
+
+        AuditLogger.log(
+            "TRANSACTION_LIST_" + operation.name() + "_ME",
+            auditCtx.toBuilder().info("operation=" + operation + ",rows=" + response.getNumberOfElements()).build()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

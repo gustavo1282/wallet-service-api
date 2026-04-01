@@ -19,7 +19,7 @@ MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
 app:
   api-prefix: ${API_PREFIX}
   seeder:
-    enabled: false # Mude para true para executar a carga na inicialização
+    enabled: true # Mude para true para executar a carga na inicialização
 
 server:
   address: 0.0.0.0
@@ -38,7 +38,7 @@ spring:
       ##- "optional:vault://v1/secret/data/${APP_NAME}/${PROFILE}"
       ##- "optional:vault://secret/${APP_NAME}/${PROFILE}"
     active:
-      on-profile: local
+      on-profile: ${PROFILE}
   cloud:
     bootstrap:
       enabled: false  # Desativa o carregamento do bootstrap.yml
@@ -46,13 +46,7 @@ spring:
       enabled: false
       ssl:
         enabled: false
-      #authentication: TOKEN
-      #kv:
-      #  enabled: true
-      #  backend: secret
-      #  version: 2
-      #  default-context: ${APP_NAME}
-      #  profiles: ${PROFILE:local}
+
   data:
     web:
       pageable:
@@ -82,9 +76,6 @@ spring:
   threads:
     virtual:
       enabled: true # Opcional, mas recomendado para Java 21+
-  #mvc:
-    #servlet:
-      #path: /api/v1
 
 springdoc:
   #paths-to-match: "${API_PREFIX}/**"
@@ -153,10 +144,6 @@ springdoc:
     try-it-out-enabled: 'false'
     operationsSorter: operationId # Define a ordenação por operationId
     custom-js: /swagger-ui/custom.js
-    #tagsSorter: none
-    ## groups-order: ASC
-  #use-root-path: true
-
 
 management:
   endpoints:
@@ -168,10 +155,12 @@ management:
       show-details: always
     prometheus:
       enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true # novo padrão recomendado
+
   # --- Configuração OTLP (Logs, Traces e Metrics) ---
   otlp:
     logs:
@@ -183,8 +172,6 @@ management:
         url: "http://otel-collector:4318/v1/metrics"
         step: 10s
 
-
-
 logging:
   # Mantive seus redirecionamentos de saída
   stderr:
@@ -192,41 +179,46 @@ logging:
   stdout:
     level: DEBUG
   file:
-    name: logs/${APP_NAME:wallet-service-api}.log
+    name: logs/${APP_NAME:wallet-service-api}-${PROFILE}.log
   exception-conversion-word: "%wEx{5}"  
   level:
     # --- Raiz e Projeto ---
-    root: DEBUG
-    com.guga.walletserviceapi: DEBUG
-    com.guga.walletserviceapi.security: DEBUG
+    root: INFO
+    com.guga.walletserviceapi: INFO
+    com.guga.walletserviceapi.security: INFO
 
     # --- opentelemetry --
-    io.opentelemetry: DEBUG
-    io.opentelemetry.exporter.otlp: DEBUG
+    io.opentelemetry: INFO
+    io.opentelemetry.exporter.otlp: INFO
 
     # --- Silenciamento (Actuator/Tomcat) ---
-    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR
-    org.apache.tomcat.util.http.Parameters: ERROR
+    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: INFO
+    org.springframework.boot.context.config: INFO
+    org.apache.tomcat.util.http.Parameters: INFO
 
     # --- Spring Web e Endpoints (Seus Debugs Específicos) ---
-    org.springframework.web: DEBUG
-    org.springframework.web.servlet.DispatcherServlet: DEBUG
-    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+    org.springframework.web: INFO
+    org.springframework.web.servlet.DispatcherServlet: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: INFO
 
     # --- Spring Security (Sua rastreabilidade de filtros) ---
-    org.springframework.security: DEBUG
-    org.springframework.security.web.FilterChainProxy: DEBUG
-    org.springframework.security.web.authentication.AnonymousAuthenticationFilter: DEBUG
+    org.springframework.security: INFO
+    org.springframework.security.web.FilterChainProxy: INFO
+    org.springframework.security.web.authentication.AnonymousAuthenticationFilter: INFO
 
     # --- Infraestrutura e Testes ---
-    org.springframework.test: DEBUG
-    org.springframework.core.env: DEBUG
+    org.springframework.test: INFO
+    org.springframework.core.env: INFO
     org.hibernate: INFO
 
     # --- Cloud, Vault e OTel (Corrigidos para o nível certo) ---
-    org.springframework.cloud.vault: DEBUG
-    org.springframework.vault: DEBUG
-    org.springframework.boot.actuate.autoconfigure.logging.otlp: DEBUG
+    org.springframework.vault.core.env: INFO
+    org.springframework.cloud.vault: INFO
+    org.springframework.cloud.vault.config: INFO
+    org.springframework.vault: INFO
+    org.springframework.vault.client: INFO
+    org.springframework.boot.actuate.autoconfigure.logging.otlp: INFO
 
     # --- Seu Filtro Customizado (Jwt) ---
     # com.guga.walletserviceapi.security.JwtAuthenticationFilter: ERROR
+

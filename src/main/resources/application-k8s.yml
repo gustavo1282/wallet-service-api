@@ -1,0 +1,80 @@
+﻿# ===================================================================
+# APPLICATION-K8S.YML - AMBIENTE DE KUBERNETES / TELEPRESENCE
+# ===================================================================
+
+app:
+  seeder:
+    enabled: true
+
+server:
+  address: 0.0.0.0
+  port: 8080
+  servlet:
+    context-path: /${APP_NAME:wallet-service-api}
+
+spring:
+  config:
+    import:
+      - "optional:classpath:security-matchers.yml"
+  
+  cloud:
+    vault:
+      fail-fast: true
+      enabled: ${SPRING_CLOUD_VAULT_ENABLED:false}
+      uri: ${VAULT_URI:http://localhost:8200}
+      authentication: TOKEN
+      token: ${VAULT_TOKEN:root}
+      scheme: http
+      kv:
+        enabled: true
+        backend: secret
+        version: 2
+        default-context: ${APP_NAME:wallet-service-api}
+        profiles: ${PROFILE:k8s}
+    bootstrap:
+      enabled: false
+
+  datasource:
+    # Fase de estabilizacao sem Vault: valores via Secret K8s
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/wallet_db}
+    username: ${SPRING_DATASOURCE_USERNAME:wallet_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:wallet_pass}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  security:
+    user:
+      name: ${WALLET_USER:wallet_user}
+      password: ${WALLET_PASS:wallet_pass}
+      roles: [ADMIN, USER]
+
+management:
+  otlp:
+    logs:
+      endpoint: "${MANAGEMENT_OTLP_ENDPOINT:http://otel-collector:4318}/v1/logs"
+  logs:
+    export:
+      enabled: true
+
+logging:
+  stderr:
+    level: ERROR
+  stdout:
+    level: INFO
+  file:
+    name: logs/${APP_NAME:wallet-service-api}-${PROFILE:k8s}.log
+  exception-conversion-word: "%wEx{5}"  
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.guga.walletserviceapi: INFO
+    io.opentelemetry: INFO
+    org.springframework.vault: TRACE
+    org.springframework.cloud.vault: TRACE
+    # Silenciamento de ruídos repetitivos
+    org.apache.tomcat.util.http.Parameters: ERROR
+    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR

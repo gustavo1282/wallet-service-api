@@ -7,13 +7,14 @@ security:
       - "/h2-console/**"
       - "/api/v1/auth/**"
       - "/api/v1/params/list"
+      - "api/v1/seeder/admin/run"
       # Observabilidade (Básica)
       #- "/actuator/health"
       #- "/actuator/info"
       #- "/actuator/prometheus"
       #- "/actuator/metrics"
       - "/actuator/**"        # Todos os outros dados sensíveis do Actuator
-      - "/api/v1/alerts/**"
+      - "/api/v1/alerts/**"      
 
     documentation:
       # Documentação

@@ -1,0 +1,108 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: wallet-api
+spec:
+  type: NodePort
+  selector:
+    app: wallet-api
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallet-api
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: wallet-api
+  template:
+    metadata:
+      labels:
+        app: wallet-api
+    spec:
+      containers:
+      - name: wallet-api
+        image: wallet-service-api:1.0.9
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        
+        # 1. Limites de Recursos para nÃ£o travar o Docker Desktop
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
+
+        # 2. Health Checks AutomÃ¡ticos (Spring Actuator)
+        startupProbe:
+          httpGet:
+            path: /wallet-service-api/actuator/health/liveness
+            port: 8080
+          periodSeconds: 10
+          failureThreshold: 60
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /wallet-service-api/actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 0
+          periodSeconds: 15
+          failureThreshold: 6
+          timeoutSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /wallet-service-api/actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          failureThreshold: 12
+          timeoutSeconds: 2
+
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: "k8s"
+          - name: APP_SEEDER_ENABLED
+            value: "true"
+          - name: SPRING_DATASOURCE_URL
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: spring.datasource.url
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: spring.datasource.username
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: spring.datasource.password
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: jwt.secret
+
+          # Observabilidade
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://otel-collector:4318"
+          - name: OTEL_SERVICE_NAME
+            value: "wallet-service-api"
+          # Adicionado para garantir logs no formato certo
+          - name: LOGGING_LEVEL_ROOT
+            value: "DEBUG"

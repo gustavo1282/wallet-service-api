@@ -1,4 +1,4 @@
-package com.guga.walletserviceapi.controller;
+﻿package com.guga.walletserviceapi.controller;
 
 import java.net.URI;
 
@@ -51,10 +51,6 @@ public class CustomerController {
     private final JwtAuthenticatedUserProvider authUserProvider;
     private final CustomerMapper customerMapper;
 
-    // =====================================================
-    // USER CONTEXT
-    // =====================================================
-
     @Operation(
         operationId = "cust_01_get_customer_me",
         summary = "Get authenticated customer profile",
@@ -69,6 +65,13 @@ public class CustomerController {
 
         LOGGER.info(LogMarkers.LOG,
             "GET_CUSTOMER_ME | customerId={} login={}", customerId, authDetails.getLogin()
+        );
+
+        AuditLogger.log(
+            "CUSTOMER_GET_ME",
+            AuditLogContext.from(authDetails).toBuilder()
+                .info("customerId=" + customerId)
+                .build()
         );
 
         return ResponseEntity.ok(
@@ -86,7 +89,6 @@ public class CustomerController {
     public ResponseEntity<CustomerResponseDTO> updateMyCustomer(
         @RequestBody @Valid CustomerUpdateDTO dto
     ) {
-        // 1. Extrai o ID do cliente diretamente do contexto de segurança (Token)
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Long customerId = auditCtx.getCustomerId();
 
@@ -94,19 +96,18 @@ public class CustomerController {
             customerId, auditCtx.getUsername()
         );
 
-        AuditLogger.log("CUSTOMER_UPDATE_ME", auditCtx);
+        AuditLogger.log("CUSTOMER_UPDATE_ME [START]", auditCtx);
 
         Customer customerUpdate = customerMapper.toEntity(dto);
-        // Customer customerUpdate = customerMapper.toEntity(dto); // Será usado após a criação do mapper
-        // 2. Chama o serviço passando o ID extraído do token
-        return ResponseEntity.ok(
-            customerMapper.toDto(customerService.updateCustomer(customerId, customerUpdate))
-        );
-    }
+        Customer updatedCustomer = customerService.updateCustomer(customerId, customerUpdate);
 
-    // =====================================================
-    // ADMIN CONTEXT
-    // =====================================================
+        AuditLogger.log(
+            "CUSTOMER_UPDATE_ME [SUCCESS]",
+            auditCtx.toBuilder().info("customerId=" + updatedCustomer.getCustomerId()).build()
+        );
+
+        return ResponseEntity.ok(customerMapper.toDto(updatedCustomer));
+    }
 
     @Operation(
         operationId = "cust_03_list_customers",
@@ -117,12 +118,31 @@ public class CustomerController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<CustomerResponseDTO>> listCustomers(
         @RequestParam(required = false) Status status
-        //@RequestParam(defaultValue = "0") int page
     ) {
-        Pageable pageable = GlobalHelper.getDefaultPageable();
-        return ResponseEntity.ok(customerService.filterByStatus(status, pageable).map(customerMapper::toDto));
-    }
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
+        AuditLogger.log("CUSTOMER_LIST [START]", auditCtx);
+
+        LOGGER.info(LogMarkers.LOG, "LIST_CUSTOMERS | status={} admin={}",
+            status, auditCtx.getUsername()
+        );
+
+        Pageable pageable = GlobalHelper.getDefaultPageable();
+        Page<CustomerResponseDTO> result = customerService
+            .filterByStatus(status, pageable)
+            .map(customerMapper::toDto);
+
+        LOGGER.info(LogMarkers.LOG, "LIST_CUSTOMERS_RESULT | returnedRows={} admin={}",
+            result.getNumberOfElements(), auditCtx.getUsername()
+        );
+
+        AuditLogger.log(
+            "CUSTOMER_LIST [SUCCESS]",
+            auditCtx.toBuilder().info("rows=" + result.getNumberOfElements()).build()
+        );
+
+        return ResponseEntity.ok(result);
+    }
 
     @Operation(
         operationId = "cust_04_create_customer",
@@ -142,6 +162,8 @@ public class CustomerController {
             auditContext.getUsername()
         );
 
+        AuditLogger.log("CUSTOMER_CREATE [START]", auditContext);
+
         Customer customer = customerMapper.toEntity(dto);
         Customer createdCustomer = customerService.saveCustomer(customer);
 
@@ -151,12 +173,16 @@ public class CustomerController {
             .buildAndExpand(createdCustomer.getCustomerId())
             .toUri();
 
+        AuditLogger.log(
+            "CUSTOMER_CREATE [SUCCESS]",
+            auditContext.toBuilder().info("customerId=" + createdCustomer.getCustomerId()).build()
+        );
+
         return ResponseEntity
             .created(location)
-            .header("X-Trace-Id", auditContext.getTraceId()) // TODO: Verificar se o traceId está sendo gerado corretamente
+            .header("X-Trace-Id", auditContext.getTraceId())
             .body(customerMapper.toDto(createdCustomer));
     }
-
 
     @Operation(
         operationId = "cust_05_get_customer",
@@ -167,12 +193,17 @@ public class CustomerController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CustomerResponseDTO> getCustomerById(
         @PathVariable Long id
-        ) 
-    {
+    ) {
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
         LOGGER.info(LogMarkers.LOG,
             "GET_CUSTOMER_BY_ID | admin={} customerId={}",
-            authUserProvider.getLogin(), id
+            auditCtx.getUsername(), id
+        );
+
+        AuditLogger.log(
+            "CUSTOMER_GET_BY_ID",
+            auditCtx.toBuilder().info("customerId=" + id).build()
         );
 
         return ResponseEntity.ok(
@@ -191,14 +222,22 @@ public class CustomerController {
         @PathVariable Long id,
         @RequestBody @Valid CustomerUpdateDTO dto
     ) {
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
         LOGGER.info(LogMarkers.LOG, "UPDATE_CUSTOMER | admin={} customerId={}",
-            authUserProvider.getLogin(), id
+            auditCtx.getUsername(), id
         );
 
+        AuditLogger.log("CUSTOMER_UPDATE [START]", auditCtx);
+
         Customer customerUpdate = customerMapper.toEntity(dto);
-        return ResponseEntity.ok(customerMapper.toDto(customerService.updateCustomer(id, customerUpdate)));
+        Customer updatedCustomer = customerService.updateCustomer(id, customerUpdate);
 
+        AuditLogger.log(
+            "CUSTOMER_UPDATE [SUCCESS]",
+            auditCtx.toBuilder().info("customerId=" + updatedCustomer.getCustomerId()).build()
+        );
+
+        return ResponseEntity.ok(customerMapper.toDto(updatedCustomer));
     }
-
 }

@@ -70,14 +70,18 @@ public class TransactionController {
         AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
         Long walletId = auditCtx.getWalletId();
 
-        Pageable pageable = GlobalHelper.getDefaultPageable();
+        LOGGER.info(LogMarkers.LOG, "LIST_MY_TRANSACTIONS | walletId={} status={}", walletId, status);
 
-        AuditLogger.log("TRANSACTION_LIST_ME", auditCtx);
-        return ResponseEntity.ok(
-            transactionService
-                .filterTransactionByWalletIdAndProcessType(walletId, status, pageable)
-                .map(transactionMapper::toDto)
+        Pageable pageable = GlobalHelper.getDefaultPageable();
+        Page<TransactionResponseDTO> result = transactionService
+            .filterTransactionByWalletIdAndProcessType(walletId, status, pageable)
+            .map(transactionMapper::toDto);
+
+        AuditLogger.log(
+            "TRANSACTION_LIST_ME",
+            auditCtx.toBuilder().info("rows=" + result.getNumberOfElements()).build()
         );
+        return ResponseEntity.ok(result);
     }
 
 
@@ -99,7 +103,10 @@ public class TransactionController {
             throw new ResourceBadRequestException("Access denied: This transaction does not belong to your wallet.");
         }
 
-        AuditLogger.log("TRANSACTION_GET_BY_ID_ME", auditCtx);
+        AuditLogger.log(
+            "TRANSACTION_GET_BY_ID_ME",
+            auditCtx.toBuilder().info("transactionId=" + id).build()
+        );
         return ResponseEntity.ok(transactionMapper.toDto(transaction));
     }
 
@@ -173,7 +180,10 @@ public class TransactionController {
             .buildAndExpand(deposit.getTransactionId())
             .toUri();
 
-        AuditLogger.log("TRANSACTION_DEPOSIT [SUCCESS]", auditCtx);
+        AuditLogger.log(
+            "TRANSACTION_DEPOSIT [SUCCESS]",
+            auditCtx.toBuilder().info("transactionId=" + deposit.getTransactionId()).build()
+        );
         return ResponseEntity.created(location).body(transactionMapper.toDto(deposit));
     }
 
@@ -195,7 +205,10 @@ public class TransactionController {
 
         Transaction transaction = transactionService.saveWithdrawMoney(walletId, dto.amount());
 
-        AuditLogger.log("TRANSACTION_WITHDRAW [SUCCESS]", auditCtx);
+        AuditLogger.log(
+            "TRANSACTION_WITHDRAW [SUCCESS]",
+            auditCtx.toBuilder().info("transactionId=" + transaction.getTransactionId()).build()
+        );
         return ResponseEntity.ok(transactionMapper.toDto(transaction));
     }
 
@@ -220,7 +233,10 @@ public class TransactionController {
         TransferMoneySend transfer =
             transactionService.saveTransferMoneySend(walletIdSend, dto.walletIdReceived(), dto.amount());
 
-        AuditLogger.log("TRANSACTION_TRANSFER [SUCCESS]", auditCtx);
+        AuditLogger.log(
+            "TRANSACTION_TRANSFER [SUCCESS]",
+            auditCtx.toBuilder().info("transactionId=" + transfer.getTransactionId()).build()
+        );
         return ResponseEntity.ok(transactionMapper.toDto(transfer));
     }
 
@@ -232,7 +248,20 @@ public class TransactionController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TransactionResponseDTO> getTransactionById(@PathVariable Long id) {
-        return ResponseEntity.ok(transactionMapper.toDto(transactionService.getTransactionById(id)));
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
+
+        LOGGER.info(LogMarkers.LOG, "GET_TRANSACTION_BY_ID | transactionId={} admin={}",
+            id, auditCtx.getUsername()
+        );
+
+        Transaction transaction = transactionService.getTransactionById(id);
+
+        AuditLogger.log(
+            "TRANSACTION_GET_BY_ID",
+            auditCtx.toBuilder().info("transactionId=" + id).build()
+        );
+
+        return ResponseEntity.ok(transactionMapper.toDto(transaction));
     }
 
     @Operation(
@@ -246,13 +275,23 @@ public class TransactionController {
         @PathVariable Long id,
         @RequestParam(required = false) StatusTransaction type
     ) {
-        Pageable pageable = GlobalHelper.getDefaultPageable();
+        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
 
-        return ResponseEntity.ok(
-            transactionService
-                .filterTransactionByWalletIdAndProcessType(id, type, pageable)
-                .map(transactionMapper::toDto)
+        LOGGER.info(LogMarkers.LOG, "LIST_TRANSACTIONS_BY_WALLET | walletId={} type={} admin={}",
+            id, type, auditCtx.getUsername()
         );
+
+        Pageable pageable = GlobalHelper.getDefaultPageable();
+        Page<TransactionResponseDTO> result = transactionService
+            .filterTransactionByWalletIdAndProcessType(id, type, pageable)
+            .map(transactionMapper::toDto);
+
+        AuditLogger.log(
+            "TRANSACTION_LIST_BY_WALLET",
+            auditCtx.toBuilder().info("walletId=" + id + ",rows=" + result.getNumberOfElements()).build()
+        );
+
+        return ResponseEntity.ok(result);
     }
 
     private ResponseEntity<Page<TransactionResponseDTO>> listMyTransactionsByOperation(OperationType operation) {
@@ -263,13 +302,15 @@ public class TransactionController {
         LOGGER.info(LogMarkers.LOG, "LIST_MY_TRANSACTIONS | walletId={} operation={} limit=150", walletId, operation);
 
         String auditTag = "TRANSACTION_LIST_" + operation.name() + "_ME";
-        AuditLogger.log(auditTag, auditCtx);
-
-        return ResponseEntity.ok(
-            transactionService
-                .filterTransactionByWalletIdAndOperationType(walletId, operation, limitPageable)
-                .map(transactionMapper::toDto)
+        Page<TransactionResponseDTO> result = transactionService
+            .filterTransactionByWalletIdAndOperationType(walletId, operation, limitPageable)
+            .map(transactionMapper::toDto);
+        AuditLogger.log(
+            auditTag,
+            auditCtx.toBuilder().info("rows=" + result.getNumberOfElements()).build()
         );
+
+        return ResponseEntity.ok(result);
     }
 
 
