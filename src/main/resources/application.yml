@@ -183,37 +183,42 @@ logging:
   exception-conversion-word: "%wEx{5}"  
   level:
     # --- Raiz e Projeto ---
-    root: DEBUG
-    com.guga.walletserviceapi: DEBUG
-    com.guga.walletserviceapi.security: DEBUG
+    root: INFO
+    com.guga.walletserviceapi: INFO
+    com.guga.walletserviceapi.security: INFO
 
     # --- opentelemetry --
-    io.opentelemetry: DEBUG
-    io.opentelemetry.exporter.otlp: DEBUG
+    io.opentelemetry: INFO
+    io.opentelemetry.exporter.otlp: INFO
 
     # --- Silenciamento (Actuator/Tomcat) ---
-    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR
-    org.apache.tomcat.util.http.Parameters: ERROR
+    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: INFO
+    org.springframework.boot.context.config: INFO
+    org.apache.tomcat.util.http.Parameters: INFO
 
     # --- Spring Web e Endpoints (Seus Debugs Específicos) ---
-    org.springframework.web: DEBUG
-    org.springframework.web.servlet.DispatcherServlet: DEBUG
-    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+    org.springframework.web: INFO
+    org.springframework.web.servlet.DispatcherServlet: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: INFO
 
     # --- Spring Security (Sua rastreabilidade de filtros) ---
-    org.springframework.security: DEBUG
-    org.springframework.security.web.FilterChainProxy: DEBUG
-    org.springframework.security.web.authentication.AnonymousAuthenticationFilter: DEBUG
+    org.springframework.security: INFO
+    org.springframework.security.web.FilterChainProxy: INFO
+    org.springframework.security.web.authentication.AnonymousAuthenticationFilter: INFO
 
     # --- Infraestrutura e Testes ---
-    org.springframework.test: DEBUG
-    org.springframework.core.env: DEBUG
+    org.springframework.test: INFO
+    org.springframework.core.env: INFO
     org.hibernate: INFO
 
     # --- Cloud, Vault e OTel (Corrigidos para o nível certo) ---
-    org.springframework.cloud.vault: DEBUG
-    org.springframework.vault: DEBUG
-    org.springframework.boot.actuate.autoconfigure.logging.otlp: DEBUG
+    org.springframework.vault.core.env: INFO
+    org.springframework.cloud.vault: INFO
+    org.springframework.cloud.vault.config: INFO
+    org.springframework.vault: INFO
+    org.springframework.vault.client: INFO
+    org.springframework.boot.actuate.autoconfigure.logging.otlp: INFO
 
     # --- Seu Filtro Customizado (Jwt) ---
     # com.guga.walletserviceapi.security.JwtAuthenticationFilter: ERROR
+

@@ -16,6 +16,9 @@ spec:
     - name: metrics
       port: 8889
       targetPort: 8889
+    - name: prom-internal
+      port: 8888
+      targetPort: 8888
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,6 +42,7 @@ spec:
         - containerPort: 4317
         - containerPort: 4318
         - containerPort: 8889
+        - containerPort: 8888
         volumeMounts:
         - name: otel-config-vol
           mountPath: /etc/otel-collector-config.yaml

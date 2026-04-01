@@ -9,6 +9,8 @@ spec:
   ports:
     - name: http
       port: 3100
+      targetPort: 3100
+      nodePort: 30100
 ---
 apiVersion: apps/v1
 kind: Deployment

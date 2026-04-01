@@ -1,53 +1,45 @@
-# =========================
-# Vars usadas por placeholders (bootstrapping)
-# =========================
-APP_NAME: wallet-service-api
-PROFILE: k8s
-API_PREFIX: /api/v1
-ENV: env-k8s
-WALLET_USER: wallet_user
-WALLET_PASS: wallet_pass
-JWT_SECRET: mock.jwt_token.appconfig.k8s.859jg89045j9045i
-MANAGEMENT_OTLP_ENDPOINT: http://otel-collector:4318
+﻿# ===================================================================
+# APPLICATION-K8S.YML - AMBIENTE DE KUBERNETES / TELEPRESENCE
+# ===================================================================
 
 app:
   seeder:
-    enabled: true # Mude para true para executar a carga na inicialização
+    enabled: true
+
 server:
   address: 0.0.0.0
-  port: 8081
+  port: 8080
   servlet:
-    context-path: /${APP_NAME}
+    context-path: /${APP_NAME:wallet-service-api}
 
 spring:
   config:
-    import: 
+    import:
       - "optional:classpath:security-matchers.yml"
-      #- "optional:vault:8200/v1/secret/data/${APP_NAME}/${PROFILE}"
+  
   cloud:
     vault:
-      enabled: true
-      uri: http://vault:8200
+      fail-fast: true
+      enabled: ${SPRING_CLOUD_VAULT_ENABLED:false}
+      uri: ${VAULT_URI:http://localhost:8200}
       authentication: TOKEN
-      token: root
+      token: ${VAULT_TOKEN:root}
       scheme: http
       kv:
         enabled: true
         backend: secret
         version: 2
-        #authentication: TOKEN
-        default-context: wallet-service-api
-        profiles: k8s
+        default-context: ${APP_NAME:wallet-service-api}
+        profiles: ${PROFILE:k8s}
     bootstrap:
       enabled: false
 
-
   datasource:
-    # Configuração para POSTGRES via arquivo
+    # Fase de estabilizacao sem Vault: valores via Secret K8s
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/wallet_db
-    username: wallet_user
-    password: wallet_pass
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/wallet_db}
+    username: ${SPRING_DATASOURCE_USERNAME:wallet_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:wallet_pass}
 
   jpa:
     hibernate:
@@ -59,16 +51,30 @@ spring:
     user:
       name: ${WALLET_USER:wallet_user}
       password: ${WALLET_PASS:wallet_pass}
-      roles:
-        - ADMIN
-        - USER
+      roles: [ADMIN, USER]
 
 management:
   otlp:
     logs:
-      endpoint: "http://otel-collector:4318/v1/logs"
+      endpoint: "${MANAGEMENT_OTLP_ENDPOINT:http://otel-collector:4318}/v1/logs"
   logs:
     export:
-      enabled: true # FORÇA a exportação dos logs via OTLP
+      enabled: true
 
-
+logging:
+  stderr:
+    level: ERROR
+  stdout:
+    level: INFO
+  file:
+    name: logs/${APP_NAME:wallet-service-api}-${PROFILE:k8s}.log
+  exception-conversion-word: "%wEx{5}"  
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.guga.walletserviceapi: INFO
+    io.opentelemetry: INFO
+    org.springframework.vault: TRACE
+    org.springframework.cloud.vault: TRACE
+    # Silenciamento de ruídos repetitivos
+    org.apache.tomcat.util.http.Parameters: ERROR
+    org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR

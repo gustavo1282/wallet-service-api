@@ -9,6 +9,7 @@ spec:
   ports:
     - port: 9187
       targetPort: 9187
+      nodePort: 30087
 ---
 apiVersion: apps/v1
 kind: Deployment

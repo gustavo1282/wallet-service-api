@@ -1,8 +1,21 @@
-﻿apiVersion: apps/v1
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: cadvisor
+  namespace: kube-system
+spec:
+  selector:
+    name: cadvisor
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: cadvisor
-  namespace: kube-system # Geralmente cAdvisor fica aqui, mas pode manter o seu padrÃ£o
+  namespace: kube-system # Geralmente cAdvisor fica aqui, mas pode manter o seu padrão
 spec:
   selector:
     matchLabels:
@@ -12,7 +25,6 @@ spec:
       labels:
         name: cadvisor
     spec:
-      # REMOVIDO: type: NodePort (Isso nÃ£o existe aqui)
       containers:
       - name: cadvisor
         image: gcr.io/cadvisor/cadvisor:v0.49.1

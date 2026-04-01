@@ -10,9 +10,14 @@ spec:
     - name: ui
       port: 16686
       nodePort: 30004
+    - name: metrics
+      port: 14269
+      targetPort: 14269
+      nodePort: 30069
     - name: otlp-grpc # <--- Mude de 4318 para 4317 (gRPC)
       port: 4317
       targetPort: 4317
+      nodePort: 31687
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,4 +40,5 @@ spec:
             value: "true"
         ports:
           - containerPort: 16686
+          - containerPort: 14269
           - containerPort: 4317 # <--- Exponha a 4317 no container tambÃ©m

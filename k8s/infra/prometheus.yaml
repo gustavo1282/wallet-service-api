@@ -30,16 +30,29 @@ spec:
         args:
           - "--config.file=/etc/prometheus/prometheus.yml"
           - "--storage.tsdb.path=/prometheus"
+          - "--web.enable-lifecycle"
         volumeMounts:
           - name: config-volume
-            mountPath: /etc/prometheus/prometheus.yml
-            subPath: prometheus.yml
+            mountPath: /etc/prometheus
+          - name: rules-volume
+            mountPath: /etc/prometheus/rules
           - name: prometheus-data
             mountPath: /prometheus
       volumes:
         - name: config-volume
           configMap:
             name: prometheus-config
+            items:
+              - key: prometheus.yml
+                path: prometheus.yml
+        - name: rules-volume
+          configMap:
+            name: prometheus-config
+            items:
+              - key: http_otel_compat.yml
+                path: http_otel_compat.yml
+              - key: wallet-alerts.yml
+                path: wallet-alerts.yml
         - name: prometheus-data
           persistentVolumeClaim:
             claimName: prometheus-data-pvc

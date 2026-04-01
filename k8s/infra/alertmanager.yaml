@@ -9,6 +9,7 @@ spec:
   ports:
     - port: 9093
       targetPort: 9093
+      nodePort: 30093
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -26,3 +27,13 @@ spec:
       containers:
       - name: alertmanager
         image: prom/alertmanager:latest
+        args:
+          - "--config.file=/etc/alertmanager/alertmanager.yml"
+        volumeMounts:
+          - name: alertmanager-config
+            mountPath: /etc/alertmanager/alertmanager.yml
+            subPath: alertmanager.yml
+      volumes:
+        - name: alertmanager-config
+          configMap:
+            name: alertmanager-config

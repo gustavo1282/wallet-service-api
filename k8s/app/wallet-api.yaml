@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: wallet-api
-        image: wallet-service-api:latest
+        image: wallet-service-api:1.0.9
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -77,42 +77,26 @@ spec:
             value: "k8s"
           - name: APP_SEEDER_ENABLED
             value: "true"
-
-          # JWT via Vault (v2):
-          # path esperado: secret/data/wallet-service-api/ks8
-          # chave esperada: jwt.secret
-          # - name: JWT_SECRET
-          #   value: "jwt_token.local.k8s.kind.7d2A9b3E5f1H4k"
-           
-          # Banco de Dados
-          # Datasource via Vault (v2):
-          # chaves esperadas: spring.datasource.url|username|password
-          # - name: SPRING_DATASOURCE_URL
-          #   value: "jdbc:postgresql://postgres:5432/wallet_db"
-          # - name: SPRING_DATASOURCE_USERNAME
-          #   value: "wallet_user"
-          # - name: SPRING_DATASOURCE_PASSWORD
-          #   value: "wallet_pass"
-          
-          # Vault
-          - name: SPRING_CLOUD_VAULT_URI
-            value: "http://vault:8200"
-          - name: SPRING_CONFIG_IMPORT
-            value: "optional:classpath:security-matchers.yml,optional:vault://"
-          - name: SPRING_CLOUD_VAULT_APPLICATION_NAME
-            value: "wallet-service-api"
-          - name: SPRING_CLOUD_VAULT_KV_ENABLED
-            value: "true"
-          - name: SPRING_CLOUD_VAULT_KV_BACKEND
-            value: "secret"
-          - name: SPRING_CLOUD_VAULT_KV_DEFAULT_CONTEXT
-            value: "wallet-service-api"
-          - name: SPRING_CLOUD_VAULT_TOKEN
-            value: "root"
-          - name: SPRING_CLOUD_VAULT_KV_PROFILES
-            value: "ks8"
-          - name: SPRING_CLOUD_VAULT_KV_PROFILE_SEPARATOR
-            value: "/"
+          - name: SPRING_DATASOURCE_URL
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: spring.datasource.url
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: spring.datasource.username
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: spring.datasource.password
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: wallet-api-secrets
+                key: jwt.secret
 
           # Observabilidade
           - name: OTEL_EXPORTER_OTLP_ENDPOINT
@@ -121,4 +105,4 @@ spec:
             value: "wallet-service-api"
           # Adicionado para garantir logs no formato certo
           - name: LOGGING_LEVEL_ROOT
-            value: "INFO"
+            value: "DEBUG"

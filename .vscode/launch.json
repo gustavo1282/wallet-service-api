@@ -7,45 +7,42 @@
                 "cwd": "${workspaceFolder}",
                 "mainClass": "com.guga.walletserviceapi.WalletServiceApplication",
                 "projectName": "wallet-service-api",
+                //"preLaunchTask": "reset-and-connect-telepresence",
                 "args": "",
-                //"envFile": "${workspaceFolder}/.env",
                 "vmArgs": [
                     "-Dspring.profiles.active=k8s",
                     "-javaagent:${workspaceFolder}/lib/opentelemetry-javaagent.jar",
+                    "-Dspring.jmx.enabled=false",
+                    "-Dspring.boot.admin.client.enabled=false",
+                    "-Dspring.devtools.restart.enabled=false",
+                    "-Djava.net.preferIPv4Stack=true",
                     "-Dotel.service.name=wallet-service-api",
                     "-Dotel.resource.attributes=service.name=wallet-service-api,environment=env-k8s",
                     "-Dotel.traces.exporter=otlp",
                     "-Dotel.metrics.exporter=otlp",
                     "-Dotel.logs.exporter=otlp",
                     "-Dotel.exporter.otlp.protocol=http/protobuf",
-                    // MUDANÇA: Usando o IP que o curl validou
-                    "-Dotel.exporter.otlp.endpoint=http://localhost:4318",
-                    // ADIÇÃO: Garante que o OkHttp não se perca no IPv6 do Windows
-                    "-Djava.net.preferIPv4Stack=true",
                     "-Dotel.exporter.otlp.timeout=10000",
                     "-Dotel.instrumentation.spring-webmvc.enabled=true",
                     "-Dotel.instrumentation.spring-web.enabled=true",
                     "-Dotel.instrumentation.servlet.enabled=true"
-                    // SE VOCÊS ESTIVER RODANDO DENTRO DE UM CONTAINER DO DOCKER, DESCOMENTE AS LINHAS ABAIXO E COMENTE A LINHA ACIMA
-                    //,"-Dotel.exporter.otlp.traces.endpoint=http://otel-collector:4318/v1/traces",
-                    //"-Dotel.exporter.otlp.metrics.endpoint=http://otel-collector:4318/v1/metrics",
-                    //"-Dotel.exporter.otlp.logs.endpoint=http://otel-collector:4318/v1/logs"
                 ],
                 "env": {
-                    "SPRING_DATASOURCE_PASSWORD": "wallet_pass",
                     "APP_NAME": "wallet-service-api",
                     "PROFILE": "k8s",
                     "ENV": "env-k8s",
                     "SPRING_PROFILES_ACTIVE": "k8s",
                     "WALLET_USER": "wallet_user",
-                    "WALLET_PASS": "wallet_pass",            
-                    "JWT_SECRET": "mock.jwt_token.profile_local.43h53h4i5i345",
-                    "MANAGEMENT_OTLP_ENDPOINT": "http://otel-collector:4318",
-                    "SONAR_LOCAL_TOKEN": "sqa_26c64d9618282081aa091e3527e728c8a9eadcfc",
-                    "VAULT_URI": "http://vault:8200",
-                    "OTEL_METRICS_EXPORTER": "none",
-                    "OTEL_LOGS_EXPORTER": "none",
-                    "OTEL_TRACES_EXPORTER": "none"
+                    "WALLET_PASS": "wallet_pass",
+                    "SPRING_DATASOURCE_PASSWORD": "wallet_pass",
+                    "JWT_SECRET": "jwttoken.vault.ks8.239FHF2F923HF9823HF98238F",
+                    "VAULT_URI": "http://localhost:8200",
+                    "VAULT_TOKEN": "root",
+                    "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318",
+                    "LOGGING_LEVEL_ROOT": "TRACE",
+                    "SPRING_CLOUD_VAULT_ENABLED": "true",
+                    "SPRING_DATASOURCE_URL": "jdbc:postgresql://localhost:5432/wallet_db",
+                    "SERVER_PORT": "8081"
                 }
             },
             {
@@ -60,26 +57,24 @@
                 ],
                 "vmArgs": [
                     "-Dspring.profiles.active=test",
-                    "-Dspring.main.log-startup-info=true",
                     "-Dspring.main.banner-mode=off",
-                    "-Dmanagement.endpoint.startup.enabled=true",
-                    "-Dmanagement.endpoints.web.exposure.include=startup",
-                    "-Dspring.config.import=",
+                    "-Dspring.jmx.enabled=false",
+                    "-Dspring.boot.admin.client.enabled=false",
+                    "-Dspring.devtools.restart.enabled=false",
                     "-Dspring.cloud.vault.enabled=false",
                     "-Djava.net.preferIPv4Stack=true",
-                    "-Dsonar.projectKey=com.gugawallet:wallet-service-api",
-                    "-Dsonar.host.url=http://localhost:9000",
-                    "-Dsonar.token=${env:SONAR_LOCAL_TOKEN}"
+                    "-Dotel.sdk.disabled=true"
                 ],
                 "env": {
                     "APP_NAME": "wallet-service-api",
                     "PROFILE": "test",
                     "ENV": "env-test",
+                    "API_PREFIX": "/api/v1",
                     "WALLET_USER": "wallet_user",
                     "WALLET_PASS": "wallet_pass",
                     "JWT_SECRET": "mock.jwt_token.profile_test.859jg89045j9045i",
                     "SONAR_LOCAL_TOKEN": "sqa_26c64d9618282081aa091e3527e728c8a9eadcfc",
-                    "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1",
+                    "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1"
                 }
             },
             {
@@ -126,10 +121,14 @@
                     "WALLET_USER": "wallet_user",
                     "WALLET_PASS": "wallet_pass",
                     "JWT_SECRET": "mock.jwt_token.profile_dev.hu43oxq",
-                    "MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1",
+                    //"MANAGEMENT_OTLP_ENDPOINT": "http://localhost:4318/v1",
                     "SONAR_LOCAL_TOKEN": "sqa_26c64d9618282081aa091e3527e728c8a9eadcfc",
-                    "VAULT_URI": "http://localhost:8200"
+                    "VAULT_URI": "http://localhost:8200",
+                    "OTEL_METRICS_EXPORTER": "none",
+                    "OTEL_LOGS_EXPORTER": "none",
+                    "OTEL_TRACES_EXPORTER": "none",
+                    "LOGGING_LEVEL_ROOT": "TRACE"
                 }
-            }
+            }            
   ]
 }
