@@ -31,7 +31,8 @@ public class FileUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(FileUtils.class);
 
-    public static final String SEED_FOLDER_DEFAULT = "./data/seed/";
+    //public static final String SEED_FOLDER_DEFAULT = "./data/seed/";
+    public static final String SEED_FOLDER_DEFAULT = "../../storage/seed/";
 
     public static final String JSON_FILE_PARAMS_APP = "params_app.json";
     public static final String JSON_FILE_CUSTOMER = "customers.json";

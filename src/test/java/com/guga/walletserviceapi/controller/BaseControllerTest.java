@@ -33,10 +33,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.header.Header;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
@@ -49,6 +51,7 @@ import com.guga.walletserviceapi.config.OpenApiConfig;
 import com.guga.walletserviceapi.dto.auth.LoginRequest;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.RandomMock;
+import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.DepositSender;
@@ -80,6 +83,7 @@ import lombok.NonNull;
     com.guga.walletserviceapi.config.PasswordConfig.class,
     com.guga.walletserviceapi.service.common.DataPersistenceService.class,
     com.guga.walletserviceapi.config.SecurityConfig.class,
+    com.guga.walletserviceapi.helpers.TransactionUtilsMock.class
     }
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -88,7 +92,6 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
 
     protected static final Logger LOGGER = LogManager.getLogger(BaseControllerTest.class);
     protected static final boolean CREATE_JSON_MOCKS = true;
-    protected boolean loadDataOnSetup = true;
 
     @Autowired
     protected WebApplicationContext context;    
@@ -171,6 +174,8 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
     protected SecretKey key;
     protected String bearerAuth;
 
+    @Autowired
+    protected TransactionUtilsMock transactionUtilsMock;
 
     @BeforeAll
     void setupOnce() {
@@ -194,17 +199,17 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
     }
 
     protected void runDatabaseSeeder() {
-        if (loadDataOnSetup) {
+        if (seederEnabled) {
             LOGGER.info(LogMarkers.LOG, "Seeding database for test...");            
             
             SeedOrderConfig config = new SeedOrderConfig();
             SeedExecutor executor = new SeedExecutor(context);
-            SeedRunner runner = new SeedRunner(executor, config, seederEnabled);
+            SeedRunner runner = new SeedRunner(executor, config);
             runner.runSeed();
-            LOGGER.info(LogMarkers.LOG, "Seed executado com sucesso.");
+            LOGGER.info(LogMarkers.LOG, "Processo Seed finalizado.");
         }
         else {
-            LOGGER.info(LogMarkers.LOG, "Do not exec seeder database for test [loadDataOnSetup=false]...");
+            LOGGER.info(LogMarkers.LOG, "Do not exec seeder database for test [seederEnabled=false]...");
         }
     }
 
@@ -340,24 +345,27 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
             .compact();
     }
 
-/**
-     * Método centralizador para chamadas MockMvc
-     */
-    @SuppressWarnings("null")
     protected ResultActions performRequest(
         @NonNull HttpMethod method, 
         @NonNull String uri, 
         Object content,
-        MultiValueMap<String, String> params) throws Exception {
+        MultiValueMap<String, String> params,
+        List<Header> headers) throws Exception {
 
         Objects.requireNonNull(method, "O método HTTP não pode ser nulo");
         Objects.requireNonNull(uri, "A URI não pode ser nula");
 
-        var requestBuilder = MockMvcRequestBuilders.request(method, getBaseUri(uri))
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.request(method, getBaseUri(uri))
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
-                //.header("Authorization", "Bearer " + bearerAuth)
                 ;
+        
+        if (headers != null && !headers.isEmpty()) {
+            for (Header header : headers) {
+                requestBuilder.header(header.getName(), header.getValues());
+            }
+        }
+        
         // Adiciona o Header APENAS se o token existir
         if (bearerAuth != null && !bearerAuth.isBlank()) {
             requestBuilder.header("Authorization", "Bearer " + bearerAuth);
@@ -369,10 +377,26 @@ public abstract class BaseControllerTest implements IBaseControllerTest {
         }
 
         if (content != null) {
-            requestBuilder.content(objectMapper.writeValueAsString(content));
+            String contentString = objectMapper.writeValueAsString(content);
+            requestBuilder.content(contentString);
         }
 
         return mockMvc.perform(requestBuilder);
+
+    }
+
+/**
+     * Método centralizador para chamadas MockMvc
+     */
+    @SuppressWarnings("null")
+    protected ResultActions performRequest(
+        @NonNull HttpMethod method, 
+        @NonNull String uri, 
+        Object content,
+        MultiValueMap<String, String> params) throws Exception {
+
+        return performRequest(method, uri, content, params, null);
+
     }
 
     protected MultiValueMap<String, String> params(String... pairs) {

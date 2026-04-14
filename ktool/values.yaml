@@ -1,0 +1,29 @@
+app:
+  name: wallet-api
+
+image:
+  repository: wallet-service-api
+  tag: latest
+
+service:
+  port: 8080
+  nodePort: 30001
+
+env:
+  SPRING_PROFILES_ACTIVE: k8s
+  profile: k8s
+  APP_SEEDER_ENABLED: "true"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+  OTEL_SERVICE_NAME: "wallet-service-api"
+  LOGGING_LEVEL_ROOT: "DEBUG"
+
+secrets:
+  name: wallet-api-secrets
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1024Mi"
+    cpu: "500m"

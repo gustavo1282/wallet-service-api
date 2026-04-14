@@ -1,4 +1,4 @@
-﻿package com.guga.walletserviceapi.service;
+package com.guga.walletserviceapi.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

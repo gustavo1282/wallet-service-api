@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "7e0c4f63-bf51-48da-a6a4-388799a99ebb",
-    "name": "Wallet Service API - v1.0.7-SNAPSHOT",
+    "_postman_id": "ce57ebc1-6992-40af-927a-610142f6ed31",
+    "name": "Wallet Service API - v1.0.10-SNAPSHOT",
     "description": "Documentação da API de Carteira de Clientes.\n\n---\n\n### 🔑 Autenticação (A partir da v0.2.4)\n\nA autenticação agora utiliza **JSON Web Tokens (JWT)**. Para acessar os endpoints protegidos, siga os passos abaixo:\n\n1.  **Obter o Token:**\n    * Execute o endpoint de login: **`POST /api/auth/login`**.\n    * Use suas credenciais de usuário e senha no corpo da requisição (Request Body).\n\n2.  **Autorizar o Swagger (OpenAPI):**\n    * Copie o **token JWT** retornado no campo `access_token`.\n    * Clique no botão **\"Authorize\"** (Autorizar) no topo da página.\n    * Cole o token no campo de autenticação (Geralmente no formato **`Bearer SeuTokenAqui`**).\n\n3.  **Executar Métodos:**\n    * Com o token configurado no Swagger, você pode executar todos os métodos protegidos.\n\n---\n\n**Credenciais de Teste:**\n* **Usuário:** `wallet_user`\n* **Senha:** `wallet_pass`\n",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "47458903",
-    "_collection_link": "https://go.postman.co/collection/47458903-7e0c4f63-bf51-48da-a6a4-388799a99ebb?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/47458903-ce57ebc1-6992-40af-927a-610142f6ed31?source=collection_link"
   },
   "item": [
     {
@@ -25,16 +25,32 @@
                       "item": [
                         {
                           "name": "Any Login",
+                          "event": [
+                            {
+                              "listen": "test",
+                              "script": {
+                                "exec": [
+                                  "// NÃO zere antes. Se quiser, zere apenas quando login falhar.\r",
+                                  "if (pm.response.code === 200) {\r",
+                                  "  const response = pm.response.json();\r",
+                                  "\r",
+                                  "  const user_name = response.username;\r",
+                                  "  const user_pass = response.password;\r",
+                                  "\r",
+                                  "  pm.collectionVariables.set(\"user_name\", user_name);\r",
+                                  "  pm.collectionVariables.set(\"user_pass\", user_pass);\r",
+                                  "}\r",
+                                  ""
+                                ],
+                                "type": "text/javascript",
+                                "packages": {},
+                                "requests": {}
+                              }
+                            }
+                          ],
                           "request": {
                             "auth": {
-                              "type": "bearer",
-                              "bearer": [
-                                {
-                                  "key": "token",
-                                  "value": "{{bearerToken}}",
-                                  "type": "string"
-                                }
-                              ]
+                              "type": "noauth"
                             },
                             "method": "POST",
                             "header": [
@@ -45,18 +61,18 @@
                               {
                                 "key": "Accept",
                                 "value": "*/*"
+                              },
+                              {
+                                "key": "X-Auth-User",
+                                "value": "anyuser",
+                                "type": "text"
+                              },
+                              {
+                                "key": "X-Auth-Pass",
+                                "value": "anypassword",
+                                "type": "text"
                               }
                             ],
-                            "body": {
-                              "mode": "raw",
-                              "raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
-                              "options": {
-                                "raw": {
-                                  "headerFamily": "json",
-                                  "language": "json"
-                                }
-                              }
-                            },
                             "url": {
                               "raw": "{{baseUrl}}/api/v1/auth/test/anylogin",
                               "host": [
@@ -4711,9 +4727,9 @@
           "// Caso você ainda queira manter uma lista de skip (denylist)\r",
           "const SKIP_FOLDERS = [\r",
           "    //'/api/v1/wallets/',\r",
-          "    '/api/v1/transactions/',\r",
-          "    '/api/v1/wallet-operator/',\r",
-          "    'api/v1/admin/seed/'\r",
+          "    //'/api/v1/transactions/',\r",
+          "    //'/api/v1/wallet-operator/',\r",
+          "    'api/v1/seeder/'\r",
           "];\r",
           "\r",
           "// ---------- NORMALIZAÇÃO ----------\r",
@@ -4976,6 +4992,14 @@
     },
     {
       "key": "paramIdRandom",
+      "value": ""
+    },
+    {
+      "key": "username",
+      "value": ""
+    },
+    {
+      "key": "password",
       "value": ""
     }
   ]

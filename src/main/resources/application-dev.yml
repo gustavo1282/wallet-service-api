@@ -21,7 +21,7 @@ spring:
   config:
     import: 
       - "optional:classpath:security-matchers.yml"
-      - "optional:vault://v1/secret/data/${APP_NAME}/${PROFILE}"
+      #- "optional:vault://v1/secret/data/${APP_NAME}/${PROFILE}"
   cloud:
     vault:
       enabled: false
@@ -42,7 +42,7 @@ spring:
   datasource:
     # Configuração para H2 via arquivo
     #url: jdbc:h2:mem:wallet-test-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    url: jdbc:h2:file:./data/h2/wallet-dev-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    #url: jdbc:h2:file:./data/h2/wallet-dev-db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: ${WALLET_USER:wallet_user}
     password: ""

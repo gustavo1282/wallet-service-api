@@ -1,4 +1,4 @@
-﻿package com.guga.walletserviceapi.controller;
+package com.guga.walletserviceapi.controller;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

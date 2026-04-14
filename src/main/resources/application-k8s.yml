@@ -54,6 +54,9 @@ spring:
       roles: [ADMIN, USER]
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   otlp:
     logs:
       endpoint: "${MANAGEMENT_OTLP_ENDPOINT:http://otel-collector:4318}/v1/logs"
@@ -73,8 +76,10 @@ logging:
     root: ${LOGGING_LEVEL_ROOT:INFO}
     com.guga.walletserviceapi: INFO
     io.opentelemetry: INFO
-    org.springframework.vault: TRACE
-    org.springframework.cloud.vault: TRACE
+    org.springframework.vault: INFO
+    org.springframework.cloud.vault: INFO
     # Silenciamento de ruídos repetitivos
     org.apache.tomcat.util.http.Parameters: ERROR
     org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping: ERROR
+    org.springframework.web.servlet.PageNotFound: ERROR
+    org.apache.catalina.core.ContainerBase.[Tomcat].[localhost]: WARN

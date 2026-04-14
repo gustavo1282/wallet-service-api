@@ -1,4 +1,4 @@
-ÔªøapiVersion: v1
+apiVersion: v1
 data:
   http_otel_compat.yml: |-
     groups:
@@ -47,9 +47,9 @@ data:
       scrape_interval: 15s
       evaluation_interval: 15s
       external_labels:
-        environment: "env-local"
-        env: "env-local"
-        namespace: "env-local"
+        environment: "env-k8s"
+        env: "env-k8s"
+        namespace: "env-k8s"
         application: "wallet-service-api"
         app: "wallet-service-api"
         service_name: "wallet-service-api"
@@ -65,9 +65,9 @@ data:
         static_configs:
           - targets: ["otel-collector:8889"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: env, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: env, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "wallet-service-api" }
           - { target_label: app, replacement: "wallet-service-api" }
           - { target_label: service_name, replacement: "wallet-service-api" }
@@ -76,8 +76,8 @@ data:
         static_configs:
           - targets: ["otel-collector:8888"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "otel-collector" }
           - { target_label: service_name, replacement: "otel-collector" }
 
@@ -85,8 +85,8 @@ data:
         static_configs:
           - targets: ["prometheus:9090"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "prometheus" }
           - { target_label: service_name, replacement: "prometheus" }
 
@@ -94,17 +94,17 @@ data:
         static_configs:
           - targets: ["grafana:3000"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "grafana" }
 
-      # --- NOVOS JOBS DE INFRA (SEGUINDO SEU PADR√ÉO) ---
+      # --- NOVOS JOBS DE INFRA (SEGUINDO SEU PADR√O) ---
       - job_name: "loki"
         static_configs:
           - targets: ["loki:3100"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "loki" }
           - { target_label: service_name, replacement: "loki" }
 
@@ -112,8 +112,8 @@ data:
         static_configs:
           - targets: ["tempo:3200"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "tempo" }
           - { target_label: service_name, replacement: "tempo" }
 
@@ -124,29 +124,29 @@ data:
         static_configs:
           - targets: ["vault:8200"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "vault" }
 
       - job_name: "jaeger"
         static_configs:
           - targets: ["jaeger:14269"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "jaeger" }
 
       - job_name: "wallet-service-direct"
         metrics_path: "/wallet-service-api/actuator/prometheus"
         static_configs:
-          - targets: ["localhost:8080"]
+          - targets: ["wallet-api:8080"]
         relabel_configs:
-          - { target_label: environment, replacement: "env-local" }
-          - { target_label: env, replacement: "env-local" }
-          - { target_label: deployment_environment, replacement: "env-local" }
+          - { target_label: environment, replacement: "env-k8s" }
+          - { target_label: env, replacement: "env-k8s" }
+          - { target_label: deployment_environment, replacement: "env-k8s" }
           - { target_label: service_version, replacement: "local" }
           - { target_label: host_name, replacement: "wallet-api-local-ide" }
-          - { target_label: namespace, replacement: "env-local" }
+          - { target_label: namespace, replacement: "env-k8s" }
           - { target_label: application, replacement: "wallet-service-api" }
           - { target_label: app, replacement: "wallet-service-api" }
           - { target_label: service_name, replacement: "wallet-service-api" }
@@ -196,30 +196,31 @@ data:
         - static_configs:
             - targets: ["alertmanager:9093"]
   wallet-alerts.yml: "groups:\n  - name: infrastructure-availability-alerts\n    rules:\n
-    \     # --- ALERTA GEN√âRICO PARA QUALQUER SERVI√áO DA STACK ---\n      # Este alerta
+    \     # --- ALERTA GEN…RICO PARA QUALQUER SERVI«O DA STACK ---\n      # Este alerta
     dispara se qualquer job definido no seu prometheus.yml ficar 'down'\n      - alert:
     InfrastructureServiceDown\n        expr: up == 0\n        for: 2m\n        labels:\n
-    \         severity: critical\n          env: \"env-local\"\n        annotations:\n
-    \         summary: \"Servi√ßo Cr√≠tico Indispon√≠vel: {{ $labels.job }}\"\n          description:
-    \"O servi√ßo {{ $labels.job }} (inst√¢ncia {{ $labels.instance }}) est√° fora do
-    ar h√° mais de 2 minutos.\"\n\n  - name: wallet-service-performance-alerts\n    rules:\n
-    \     # --- ALERTA ESPEC√çFICO PARA A APLICA√á√ÉO (LAT√äNCIA) ---\n      - alert:
+    \         severity: critical\n          env: \"env-k8s\"\n        annotations:\n
+    \         summary: \"ServiÁo CrÌtico IndisponÌvel: {{ $labels.job }}\"\n          description:
+    \"O serviÁo {{ $labels.job }} (inst‚ncia {{ $labels.instance }}) est· fora do
+    ar h· mais de 2 minutos.\"\n\n  - name: wallet-service-performance-alerts\n    rules:\n
+    \     # --- ALERTA ESPECÕFICO PARA A APLICA«√O (LAT NCIA) ---\n      - alert:
     WalletApiHighLatency\n        expr: histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{application=\"wallet-service-api\"}[5m])))
     > 2\n        for: 3m\n        labels:\n          severity: warning\n        annotations:\n
-    \         summary: \"Lat√™ncia Alta na Wallet API\"\n          description: \"95%
-    das requisi√ß√µes est√£o demorando mais de 2s (Valor atual: {{ $value | printf \\\"%.2f\\\"
+    \         summary: \"LatÍncia Alta na Wallet API\"\n          description: \"95%
+    das requisiÁıes est„o demorando mais de 2s (Valor atual: {{ $value | printf \\\"%.2f\\\"
     }}s).\"\n\n      # --- ALERTA DE ERROS NA API ---\n      - alert: WalletApiHighErrorRate\n
     \       expr: |\n          sum(rate(http_server_requests_seconds_count{application=\"wallet-service-api\",
     status=~\"5..\"}[5m])) \n          / \n          sum(rate(http_server_requests_seconds_count{application=\"wallet-service-api\"}[5m]))
     > 0.10\n        for: 2m\n        labels:\n          severity: critical\n        annotations:\n
     \         summary: \"Taxa de Erro 5xx elevada na Wallet API\"\n          description:
-    \"A API est√° com mais de 10% de erros 5xx (Atual: {{ $value | printf \\\"%.2f\\\"
-    }}%).\"\n\n  - name: database-alerts\n    rules:\n      # --- ALERTA DE CONEX√ïES
+    \"A API est· com mais de 10% de erros 5xx (Atual: {{ $value | printf \\\"%.2f\\\"
+    }}%).\"\n\n  - name: database-alerts\n    rules:\n      # --- ALERTA DE CONEX’ES
     NO POSTGRES ---\n      - alert: PostgresTooManyConnections\n        expr: pg_stat_activity_count{application=\"postgres\"}
     > 15\n        for: 5m\n        labels:\n          severity: warning\n        annotations:\n
-    \         summary: \"Postgres pr√≥ximo ao limite de conex√µes\"\n          description:
-    \"O Postgres est√° com {{ $value }} conex√µes. O limite configurado no seu compose
-    √© 20.\""
+    \         summary: \"Postgres prÛximo ao limite de conexıes\"\n          description:
+    \"O Postgres est· com {{ $value }} conexıes. O limite configurado no seu compose
+    È 20.\""
 kind: ConfigMap
 metadata:
   name: prometheus-config
+

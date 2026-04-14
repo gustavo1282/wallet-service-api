@@ -1,4 +1,4 @@
-﻿package com.guga.walletserviceapi.service;
+package com.guga.walletserviceapi.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.guga.walletserviceapi.exception.ResourceBadRequestException;
+import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.enums.LoginRole;
 import com.guga.walletserviceapi.repository.LoginAuthRepository;
@@ -81,19 +83,31 @@ public class LoginAuthService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    private LoginAuth findRandomLogin() {
-        LOGGER.info("LOGIN_AUTH_SERVICE_FIND_RANDOM_ENTRY");
+    public LoginAuth findAnyLoginWithTransactions(String username, String password) {
+        LOGGER.info("LOGIN_AUTH_SERVICE_FIND_ANY_LOGIN_WITH_TRN");
 
-        LoginAuth randomLogin = Optional.ofNullable(loginAuthRepository.findAnyLogin().get())
-            .filter(list -> !list.isEmpty())
-            .map(list -> {
-                var random = java.util.random.RandomGenerator.getDefault();
-                int randomIndex = random.nextInt(list.size());
-                return list.get(randomIndex);
-            })
-            .orElseThrow(() -> new UsernameNotFoundException("Nenhum usuario aleatorio encontrado para o perfil de teste."));
+        boolean isAnyUser = (username.equals("anyuser") &&
+                             password.equals("anypassword"));
 
-        LOGGER.info("LOGIN_AUTH_SERVICE_FIND_RANDOM_SUCCESS | loginId={} username={}", randomLogin.getId(), randomLogin.getLogin());
-        return randomLogin;
+        if (!isAnyUser) {
+            LOGGER.warn(LogMarkers.LOG, "AUTH_ANY_LOGIN_UNAUTHORIZED | requestedUser={}", username);
+            throw new ResourceBadRequestException("LOGIN_UNAUTHORIZED");
+        }
+
+        Optional<LoginAuth> dataRet = loginAuthRepository.findAnyLoginWithTransactions();
+        if (dataRet == null || dataRet.isEmpty()) {
+            LOGGER.info("LOGIN_AUTH_SERVICE_FIND_ANY_LOGIN_WITH_TRN");
+            throw new UsernameNotFoundException("Nenhum login disponível.");
+        }
+
+        LoginAuth loginAuth = dataRet.get();
+
+        LOGGER.info("LOGIN_AUTH_SERVICE_FIND_ANY_LOGIN_WITH_TRN_SUCCESS | loginId={} username={}", 
+            loginAuth.getId(), 
+            loginAuth.getLogin()
+        );
+
+        return loginAuth;
     }
+
 }

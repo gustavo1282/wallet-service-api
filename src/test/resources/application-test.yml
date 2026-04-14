@@ -13,6 +13,7 @@ app:
       strength: 4
   seeder:
     enabled: true
+  test.anyauthlogin.enabled: true
 
 server:
   port: 0 # Porta aleatória para evitar conflitos de 'Address already in use'

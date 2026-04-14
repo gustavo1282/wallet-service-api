@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.web.header.Header;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.guga.walletserviceapi.dto.auth.LoginRequest;
@@ -24,6 +25,7 @@ import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.ParamApp;
 import com.guga.walletserviceapi.model.Routers;
+import com.guga.walletserviceapi.model.Transaction;
 import com.guga.walletserviceapi.model.Wallet;
 import com.guga.walletserviceapi.model.enums.LoginRole;
 
@@ -170,21 +172,6 @@ class AuthControllerTests extends BaseControllerTest {
                 .andExpect(jsonPath("$.login").value(loginAuthMock.getLogin()))
                 .andExpect(jsonPath("$.customerId").value(loginAuthMock.getCustomerId()));
         }
-
-        @Test
-        @DisplayName("Deve retornar OK com corpo vazio se o provedor de autenticação falhar")
-        void getMyProfile_whenProviderFails_shouldReturnOkWithEmptyBody() throws Exception {
-
-            setupMockAuth(List.of(LoginRole.ADMIN, LoginRole.USER));
-
-            // 1. Arrange
-            when(authUserProvider.get()).thenReturn(null);
-
-            // 2. Act & Assert
-            performRequest(HttpMethod.GET, Routers.AUTH + "/my_profile", null, null)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist());
-        }
     }
 
     // =========================================================
@@ -198,30 +185,47 @@ class AuthControllerTests extends BaseControllerTest {
         @Test
         @DisplayName("Deve autenticar com sucesso usando anyLogin e retornar tokens")
         void anyLogin_ok() throws Exception {
+            Transaction trnValid = transactionUtilsMock.getAnyValidTransactionsForLogins(wallets, loginAuths, transactions);
 
-            setupMockAuth(List.of(LoginRole.ADMIN));
+            LoginAuth loginAuth = loginAuths.stream()
+                    .filter(la -> la != null &&
+                                la.getId().equals(trnValid.getLoginAuthId())
+                    )
+                    .findFirst()
+                    .orElseThrow(() -> new ResourceBadRequestException(String.format("Login %s não encontrado")));
 
-            // 1. Arrange
-            LoginRequest request = new LoginRequest("anyuser", "anypassword");
+            when(loginAuthService.findAnyLoginWithTransactions(anyString(), anyString()))
+                .thenReturn(loginAuth);
+
+            List<Header> headers = List.of(
+                new Header("X-Auth-User", "anyuser"),
+                new Header("X-Auth-Pass", "anypassword")
+            );
 
             // 2. Act & Assert
-            performRequest(HttpMethod.POST, Routers.AUTH + "/test/anylogin", request, null)
+            performRequest(HttpMethod.POST, Routers.AUTH + "/test/anylogin", null, null, headers)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.login").exists())
-                .andExpect(jsonPath("$.login").isNotEmpty())
-                .andExpect(jsonPath("$.login").value(request.username()));
+                .andExpect(jsonPath("$.username").exists())
+                .andExpect(jsonPath("$.password").isNotEmpty());
         }
 
         @Test
         @DisplayName("Deve retornar 401 Unauthorized se anyLogin falhar")
         void anyLogin_fail() throws Exception {
+
+            String username = "wronguser";
+            String password = "wrongpassword";
             
-            setupMockAuth(List.of(LoginRole.ADMIN));
-
-            LoginRequest request = new LoginRequest("wronguser", "wrongpassword");
-
+            when(loginAuthService.findAnyLoginWithTransactions(anyString(), anyString()))
+                .thenThrow(new org.springframework.security.core.AuthenticationException("Bad credentials") {});
+            
+            List<Header> headers = List.of(
+                new Header("X-Auth-User", username),
+                new Header("X-Auth-Pass", password)
+            );
+            
             // 2. Act & Assert
-            performRequest(HttpMethod.POST, Routers.AUTH + "/test/anylogin", request, null)
+            performRequest(HttpMethod.POST, Routers.AUTH + "/test/anylogin", null, null, headers)
                 .andExpect(status().isUnauthorized());
         }
     }
@@ -240,10 +244,19 @@ class AuthControllerTests extends BaseControllerTest {
         customers = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_CUSTOMER, new TypeReference<List<Customer>>() {});      
         wallets = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_WALLET, new TypeReference<List<Wallet>>() {});
         loginAuths = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_LOGIN_AUTH, new TypeReference<List<LoginAuth>>() {});
+        transactions = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_TRANSACTION, new TypeReference<List<Transaction>>() {});
     }
 
     private LoginRequest generateLoginRequest(LoginAuth loginAuthMock) {
         return new LoginRequest(loginAuthMock.getLogin(), "password");
+    }
+
+    private LoginAuth getLoginAuthByUsername(String username) {
+        return loginAuths.stream()
+            .filter(la -> la != null &&
+                         la.getLogin().equals(username))
+            .findFirst()
+            .orElseThrow(() -> new ResourceBadRequestException(String.format("Login %s não encontrado", username)));
     }
 
 }

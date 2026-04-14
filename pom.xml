@@ -14,7 +14,7 @@
 
     <groupId>com.gugawallet</groupId>
     <artifactId>wallet-service-api</artifactId>
-    <version>1.0.9-SNAPSHOT</version>
+    <version>1.0.10-SNAPSHOT</version>
     <name>wallet-service-api</name>
     <description>Spring Boot Project for Digital Wallet Features</description>
 
@@ -33,7 +33,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 
         <mapstruct.version>1.6.3</mapstruct.version>
-
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
@@ -208,7 +208,8 @@
     </dependencyManagement>
 
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
+        <!--finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName-->
+        <finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}-${git.commit.id.abbrev}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

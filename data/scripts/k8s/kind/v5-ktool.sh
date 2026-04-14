@@ -110,6 +110,32 @@ require_cmd() {
   }
 }
 
+# New function to build Docker image from existing JAR in target/
+cmd_build_image() {
+  local jar_path
+  jar_path=$(ls target/${APP_IMAGE_REPO}-*.jar 2>/dev/null | head -n 1 || true)
+
+  if [[ -z "$jar_path" || ! -f "$jar_path" ]]; then
+    error "JAR nao encontrado em target/. Execute 'wallet_quality.sh' primeiro."
+    return 1
+  fi
+
+  local filename
+  filename=$(basename "$jar_path")
+  # Extrai a tag removendo o nome do repo e a extensao .jar
+  local tag="${filename#$APP_IMAGE_REPO-}"
+  tag="${tag%.jar}"
+
+  APP_IMAGE_TAG="$tag"
+  APP_IMAGE="${APP_IMAGE_REPO}:${APP_IMAGE_TAG}"
+
+  info "Construindo imagem Docker a partir de: $filename"
+  run docker build -t "${APP_IMAGE}" . || { error "Falha ao construir a imagem Docker."; exit 1; }
+  info "Carregando imagem no cluster Kind..."
+  load_image
+  success "Imagem construida e carregada: ${APP_IMAGE}"
+}
+
 resolve_app_image() {
   if [[ -n "$APP_IMAGE_TAG" ]]; then
     APP_IMAGE="${APP_IMAGE_REPO}:${APP_IMAGE_TAG}"
@@ -117,18 +143,18 @@ resolve_app_image() {
     return 0
   fi
 
-  local tag
-  tag="$(docker image ls "${APP_IMAGE_REPO}" --format '{{.Tag}} {{.CreatedAt}}' | grep -v '^<none>' | head -n 1 | awk '{print $1}')"
+  local latest_tag_from_docker
+  latest_tag_from_docker="$(docker image ls "${APP_IMAGE_REPO}" --format '{{.Tag}} {{.CreatedAt}}' | grep -v '^<none>' | head -n 1 | awk '{print $1}')"
 
-  if [[ -z "${tag:-}" ]]; then
+  if [[ -z "${latest_tag_from_docker:-}" ]]; then
     error "Nenhuma imagem local encontrada para ${APP_IMAGE_REPO}:*"
-    error "Informe --image-tag ou APP_IMAGE_TAG"
+    error "Informe --image-tag ou gere uma nova (opcao 7)"
     exit 1
   fi
 
-  APP_IMAGE_TAG="$tag"
+  APP_IMAGE_TAG="$latest_tag_from_docker"
   APP_IMAGE="${APP_IMAGE_REPO}:${APP_IMAGE_TAG}"
-  info "Imagem auto-resolvida: ${APP_IMAGE}"
+  info "Imagem auto-resolvida (mais recente): ${APP_IMAGE}"
 }
 
 validate_cluster() {
@@ -166,10 +192,10 @@ validate_manifests() {
 }
 
 load_image() {
-  resolve_app_image
   run docker image inspect "$APP_IMAGE" >/dev/null
   info "Carregando imagem no Kind (${CLUSTER_NAME})"
   run kind load docker-image "$APP_IMAGE" --name "$CLUSTER_NAME"
+  success "Imagem carregada no cluster Kind: ${APP_IMAGE}"
 }
 
 apply_stack() {
@@ -188,11 +214,29 @@ apply_stack() {
 }
 
 apply_app() {
-  resolve_app_image
-  info "Aplicando app"
-  run kubectl apply -n "$NAMESPACE" -f "$APP_MANIFEST"
-  run kubectl set image deployment/"$APP_NAME" "$APP_NAME"="$APP_IMAGE" -n "$NAMESPACE"
-  run kubectl set env deployment/"$APP_NAME" SPRING_PROFILES_ACTIVE="$K8S_PROFILE" -n "$NAMESPACE"
+  # Criamos um sufixo baseado na tag para o nome do Deployment (limpando caracteres especiais)
+  local version_suffix=$(echo "$APP_IMAGE_TAG" | tr '.' '-' | tr '[:upper:]' '[:lower:]')
+  local versioned_deploy_name="${APP_NAME}-${version_suffix}"
+  local temp_manifest="/tmp/deploy-${versioned_deploy_name}.yaml"
+
+  info "Gerando manifesto versionado: ${versioned_deploy_name}"
+  
+  # 1. Copia o manifesto original
+  # 2. Substitui o nome do Deployment para incluir a versão (isso mudará o nome do Pod)
+  # 3. Garante que os seletores de labels continuem os mesmos para o Service não quebrar
+  cp "$APP_MANIFEST" "$temp_manifest"
+  
+  # Ajusta o nome do Deployment e a Imagem no arquivo temporário
+  sed -i "s/name: ${APP_NAME}/name: ${versioned_deploy_name}/" "$temp_manifest"
+  sed -i "s|image: ${APP_IMAGE_REPO}.*|image: ${APP_IMAGE}|" "$temp_manifest"
+  sed -i "s|app: ${APP_NAME}|app: ${APP_NAME}|" "$temp_manifest" # Garante que o label do Service ainda funcione
+
+  info "Aplicando deployment versionado no namespace ${NAMESPACE}"
+  run kubectl apply -n "$NAMESPACE" -f "$temp_manifest"
+  run kubectl set env deployment/"$versioned_deploy_name" SPRING_PROFILES_ACTIVE="$K8S_PROFILE" -n "$NAMESPACE"
+  
+  # Atualizamos a variável global para que o wait_rollout saiba quem monitorar
+  APP_NAME="$versioned_deploy_name"
 }
 
 verify_profile() {
@@ -329,12 +373,13 @@ menu() {
 =========================================
  ktool v5 (namespace: ${NAMESPACE})
 =========================================
-1) Validate  - Valida prerequisitos, cluster, manifests e imagem
-2) Deploy    - Valida, carrega imagem, aplica stack e aguarda rollout
-3) Rollback  - Executa rollout undo da aplicacao
-4) Status    - Exibe status do namespace/app
-5) Logs      - Exibe logs da aplicacao
-6) Help      - Mostra ajuda completa
+1) Validate    - Valida prerequisitos, cluster, manifests e imagem
+2) Deploy      - Valida, aplica stack e aguarda rollout (usa imagem mais recente)
+3) Rollback    - Executa rollout undo da aplicacao
+4) Status      - Exibe status do namespace/app
+5) Logs        - Exibe logs da aplicacao
+6) Help        - Mostra ajuda completa
+7) Build Image - Gera imagem Docker do JAR no target e carrega no Kind
 0) Sair
 EOF
     read -r -p "Escolha uma opcao: " opt
@@ -345,6 +390,7 @@ EOF
       4) cmd_status ;;
       5) cmd_logs ;;
       6) usage ;;
+      7) cmd_build_image ;;
       0) info "Encerrado"; exit 0 ;;
       *) warn "Opcao invalida" ;;
     esac

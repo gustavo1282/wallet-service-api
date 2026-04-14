@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +60,9 @@ class TransactionControllerTests extends BaseControllerTest {
         @DisplayName("Deve listar transações do próprio usuário com sucesso")
         void listMyTransactions_ok() throws Exception {
             LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
-            Transaction transactionMock = getDinamicTransactionByWalletId(auth.getWalletId());                
+
+            Transaction transactionMock = getAnyTransactionByWalletId(auth.getWalletId());
+
             when(transactionService.filterTransactionByWalletIdAndProcessType(eq(auth.getWalletId()), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(transactionMock)));
 
@@ -75,17 +78,16 @@ class TransactionControllerTests extends BaseControllerTest {
         @DisplayName("Deve detalhar uma transação específica do próprio usuário")
         void getMyTransaction_ok() throws Exception {
 
-            Transaction transactionMock = findValidTransaction();
+            LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
+
+            Transaction transactionMock = transactionUtilsMock.getAnyValidTransactionsForLogins(
+                wallets, loginAuths, transactions
+            );
+
+            transactionMock.setWalletId(auth.getWalletId());
+            transactionMock.setWallet(null);
 
             Long transactionId = transactionMock.getTransactionId();
-            Long walletId = transactionMock.getWalletId();
-
-            LoginAuth loginAuth = loginAuths.stream()
-                .filter(la -> la.getWalletId().equals(walletId))
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("Nenhuma transação válida foi encontrada com uma carteira e um login vinculados."));;
-
-            autenticarLogin(loginAuth);
 
             when(transactionService.getTransactionById(anyLong()))
                 .thenReturn(transactionMock);
@@ -101,7 +103,9 @@ class TransactionControllerTests extends BaseControllerTest {
         @DisplayName("Deve listar os últimos depósitos do usuário")
         void listMyDeposits_ok() throws Exception {
             LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
-            Transaction transactionMock = getDinamicTransactionByWalletId(auth.getWalletId());
+
+            Transaction transactionMock = getAnyTransactionByWalletId(auth.getWalletId());
+
             when(transactionService.filterTransactionByWalletIdAndOperationType(eq(auth.getWalletId()), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(transactionMock)));
 
@@ -255,14 +259,14 @@ class TransactionControllerTests extends BaseControllerTest {
         return filteredTransactions;
     }
 
-    private Transaction getDinamicTransactionByWalletId(long walletId) throws Exception {
+    private Transaction getAnyTransactionByWalletId(long walletId) throws Exception {
 
         List<Transaction> filteredTransactions = getTransactionByWalletId(walletId);
 
         if (filteredTransactions == null) return null;
-
+        
         Collections.shuffle(filteredTransactions);
-        return filteredTransactions.get(0);
+        return filteredTransactions.get(ThreadLocalRandom.current().nextInt(filteredTransactions.size()));
 
     }
 
@@ -304,30 +308,4 @@ class TransactionControllerTests extends BaseControllerTest {
         this.depositSenders = dataPersistenceService.importJson(FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_DEPOSIT_SENDER, new TypeReference<List<DepositSender>>() {});
     }
 
-    protected Transaction findValidTransaction() {
-        // Cria um mapa de consulta para wallets: walletId -> customerId
-        java.util.Map<Long, Long> walletCustomerMap = wallets.stream()
-                .filter(w -> w != null && w.getWalletId() != null && w.getCustomerId() != null)
-                .collect(Collectors.toMap(Wallet::getWalletId, Wallet::getCustomerId, (a, b) -> a));
-
-        // Cria um conjunto de consulta para logins: walletId
-        java.util.Set<Long> authWalletIds = loginAuths.stream()
-                .filter(la -> la != null && la.getWalletId() != null && la.getRole().contains(LoginRole.USER))
-                .map(LoginAuth::getWalletId)
-                .collect(Collectors.toSet());
-
-        // Encontra a primeira transação que possui uma carteira e um login válidos e vinculados
-        return transactions.stream()
-                .filter(tx -> {
-                    if (tx == null || tx.getWalletId() == null) return false;
-
-                    // Verifica se a carteira da transação existe e está vinculada a um login
-                    return walletCustomerMap.containsKey(tx.getWalletId()) 
-                        && authWalletIds.contains(tx.getWalletId());
-                })
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("Nenhuma transação válida foi encontrada com uma carteira e um login vinculados."));
-    }
-
-    
 }

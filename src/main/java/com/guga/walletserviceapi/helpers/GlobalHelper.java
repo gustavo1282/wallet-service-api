@@ -1,5 +1,6 @@
 package com.guga.walletserviceapi.helpers;
 
+import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -7,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -99,6 +101,25 @@ public class GlobalHelper {
             return null;
         }
         return value.trim();
+    }
+
+    public static String generateKeyToLoginAuth(Long walletId) {
+        return GlobalHelper.APP_WALLET_PASS + "_" + walletId + "_@";
+    }
+
+    public static String normalizeString(String text) {
+        if (text == null) return null;
+
+        // 1. Remove acentos (ex: 'á' vira 'a' + '´')
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
+        
+        // 2. Remove os sinais diacríticos (os acentos separados)
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String withoutAccents = pattern.matcher(normalized).replaceAll("");
+
+        // 3. Mantém apenas letras (a-z, A-Z) e números (0-9)
+        // O ^ dentro do colchete significa "NÃO", ou seja, substitui tudo que NÃO for alfanumérico por ""
+        return withoutAccents.replaceAll("[^a-zA-Z0-9 ]", "");
     }
 
 }

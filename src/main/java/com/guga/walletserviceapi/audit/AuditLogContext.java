@@ -11,6 +11,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.guga.walletserviceapi.helpers.GlobalHelper;
+import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,14 +79,39 @@ public class AuditLogContext {
         .toEpochMilli();
 
 
+
+    public static AuditLogContext from(
+        JwtAuthenticationDetails details
+    ) {
+
+        return builderLogContext(
+            details.getLogin(),
+            details.getLoginId(),
+            details.getCustomerId(),
+            details.getWalletId(),
+            details.getLoginType()
+        );        
+    }        
+
+
     /**
      * Factory method OFICIAL para criar AuditLogContext
      * a partir do JWT autenticado.
      */
     public static AuditLogContext from(
-        JwtAuthenticationDetails details
+        LoginAuth loginAuth
     ) {
 
+        return builderLogContext(
+            loginAuth.getLogin(),
+            loginAuth.getId(),
+            loginAuth.getCustomerId(),
+            loginAuth.getWalletId(),
+            loginAuth.getLoginAuthType().name()
+        );        
+    }
+
+    private static AuditLogContext builderLogContext(String login, Long loginId, Long customerId, Long walletId, String loginType) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     
         String ipAddress = null;
@@ -100,23 +126,22 @@ public class AuditLogContext {
             traceId = ThreadContext.get("traceId");
         }
 
+        Long sequenceIdDefault = LocalDateTime.now()
+                    .atZone(ZoneId.of("America/Sao_Paulo"))
+                    .toInstant()
+                    .toEpochMilli();
+
         return AuditLogContext.builder()
-            .username(details.getLogin())
             .ipAddress(ipAddress)
             .userAgent(userAgent)
             .traceId(traceId)
-            .loginId(details.getLoginId())
-            .customerId(details.getCustomerId())
-            .walletId(details.getWalletId())
-            .loginType(details.getLoginType())
-            .sequenceId(
-                LocalDateTime.now()
-                    .atZone(ZoneId.of("America/Sao_Paulo"))
-                    .toInstant()
-                    .toEpochMilli()
-            )
+            .username(login)
+            .loginId(loginId)
+            .customerId(customerId)
+            .walletId(walletId)
+            .loginType(loginType)
+            .sequenceId(sequenceIdDefault)
             .timeMillis(Instant.now().toEpochMilli())
-
             .build();
     }
 

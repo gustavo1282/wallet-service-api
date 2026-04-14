@@ -109,7 +109,7 @@ public class TransactionUtils {
                 //.transaction(depositMoney)
                 .cpf(cpfSender)
                 .terminalId(terminalId)
-                .fullName(senderName)
+                .fullName(GlobalHelper.normalizeString(senderName))
                 .amount(depositMoney.getAmount())
                 .build();
     }

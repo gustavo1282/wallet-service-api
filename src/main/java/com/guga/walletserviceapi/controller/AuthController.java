@@ -1,7 +1,8 @@
-﻿package com.guga.walletserviceapi.controller;
+package com.guga.walletserviceapi.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +23,7 @@ import com.guga.walletserviceapi.audit.AuditLogContext;
 import com.guga.walletserviceapi.audit.AuditLogger;
 import com.guga.walletserviceapi.dto.auth.LoginRequest;
 import com.guga.walletserviceapi.dto.auth.TokenResponse;
+import com.guga.walletserviceapi.helpers.GlobalHelper;
 import com.guga.walletserviceapi.logging.LogMarkers;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.security.JwtAuthenticationDetails;
@@ -35,6 +38,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -50,8 +55,11 @@ public class AuthController {
     private final LoginAuthService loginAuthService;
     private final JwtAuthenticatedUserProvider authUserProvider;
 
+    @Value("${app.test.anyauthlogin.enabled:false}")
+    boolean anyAuthLogin = false;
+
     @Operation(
-        operationId = "auth_01_login",
+        operationId = "auth_00_login",
         summary = "Login",
         description = "Authenticates the user and returns accessToken and refreshToken."
     )
@@ -84,7 +92,7 @@ public class AuthController {
 
         AuditLogger.log(
             "AUTH_LOGIN [SUCCESS]",
-            AuditLogContext.from(authUserProvider.get())
+            AuditLogContext.from(loginAuth)
                 .toBuilder()
                 .info("loginId=" + loginAuth.getId())
                 .build()
@@ -188,14 +196,13 @@ public class AuthController {
         return ResponseEntity.ok(loginAuth);
     }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    //@SecurityRequirement(name = "bearerAuth")
+    //@PreAuthorize("hasAnyRole('ADMIN')")
     @Operation(
         operationId = "auth_01_any_login",
         summary = "Any Login",
         description = "Authenticates a user based on the environment profile. For test/dev environments, it can return a random user. Otherwise, it performs standard authentication. This endpoint does NOT use the standard Spring AuthenticationManager."
-    )
-    @PostMapping("/test/anylogin")
+    )    
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
         content = @Content(
             mediaType = "application/json",
@@ -206,39 +213,30 @@ public class AuthController {
             )
         )
     )
-    public ResponseEntity<LoginAuth> anyLogin(@Valid @RequestBody LoginRequest request) {
+    @PostMapping("/test/anylogin")
+    public ResponseEntity<LoginRequest> anyLogin(           //@Valid @RequestBody LoginRequest request
+        @RequestHeader("X-Auth-User") @NotBlank @Size(min = 5) String username,
+        @RequestHeader("X-Auth-Pass") @NotBlank @Size(min = 5) String password) {
 
-        AuditLogContext auditCtx = AuditLogContext.from(authUserProvider.get());
-
-        LOGGER.info(LogMarkers.LOG, "AUTH_ANY_LOGIN | admin={} requestedUser={}",
-            auditCtx.getUsername(), request.username()
+        LOGGER.info(LogMarkers.LOG, "AUTH_LOGIN_ANY_WITH_TRANSACTION | accessBy={} password=**********",
+            username
         );
 
-        AuditLogger.log("AUTH_ANY_LOGIN [START]", auditCtx);
+        //if (!anyAuthLogin) {
+        //    throw new ResourceBadRequestException("Method not implemented.");
+        //}
 
-        boolean isAnyUser = (request.username().equals("anyuser") &&
-                            request.password().equals("anypassword"));
+        LoginAuth loginAuth = loginAuthService.findAnyLoginWithTransactions(username, password);
 
-        if (!isAnyUser) {
-            LOGGER.warn(LogMarkers.LOG, "AUTH_ANY_LOGIN_UNAUTHORIZED | requestedUser={}", request.username());
-            AuditLogger.log(
-                "AUTH_ANY_LOGIN [UNAUTHORIZED]",
-                auditCtx.toBuilder().info("requestedUser=" + request.username()).build()
-            );
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        LoginAuth loginAuth = LoginAuth.builder()
-            .login("anyuser")
-            .accessKey("anypassword")
-            .build();
-
-        AuditLogger.log(
-            "AUTH_ANY_LOGIN [SUCCESS]",
-            auditCtx.toBuilder().info("generatedUser=" + loginAuth.getLogin()).build()
+        LoginRequest dataRet = new LoginRequest(loginAuth.getLogin(), 
+            GlobalHelper.generateKeyToLoginAuth(loginAuth.getWalletId())
         );
 
-        return ResponseEntity.ok(loginAuth);
+        LOGGER.info(LogMarkers.LOG, "AUTH_LOGIN_ANY_WITH_TRANSACTION | username={}",
+            dataRet.username()
+        );
+
+        return ResponseEntity.ok(dataRet);
     }
 
 }
