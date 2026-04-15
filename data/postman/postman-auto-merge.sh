@@ -22,7 +22,7 @@ if ! command -v npx &> /dev/null || ! command -v node &> /dev/null; then
   exit 1
 fi
 
-OPENAPI_URL="${OPENAPI_URL:-http://localhost:8080/wallet-service-api/v3/api-docs}"
+OPENAPI_URL="${OPENAPI_URL:-http://localhost:8081/wallet-service-api/v3/api-docs}"
 
 echo "⬇️  Baixando OpenAPI spec de: $OPENAPI_URL"
 if command -v curl &> /dev/null; then

@@ -50,7 +50,7 @@ import lombok.experimental.SuperBuilder;
         @JsonSubTypes.Type(value = TransferMoneyReceived.class, name = "TRANSFER_RECEIVED")
 })
 @JsonPropertyOrder({
-    "transactionId", "operationType", "walletId", "login", "previousBalance", "amount", "currentBalance", "statusTransaction", "movementId", "createdAt"
+    "transactionId", "operationType", "walletId", "loginId", "previousBalance", "amount", "currentBalance", "statusTransaction", "movementId", "createdAt"
 })
 @Entity
 @Table(name = "tb_transaction")
@@ -66,8 +66,8 @@ public abstract class Transaction {
     @Column(name = "transaction_id", nullable = false, unique = true)
     private Long transactionId;
 
-    @Column(name = "login", nullable = false, length = 25)
-    private String login;
+    @Column(name = "loginId", nullable = false, length = 25)
+    private Long loginAuthId;
 
     @NotNull(message = "Wallet ID cannot be null")
     @Column(name = "wallet_id", nullable = false)

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.ThreadContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -105,6 +106,29 @@ public class GlobalExceptionHandler {
                     request
             ));
     }
+
+
+    // =====================================================
+    // 400 - REGRA DE NEGÓCIO
+    // =====================================================
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
+
+        // Você pode extrair uma mensagem mais amigável ou usar uma fixa
+        String detail = "JSON mal formatado ou com tipos inválidos";
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(buildError(
+                        HttpStatus.BAD_REQUEST,
+                        ErrorCode.BAD_REQUEST,
+                        ex.getMessage(),
+                        request
+                ));
+
+    }
+
+
 
     // =====================================================
     // 400 - REGRA DE NEGÓCIO
@@ -206,14 +230,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex,
                                                        HttpServletRequest request) {
 
-        LOGGER.error("Unexpected internal error", ex);
+        String messageEx = ex.getMessage().substring(0, Math.min(ex.getMessage().length(), 50));
+
+        LOGGER.error("Unexpected internal error", messageEx);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(buildError(
                         HttpStatus.INTERNAL_SERVER_ERROR,
                         ErrorCode.INTERNAL_ERROR,
-                        "Unexpected internal error.",
+                        messageEx,
                         request
                 ));
     }

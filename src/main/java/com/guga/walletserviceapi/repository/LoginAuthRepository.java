@@ -1,6 +1,5 @@
 package com.guga.walletserviceapi.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,11 +25,14 @@ public interface LoginAuthRepository extends JpaRepository<LoginAuth, Long> {
           OR
           EXISTS (SELECT 1 FROM tb_transaction t WHERE t.wallet_id = au.wallet_id_fk)
           )
-          ORDER BY ORDER_ID
-          LIMIT 100
+          ORDER BY RANDOM()
+          LIMIT 1
           """, nativeQuery = true)
-  Optional<List<LoginAuth>> findAnyLogin();
+  Optional<LoginAuth> findAnyLoginWithTransactions();
             
   Optional<LoginAuth> findByLogin(String login);
+
+  @Query(value = "SELECT * FROM tb_login_auth ORDER BY RANDOM() LIMIT 1;", nativeQuery = true)
+  LoginAuth findAnyLoginOrderRandom();
   
 }

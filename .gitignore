@@ -55,6 +55,7 @@ data/h2/
 Thumbs.db
 
 #artefatos do projeto
+data/k8s-persistence
 data/scripts/backup
 data/postman/postman_wallet_download.json
 data/postman/postman_merged_final__v*.json
@@ -62,3 +63,4 @@ data/postman/reports/
 data/postman/newman/
 grafana/data/grafana.db
 data/postgres/backup/
+storage/

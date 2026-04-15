@@ -33,7 +33,8 @@ spec:
     spec:
       containers:
       - name: wallet-api
-        image: wallet-service-api:1.0.9
+        image: wallet-service-api:latest
+        #image: REPLACED_BY_SCRIPT        
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

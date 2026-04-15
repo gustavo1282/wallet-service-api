@@ -13,8 +13,10 @@ CONTAINER_NAME="${CONTAINER_NAME:-cont-wallet-grafana}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-BACKUP_DIR_DB="$PROJECT_ROOT/grafana/backup"
-BACKUP_DIR_JSON="$PROJECT_ROOT/grafana/backup/json"
+#BACKUP_DIR_DB="$PROJECT_ROOT/grafana/backup"
+#BACKUP_DIR_JSON="$PROJECT_ROOT/grafana/backup/json"
+BACKUP_DIR_DB="../../storage/grafana"
+BACKUP_DIR_JSON=="../../storage/grafana/json"
 
 GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
 GRAFANA_USER="${GRAFANA_USER:-admin}"

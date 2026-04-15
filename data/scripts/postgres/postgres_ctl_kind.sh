@@ -19,7 +19,9 @@ POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-wallet_pass}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-BACKUP_DIR="${BACKUP_DIR:-$PROJECT_ROOT/data/postgres/backup}"
+BACKUP_DIR="../../storage/postgres"
+#BACKUP_DIR="${BACKUP_DIR:-$PROJECT_ROOT/data/postgres/backup}"
+#BACKUP_DIR="${BACKUP_DIR:-$PROJECT_ROOT/data/postgres/backup}"
 
 TIMESTAMP="$(date +"%Y%m%d_%H%M%S")"
 
@@ -39,6 +41,23 @@ get_postgres_pod() {
 wait_postgres_ready() {
   kubectl rollout status statefulset/"$POSTGRES_STATEFULSET" -n "$NAMESPACE" --timeout=180s >/dev/null
   kubectl wait --for=condition=Ready pod -l app="$POSTGRES_STATEFULSET" -n "$NAMESPACE" --timeout=180s >/dev/null
+}
+
+ensure_extensions() {
+  require_cmd kubectl
+  wait_postgres_ready
+
+  local pod
+  pod="$(get_postgres_pod)"
+  [ -n "$pod" ] || die "Pod do Postgres nao encontrado (label app=$POSTGRES_STATEFULSET)"
+
+  log "Garantindo extensao pg_stat_statements no banco '$POSTGRES_DB' (idempotente)"
+  kubectl exec -n "$NAMESPACE" "$pod" -c "$POSTGRES_CONTAINER_NAME" -- \
+    env PGPASSWORD="$POSTGRES_PASSWORD" \
+    psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c \
+    "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
+
+  log "[OK] Extensoes garantidas"
 }
 
 pick_latest_backup() {
@@ -133,8 +152,9 @@ menu() {
   echo "1) Backup"
   echo "2) Restore (latest)"
   echo "3) Restore (choose file)"
-  echo "4) Status"
-  echo "5) Exit"
+  echo "4) Ensure Extensions (pg_stat_statements)"
+  echo "5) Status"
+  echo "6) Exit"
   echo
   read -r -p "Choose: " choice
   case "$choice" in
@@ -146,8 +166,9 @@ menu() {
       read -r -p "Path to .sql.gz file: " p
       restore_db "$p"
       ;;
-    4) status ;;
-    5) exit 0 ;;
+    4) ensure_extensions ;;
+    5) status ;;
+    6) exit 0 ;;
     *) echo "Invalid option" ;;
   esac
 }
@@ -156,7 +177,8 @@ cmd="${1:-menu}"
 case "$cmd" in
   backup) backup_db ;;
   restore) restore_db "${2:-}" ;;
+  ensure-extensions) ensure_extensions ;;
   status) status ;;
   menu) while true; do menu; done ;;
-  *) echo "Usage: $0 [backup|restore [file]|status|menu]"; exit 2 ;;
+  *) echo "Usage: $0 [backup|restore [file]|ensure-extensions|status|menu]"; exit 2 ;;
 esac

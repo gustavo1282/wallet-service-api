@@ -7,8 +7,8 @@ nodes:
     hostPort: 8080   # Wallet API
   - containerPort: 30002
     hostPort: 3000   # Grafana
-  - containerPort: 30003
-    hostPort: 8200   # Vault
+  #- containerPort: 30003
+  #  hostPort: 8200   # Vault
   - containerPort: 30004
     hostPort: 16686  # Jaeger UI
   - containerPort: 30005

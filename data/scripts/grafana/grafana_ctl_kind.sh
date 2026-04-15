@@ -16,8 +16,10 @@ GRAFANA_CONTAINER_NAME="${GRAFANA_CONTAINER_NAME:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-BACKUP_DIR_DB="${BACKUP_DIR_DB:-$PROJECT_ROOT/grafana/backup}"
-BACKUP_DIR_JSON="${BACKUP_DIR_JSON:-$PROJECT_ROOT/grafana/backup/json}"
+#BACKUP_DIR_DB="${BACKUP_DIR_DB:-$PROJECT_ROOT/grafana/backup}"
+#BACKUP_DIR_JSON="${BACKUP_DIR_JSON:-$PROJECT_ROOT/grafana/backup/json}"
+BACKUP_DIR_DB="../../storage/grafana"
+BACKUP_DIR_JSON="../../storage/grafana/json"
 
 GRAFANA_USER="${GRAFANA_USER:-admin}"
 GRAFANA_PASS="${GRAFANA_PASS:-admin123}"
@@ -128,6 +130,7 @@ export_dashboards_json() {
 
   local uid
   while IFS= read -r uid; do
+    uid="${uid//$'\r'/}"
     [[ -z "$uid" || "$uid" == "null" ]] && continue
     log " - Exportando UID: $uid"
     curl -sS -m 15 -u "$GRAFANA_USER:$GRAFANA_PASS" \

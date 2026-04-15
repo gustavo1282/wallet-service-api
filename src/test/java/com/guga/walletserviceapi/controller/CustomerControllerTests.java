@@ -27,7 +27,6 @@ import com.guga.walletserviceapi.exception.ResourceBadRequestException;
 import com.guga.walletserviceapi.exception.ResourceNotFoundException;
 import com.guga.walletserviceapi.helpers.FileUtils;
 import com.guga.walletserviceapi.helpers.RandomMock;
-import com.guga.walletserviceapi.helpers.TransactionUtilsMock;
 import com.guga.walletserviceapi.model.Customer;
 import com.guga.walletserviceapi.model.LoginAuth;
 import com.guga.walletserviceapi.model.ParamApp;
@@ -57,7 +56,7 @@ class CustomerControllerTests extends BaseControllerTest {
         void createCustomer_created() throws Exception {
             // Arrange
             setupMockAuth(List.of(LoginRole.ADMIN));
-            Customer newCustomer = TransactionUtilsMock.createCustomerMock(nextCustomerId());
+            Customer newCustomer = transactionUtilsMock.createCustomerMock(nextCustomerId());
             when(customerService.saveCustomer(any(Customer.class))).thenReturn(newCustomer);
             customers.add(newCustomer);
 
@@ -82,7 +81,7 @@ class CustomerControllerTests extends BaseControllerTest {
         @DisplayName("Deve retornar os dados do próprio customer autenticado")
         void getMyCustomer_ok() throws Exception {
             // Arrange
-            LoginAuth loginAuthMock = setupMockAuth(List.of(LoginRole.ADMIN, LoginRole.USER));
+            LoginAuth loginAuthMock = setupMockAuth(List.of(LoginRole.USER));
             Customer mockCustomer = getCustomerById(loginAuthMock.getCustomerId());
             when(customerService.getCustomerById(mockCustomer.getCustomerId())).thenReturn(mockCustomer);
 
@@ -100,7 +99,7 @@ class CustomerControllerTests extends BaseControllerTest {
             LoginAuth auth = setupMockAuth(List.of(LoginRole.USER));
             Customer mockCustomer = getCustomerById(auth.getCustomerId());
             Customer updatedCustomer = mockCustomer.toBuilder()
-                    .status(TransactionUtilsMock.defineStatus())
+                    .status(transactionUtilsMock.defineStatus())
                     .phoneNumber(RandomMock.generatePhoneNumberAleatory())
                     .updatedAt(LocalDateTime.now())
                     .build();
@@ -172,7 +171,7 @@ class CustomerControllerTests extends BaseControllerTest {
             LoginAuth auth = setupMockAuth(List.of(LoginRole.ADMIN));
             Customer mockCustomer = getCustomerById(auth.getCustomerId());
             Customer updatedCustomer = mockCustomer.toBuilder()
-                .status(TransactionUtilsMock.defineStatus())
+                .status(transactionUtilsMock.defineStatus())
                 .phoneNumber(RandomMock.generatePhoneNumberAleatory())
                 .updatedAt(LocalDateTime.now())
                 .build();

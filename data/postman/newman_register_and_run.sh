@@ -14,7 +14,7 @@ CONCURRENCY="${CONCURRENCY:-5}"
 RUNS="${RUNS:-20}"
 RAMP_UP_SEC="${RAMP_UP_SEC:-5}"
 
-_users=('{"username":"wallet_user","password":"wallet_pass"}')
+_users=('{"username":"anyuser","password":"anypassword"}')
 
 calc_delay() {
   if [ "$CONCURRENCY" -le 1 ]; then echo 0
@@ -23,9 +23,9 @@ calc_delay() {
 }
 
 login_user() {
-  curl -sS -X POST "$BASE_URL/auth/login" \
-    -H "Content-Type: application/json" \
-    -d "{\"username\":\"$1\",\"password\":\"$2\"}"
+  curl -s -X POST "$BASE_URL/auth/test/anylogin" \
+    -H "X-Auth-User: anyuser" \
+    -H "X-Auth-Pass: anypassword"
 }
 
 worker() {
@@ -40,17 +40,20 @@ worker() {
   log "Worker $wid login ($username)"
 
   resp="$(login_user "$username" "$password")"
-  token="$(echo "$resp" | jq -r .accessToken 2>/dev/null || echo "")"
+  
+  log "Retornado $resp"
+  
+  #token="$(echo "$resp" | jq -r .accessToken 2>/dev/null || echo "")"
 
-  if [ -z "$token" ] || [ "$token" = "null" ]; then
-    warn "Worker $wid login failed"
-    return
-  fi
+  #if [ -z "$token" ] || [ "$token" = "null" ]; then
+  #  warn "Worker $wid login failed"
+  #  return
+  #fi
 
   RUN_ID="$RUN_ID" \
   RUNS="$RUNS" \
   WORKER_ID="$wid" \
-  ACCESS_TOKEN="$token" \
+  #ACCESS_TOKEN="$token" \
   bash "$BASE_SCRIPT"
 }
 

@@ -18,8 +18,9 @@ MANAGEMENT_OTLP_ENDPOINT: http://localhost:4317
 
 app:
   api-prefix: ${API_PREFIX}
+  test.anyauthlogin.enabled: true
   seeder:
-    enabled: true # Mude para true para executar a carga na inicialização
+    enabled: false # Mude para true para executar a carga na inicialização
 
 server:
   address: 0.0.0.0
@@ -57,8 +58,8 @@ spring:
     hibernate:
       ddl-auto: none
     generate-ddl: true
-    show-sql: true
-    open-in-view: true
+    show-sql: false
+    open-in-view: false
     properties:
       hibernate:
         default_schema: public
@@ -69,6 +70,9 @@ spring:
         "[order_inserts]": true
         "[order_updates]": true
         jdbc.batch_versioned_data: true
+        format_sql: false
+        type: 
+          descriptor.sql.BasicBinder: WARN 
   otlp:
     logs:
       enabled: true # Força o auto-appender
@@ -175,9 +179,9 @@ management:
 logging:
   # Mantive seus redirecionamentos de saída
   stderr:
-    level: DEBUG
+    level: INFO
   stdout:
-    level: DEBUG
+    level: INFO
   file:
     name: logs/${APP_NAME:wallet-service-api}-${PROFILE}.log
   exception-conversion-word: "%wEx{5}"  
@@ -209,7 +213,11 @@ logging:
     # --- Infraestrutura e Testes ---
     org.springframework.test: INFO
     org.springframework.core.env: INFO
+
     org.hibernate: INFO
+    org.hibernate.SQL: WARN   # Esconde os comandos SQL (SELECT, INSERT, etc)
+    org.hibernate.orm.results: WARN # Esconde resultados de queries
+    org.hibernate.type.descriptor.sql: WARN # Esconde os valores dos parâmetros (?)
 
     # --- Cloud, Vault e OTel (Corrigidos para o nível certo) ---
     org.springframework.vault.core.env: INFO
@@ -222,3 +230,5 @@ logging:
     # --- Seu Filtro Customizado (Jwt) ---
     # com.guga.walletserviceapi.security.JwtAuthenticationFilter: ERROR
 
+    org.springframework.web.servlet.PageNotFound: ERROR
+    org.apache.catalina.core.ContainerBase.[Tomcat].[localhost]: WARN

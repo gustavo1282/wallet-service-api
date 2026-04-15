@@ -2,9 +2,9 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    environment: "env-local"
-    env: "env-local"
-    namespace: "env-local"
+    environment: "env-k8s"
+    env: "env-k8s"
+    namespace: "env-k8s"
     application: "wallet-service-api"
     app: "wallet-service-api"
     service_name: "wallet-service-api"
@@ -20,9 +20,9 @@ scrape_configs:
     static_configs:
       - targets: ["otel-collector:8889"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: env, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: env, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "wallet-service-api" }
       - { target_label: app, replacement: "wallet-service-api" }
       - { target_label: service_name, replacement: "wallet-service-api" }
@@ -31,8 +31,8 @@ scrape_configs:
     static_configs:
       - targets: ["otel-collector:8888"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "otel-collector" }
       - { target_label: service_name, replacement: "otel-collector" }
 
@@ -40,8 +40,8 @@ scrape_configs:
     static_configs:
       - targets: ["prometheus:9090"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "prometheus" }
       - { target_label: service_name, replacement: "prometheus" }
 
@@ -49,8 +49,8 @@ scrape_configs:
     static_configs:
       - targets: ["grafana:3000"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "grafana" }
 
   # --- NOVOS JOBS DE INFRA (SEGUINDO SEU PADRÃO) ---
@@ -58,8 +58,8 @@ scrape_configs:
     static_configs:
       - targets: ["loki:3100"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "loki" }
       - { target_label: service_name, replacement: "loki" }
 
@@ -67,8 +67,8 @@ scrape_configs:
     static_configs:
       - targets: ["tempo:3200"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "tempo" }
       - { target_label: service_name, replacement: "tempo" }
 
@@ -79,16 +79,16 @@ scrape_configs:
     static_configs:
       - targets: ["vault:8200"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "vault" }
 
   - job_name: "jaeger"
     static_configs:
       - targets: ["jaeger:14269"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "jaeger" }
 
   - job_name: "wallet-service-direct"
@@ -96,12 +96,12 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:8080"]
     relabel_configs:
-      - { target_label: environment, replacement: "env-local" }
-      - { target_label: env, replacement: "env-local" }
-      - { target_label: deployment_environment, replacement: "env-local" }
+      - { target_label: environment, replacement: "env-k8s" }
+      - { target_label: env, replacement: "env-k8s" }
+      - { target_label: deployment_environment, replacement: "env-k8s" }
       - { target_label: service_version, replacement: "local" }
       - { target_label: host_name, replacement: "wallet-api-local-ide" }
-      - { target_label: namespace, replacement: "env-local" }
+      - { target_label: namespace, replacement: "env-k8s" }
       - { target_label: application, replacement: "wallet-service-api" }
       - { target_label: app, replacement: "wallet-service-api" }
       - { target_label: service_name, replacement: "wallet-service-api" }

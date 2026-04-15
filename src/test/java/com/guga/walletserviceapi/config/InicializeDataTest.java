@@ -36,12 +36,13 @@ import com.guga.walletserviceapi.service.common.DataPersistenceService;
     org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class,
     com.guga.walletserviceapi.config.ConfigProperties.class,
     com.guga.walletserviceapi.config.PasswordConfig.class, // Fornece o Bean real de PasswordEncoder
-    com.guga.walletserviceapi.service.common.DataPersistenceService.class
+    com.guga.walletserviceapi.service.common.DataPersistenceService.class,
+    com.guga.walletserviceapi.helpers.TransactionUtilsMock.class
 })
 @TestPropertySource(properties = {
     "management.otlp.logging.enabled=false",
     "management.observations.enabled=false",
-    "MANAGEMENT_OTLP_ENDPOINT=http://localhost" 
+    "MANAGEMENT_OTLP_ENDPOINT=http://localhost"
 })
 class InicializeDataTest {
 
@@ -64,6 +65,9 @@ class InicializeDataTest {
     @Value("${app.seeder.enabled:false}") 
     protected boolean seederEnabled; 
 
+    @Autowired
+    protected TransactionUtilsMock transactionUtilsMock;
+
     @Test
     void contextLoads() {
         LOGGER.info(LogMarkers.LOG, "\n" + "=".repeat(10));
@@ -76,15 +80,15 @@ class InicializeDataTest {
 
     private void executeSeedOnly() {
         if (CREATE_JSON_MOCKS) {
-            List<ParamApp> paramsApp = TransactionUtilsMock.createParamsAppMock();
-            List<Customer> customers = TransactionUtilsMock.createCustomerListMock();
-            List<Wallet> wallets = TransactionUtilsMock.createWalletListMock(customers);
-            List<LoginAuth> loginAuths = TransactionUtilsMock.createLoginAuthListMock(wallets);
+            List<ParamApp> paramsApp = transactionUtilsMock.createParamsAppMock();
+            List<Customer> customers = transactionUtilsMock.createCustomerListMock();
+            List<Wallet> wallets = transactionUtilsMock.createWalletListMock(customers);
+            List<LoginAuth> loginAuths = transactionUtilsMock.createLoginAuthListMock(wallets);
             
             // Aplica criptografia REAL antes de exportar e persistir
             encriptAccessKeyLoginAuthListMock(loginAuths);
 
-            TransactionMockResult trnMockResult = TransactionUtilsMock.createTransactionListMock(wallets);
+            TransactionMockResult trnMockResult = transactionUtilsMock.createTransactionListMock(wallets, loginAuths);
 
             dtPersistenceService.exportToJson(paramsApp, FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_PARAMS_APP);
             dtPersistenceService.exportToJson(customers, FileUtils.SEED_FOLDER_DEFAULT + FileUtils.JSON_FILE_CUSTOMER);
@@ -113,8 +117,8 @@ class InicializeDataTest {
         LOGGER.info(LogMarkers.LOG, "Iniciando processo de Seed no banco de dados...");
         SeedOrderConfig config = new SeedOrderConfig();
         SeedExecutor executor = new SeedExecutor(context);
-        SeedRunner runner = new SeedRunner(executor, config, seederEnabled);
+        SeedRunner runner = new SeedRunner(executor, config);
         runner.runSeed();
-        LOGGER.info(LogMarkers.LOG, "Seed executado com sucesso.");
+        LOGGER.info(LogMarkers.LOG, "Processo Seed finalizado.");
     }
 }

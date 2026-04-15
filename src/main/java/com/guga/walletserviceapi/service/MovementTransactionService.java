@@ -1,4 +1,4 @@
-﻿package com.guga.walletserviceapi.service;
+package com.guga.walletserviceapi.service;
 
 import java.util.List;
 

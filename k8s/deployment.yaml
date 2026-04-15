@@ -44,12 +44,14 @@ spec:
           value: "wallet_user"
         - name: WALLET_PASS
           value: "wallet_pass"
-        - name: VAULT_TOKEN
-          value: "root"
-        - name: VAULT_ADDR
-          value: "http://vault:8200"
-        - name: VAULT_SECRET_PATH
-          value: "secret/wallet-service-api/k8s"
+        #- name: VAULT_TOKEN
+        #  value: "root"
+        - name: "SPRING_CLOUD_VAULT_ENABLED"
+          value: "false"
+        #- name: VAULT_ADDR
+        #  value: "http://vault:8200"
+        #- name: VAULT_SECRET_PATH
+        #  value: "secret/wallet-service-api/k8s"
         - name: JWT_SECRET
           value: "mock.jwt.secret.docker.k8s.value_8235hu23523h523h57823h58723h823"
         - name: MANAGEMENT_OTLP_ENDPOINT

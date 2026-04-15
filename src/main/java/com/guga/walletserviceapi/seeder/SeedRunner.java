@@ -12,18 +12,16 @@ import com.guga.walletserviceapi.logging.LogMarkers;
 public class SeedRunner implements CommandLineRunner {
     private static final Logger LOGGER = LogManager.getLogger(SeedRunner.class);
 
-    private final SeedExecutor executor;
-    private final SeedOrderConfig config;
-    private final boolean seederEnabled;
+    private SeedExecutor executor;
+    private SeedOrderConfig config;
+
+    @Value("${app.seeder.enabled:false}")
+    private boolean seederEnabled;
 
     // O construtor é atualizado para injetar a nova propriedade do application.yml
-    public SeedRunner(
-            SeedExecutor executor,
-            SeedOrderConfig config,
-            @Value("${app.seeder.enabled:false}") boolean seederEnabled) {
+    public SeedRunner(SeedExecutor executor, SeedOrderConfig config) {
         this.executor = executor;
         this.config = config;
-        this.seederEnabled = seederEnabled;
     }
 
     @Override
